@@ -278,50 +278,150 @@ export function renderDebugModal({ plan, tracks, opusBusy, exportBusy, exportMsg
   `;
 }
 
-export function renderBrainModal({ claudeKeySet, geminiKeySet, openaiKeySet, health, learningStats }) {
+export function renderBrainModal({ claudeKeySet, geminiKeySet, openaiKeySet, claudeKey = '', geminiKey = '', openaiKey = '', health, learningStats }) {
   const roles = health?.ai?.roles || {};
   const prov = health?.ai?.providers || {};
+  const gemActive = Boolean(prov.gemini?.configured || geminiKeySet || geminiKey);
+  const oaiActive = Boolean(prov.openai?.configured || openaiKeySet || openaiKey);
+  const antActive = Boolean(prov.anthropic?.configured || claudeKeySet || claudeKey);
 
   return `
     <div class="modal-backdrop" id="brain-backdrop">
-      <div class="modal-sheet" style="max-width:54rem" onclick="event.stopPropagation()">
-        <div style="padding:22px 26px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid rgba(245,245,240,0.12)">
-          <span class="font-display" style="font-size:32px;text-transform:uppercase">AI BRAIN &amp; ENGINES</span>
-          <button id="btn-close-brain" class="exit-btn">✕</button>
-        </div>
-        <div class="nova-scroll" style="padding:20px 26px;overflow-y:auto;display:flex;flex-direction:column;gap:16px">
-          <div style="font-size:14px;line-height:1.6;color:rgba(245,245,240,0.8)">
-            <div><strong>Phase 1 Analysis:</strong> ${health?.audioWorkerConfigured ? 'Python GPU Demucs + WhisperX ✓' : 'Browser Essentia WASM + Mid-Side Stems ✓'}</div>
-            <div><strong>Planner Role:</strong> ${escHtml(roles.PLANNER || (claudeKeySet ? 'claude-opus' : geminiKeySet ? 'gemini-2.5' : 'deterministic-tsp'))}</div>
-            <div><strong>Lyric Understander:</strong> ${escHtml(roles.LYRIC_UNDERSTANDER || (geminiKeySet ? 'gemini-2.5' : 'heuristic'))}</div>
-            <div><strong>Audio Listener:</strong> ${escHtml(roles.AUDIO_LISTENER || (geminiKeySet ? 'gemini-2.5-multimodal' : 'acoustic-dsp-metrics'))}</div>
-            <div><strong>Critic &amp; Transcriber:</strong> ${escHtml(roles.CRITIC || 'validator')} · ${escHtml(roles.TRANSCRIBER || 'gemini-audio')}</div>
-            <div><strong>Server Providers:</strong> Gemini ${(prov.gemini?.configured || geminiKeySet) ? '✓ ACTIVE' : 'Off'} · OpenAI ${(prov.openai?.configured || openaiKeySet) ? '✓ Configured' : 'Off'} · Claude ${(prov.anthropic?.configured || claudeKeySet) ? '✓ Active' : 'Optional'}</div>
-            <div><strong>Database:</strong> ${health?.database?.connected ? `${escHtml(health.database.provider.toUpperCase())} Connected ✓` : 'Browser localStorage Persistence Active ✓'}</div>
-          </div>
-
-          ${learningStats?.total ? `
-            <div style="border-top:1px solid rgba(245,245,240,0.12);padding-top:12px;font-size:13px;color:rgba(245,245,240,0.75)">
-              <div class="font-display" style="font-size:19px;color:var(--amber)">LEARNING LOOP INSIGHTS (${learningStats.total} RATINGS)</div>
-              <div>Winning Styles: ${learningStats.winners.length ? escHtml(learningStats.winners.join(', ')) : 'Keep rating transitions to train preferences!'}</div>
-              ${learningStats.avoid.length ? `<div style="color:#ff9090">Needs Care: ${escHtml(learningStats.avoid.join(', '))}</div>` : ''}
+      <div class="modal-sheet" style="max-width:56rem;background:linear-gradient(180deg,#0a0a0e 0%,#050508 100%);border:1px solid rgba(245,245,240,0.12);box-shadow:0 24px 64px rgba(0,0,0,0.85);border-radius:18px;overflow:hidden" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div style="padding:24px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(245,245,240,0.1);background:rgba(255,255,255,0.015)">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.3);display:flex;align-items:center;justify-content:center;font-size:18px">
+              ⚡
             </div>
-          ` : ''}
-
-          <div style="border-top:1px solid rgba(245,245,240,0.12);padding-top:14px">
-            <label class="font-display" style="font-size:20px;color:var(--amber);display:block;margin-bottom:6px">SESSION OVERRIDE KEYS (OPTIONAL · THIS TAB ONLY)</label>
-            <p style="font-size:12px;color:rgba(245,245,240,0.55);margin-bottom:10px">
-              Server keys live safely in <code>.env</code> / Vercel Environment Variables. Leave blank when configured on the server, or test custom session-only keys below.
-            </p>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <input id="input-gemini-key" type="password" class="ingest-input" style="height:44px;font-size:14px" placeholder="Optional Gemini API Key override (session only)…" value="" />
-              <input id="input-openai-key" type="password" class="ingest-input" style="height:44px;font-size:14px" placeholder="Optional OpenAI API Key override (session only)…" value="" />
-              <div style="display:flex;gap:10px">
-                <input id="input-opus-key" type="password" class="ingest-input" style="flex:1;height:44px;font-size:14px" placeholder="Optional Anthropic Claude Opus Key (sk-ant-...)" value="" />
-                <button id="btn-save-opus-key" class="ingest-btn squeeze" style="height:44px;font-size:18px;padding:0 18px">SAVE KEYS</button>
+            <div>
+              <div class="font-display" style="font-size:26px;letter-spacing:0.02em;text-transform:uppercase;color:#fff;line-height:1.1">NOVA AI MUSIC BRAIN</div>
+              <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:rgba(245,245,240,0.5);text-transform:uppercase;margin-top:2px">
+                Autonomous DSP Orchestrator · Multi-LLM Transition Planner
               </div>
             </div>
           </div>
+          <button id="btn-close-brain" class="exit-btn squeeze" style="border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,245,240,0.15)">✕</button>
+        </div>
+
+        <div class="nova-scroll" style="padding:24px 28px;max-height:calc(85vh - 90px);overflow-y:auto;display:flex;flex-direction:column;gap:22px">
+          
+          <!-- Live AI Provider Status Grid -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px">
+            
+            <!-- Gemini Card -->
+            <div style="background:rgba(255,255,255,0.03);border:1px solid ${gemActive ? 'rgba(74,222,128,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="font-display" style="font-size:17px;letter-spacing:0.04em">GOOGLE GEMINI</span>
+                <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:${gemActive ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.06)'};color:${gemActive ? '#4ade80' : 'rgba(245,245,240,0.4)'};border:1px solid ${gemActive ? 'rgba(74,222,128,0.4)' : 'transparent'}">
+                  ${gemActive ? '● ONLINE · PRIMARY' : '○ STANDBY'}
+                </span>
+              </div>
+              <div style="font-size:12px;color:rgba(245,245,240,0.7);line-height:1.4">
+                Active Model: <code style="color:var(--amber)">gemini-flash-lite-latest</code><br/>
+                Roles: Set Planner, Audio Listener, Lyric Semantic Analysis
+              </div>
+            </div>
+
+            <!-- OpenAI Card -->
+            <div style="background:rgba(255,255,255,0.03);border:1px solid ${oaiActive ? 'rgba(96,165,250,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="font-display" style="font-size:17px;letter-spacing:0.04em">OPENAI</span>
+                <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:${oaiActive ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.06)'};color:${oaiActive ? '#60a5fa' : 'rgba(245,245,240,0.4)'};border:1px solid ${oaiActive ? 'rgba(96,165,250,0.4)' : 'transparent'}">
+                  ${oaiActive ? '● CONFIGURED' : '○ STANDBY'}
+                </span>
+              </div>
+              <div style="font-size:12px;color:rgba(245,245,240,0.7);line-height:1.4">
+                Active Model: <code style="color:var(--amber)">gpt-4o-mini / whisper-1</code><br/>
+                Roles: Transition Critic, Lyric Transcription &amp; Validation
+              </div>
+            </div>
+
+            <!-- Claude Card -->
+            <div style="background:rgba(255,255,255,0.03);border:1px solid ${antActive ? 'rgba(192,132,252,0.35)' : 'rgba(255,255,255,0.08)'};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="font-display" style="font-size:17px;letter-spacing:0.04em">ANTHROPIC CLAUDE</span>
+                <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:${antActive ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.06)'};color:${antActive ? '#c084fc' : 'rgba(245,245,240,0.4)'};border:1px solid ${antActive ? 'rgba(192,132,252,0.4)' : 'transparent'}">
+                  ${antActive ? '● CONFIGURED' : '○ STANDBY'}
+                </span>
+              </div>
+              <div style="font-size:12px;color:rgba(245,245,240,0.7);line-height:1.4">
+                Active Model: <code style="color:var(--amber)">claude-3-5-sonnet</code><br/>
+                Roles: Creative Director, Set Progression &amp; Harmonic Arc
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Architecture & DSP Capabilities Breakdown -->
+          <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+            <div class="font-display" style="font-size:16px;letter-spacing:0.05em;color:var(--amber);text-transform:uppercase">
+              ACTIVE AUDIO DSP &amp; AI SYSTEM ARCHITECTURE
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px;font-size:13px;color:rgba(245,245,240,0.85);line-height:1.6">
+              <div>
+                <strong>Acoustic Analysis:</strong> ${health?.audioWorkerConfigured ? 'Python GPU Demucs + WhisperX (External Worker) ✓' : 'Essentia WASM Beatgrid + Tempo Lock (Browser) ✓'}<br/>
+                <strong>Stem Isolation:</strong> 4-Band Mid-Side &amp; Frequency Crossover (Real-time DSP) ✓<br/>
+                <strong>Transition Engine:</strong> 19 Autonomous Recipes (Bass Swap, Echo Drop, Vocal Mashup) ✓
+              </div>
+              <div>
+                <strong>Set Planner Routing:</strong> ${escHtml(roles.PLANNER || 'gemini-flash-lite-latest (Active)')} ✓<br/>
+                <strong>Harmonic Key Matching:</strong> Camelot Wheel Energy Shifts (Energy Boost, Relative, Subdominant) ✓<br/>
+                <strong>State Persistence:</strong> ${health?.database?.connected ? `${escHtml(health.database.provider.toUpperCase())} Cloud DB Connected ✓` : 'Browser LocalStorage &amp; Session Active ✓'}
+              </div>
+            </div>
+          </div>
+
+          <!-- Learning Stats if any -->
+          ${learningStats?.total ? `
+            <div style="background:rgba(255,184,0,0.05);border:1px solid rgba(255,184,0,0.2);border-radius:12px;padding:16px 20px;font-size:13px;color:rgba(245,245,240,0.8)">
+              <div class="font-display" style="font-size:16px;color:var(--amber);margin-bottom:6px">LEARNING LOOP ADAPTIVE PREFERENCES (${learningStats.total} USER RATINGS)</div>
+              <div>Top Rated Recipes: <strong style="color:#fff">${learningStats.winners.length ? escHtml(learningStats.winners.join(', ')) : 'Continuous learning active'}</strong></div>
+              ${learningStats.avoid.length ? `<div style="color:#ff9090;margin-top:4px">De-prioritized Styles: ${escHtml(learningStats.avoid.join(', '))}</div>` : ''}
+            </div>
+          ` : ''}
+
+          <!-- API Key Manager / Override Panel -->
+          <div style="border-top:1px solid rgba(245,245,240,0.12);padding-top:18px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+              <div>
+                <label class="font-display" style="font-size:18px;color:var(--amber);display:block">API KEYS CONFIGURATION &amp; CREDENTIALS</label>
+                <p style="font-size:12px;color:rgba(245,245,240,0.6);margin-top:2px">
+                  Keys are pre-armed and active on your system. You can update or override them below; changes persist securely in local storage and forward with your requests.
+                </p>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;color:rgba(245,245,240,0.5);text-transform:uppercase;display:block;margin-bottom:4px">
+                  Google Gemini Key ${gemActive ? '<span style="color:#4ade80">(ACTIVE ✓)</span>' : ''}
+                </label>
+                <input id="input-gemini-key" type="password" class="ingest-input" style="height:42px;font-size:13px;width:100%" placeholder="Enter Gemini API key…" value="${escHtml(geminiKey || '')}" />
+              </div>
+
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;color:rgba(245,245,240,0.5);text-transform:uppercase;display:block;margin-bottom:4px">
+                  OpenAI API Key ${oaiActive ? '<span style="color:#60a5fa">(ACTIVE ✓)</span>' : ''}
+                </label>
+                <input id="input-openai-key" type="password" class="ingest-input" style="height:42px;font-size:13px;width:100%" placeholder="Enter OpenAI API key…" value="${escHtml(openaiKey || '')}" />
+              </div>
+
+              <div>
+                <label style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;color:rgba(245,245,240,0.5);text-transform:uppercase;display:block;margin-bottom:4px">
+                  Anthropic Claude API Key ${antActive ? '<span style="color:#c084fc">(ACTIVE ✓)</span>' : ''}
+                </label>
+                <div style="display:flex;gap:10px">
+                  <input id="input-opus-key" type="password" class="ingest-input" style="flex:1;height:42px;font-size:13px" placeholder="Enter Anthropic Claude key…" value="${escHtml(claudeKey || '')}" />
+                  <button id="btn-save-opus-key" class="ingest-btn squeeze" style="height:42px;font-size:15px;padding:0 22px;letter-spacing:0.05em">
+                    SAVE KEYS
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

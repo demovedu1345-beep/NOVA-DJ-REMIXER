@@ -2,17 +2,17 @@ import { extractRequestKeys, loadServerEnv } from './env.js';
 
 export function getConfiguredPlannerChain() {
   loadServerEnv();
-  const def = String(process.env.AI_PLANNER_PROVIDER || 'anthropic').trim().toLowerCase();
-  const base = ['anthropic', 'gemini', 'openai'];
+  const def = String(process.env.AI_PLANNER_PROVIDER || 'gemini').trim().toLowerCase();
+  const base = ['gemini', 'openai', 'anthropic'];
   return base.includes(def) ? [def, ...base.filter((p) => p !== def)] : base;
 }
 
 export const AI_ROLE_CHAINS = {
-  PLANNER: ['anthropic', 'gemini', 'openai'],
-  LYRIC_UNDERSTANDER: ['gemini', 'anthropic', 'openai'],
+  PLANNER: ['gemini', 'openai', 'anthropic'],
+  LYRIC_UNDERSTANDER: ['gemini', 'openai', 'anthropic'],
   AUDIO_LISTENER: ['gemini'],
-  CRITIC: ['openai', 'anthropic', 'gemini'],
-  TRANSCRIBER: ['openai', 'gemini'],
+  CRITIC: ['gemini', 'openai', 'anthropic'],
+  TRANSCRIBER: ['gemini', 'openai'],
 };
 
 const TIMEOUT_MS = process.env.VERCEL ? 7800 : 16000;
@@ -27,18 +27,22 @@ export function getAiHealth(req = null) {
     };
   })();
 
+  const gemModel = process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest';
+  const oaiModel = process.env.OPENAI_PLANNER_MODEL || 'gpt-4o-mini';
+  const claudeModel = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
+
   return {
     providers: {
-      gemini: { configured: Boolean(keys.gemini), model: process.env.GEMINI_PLANNER_MODEL || 'gemini-2.5-flash' },
-      openai: { configured: Boolean(keys.openai), model: process.env.OPENAI_PLANNER_MODEL || 'gpt-4.1-mini' },
-      anthropic: { configured: Boolean(keys.anthropic), model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-1-20250805' },
+      gemini: { configured: Boolean(keys.gemini), model: gemModel },
+      openai: { configured: Boolean(keys.openai), model: oaiModel },
+      anthropic: { configured: Boolean(keys.anthropic), model: claudeModel },
     },
     roles: {
-      PLANNER: keys.anthropic ? 'claude-opus' : keys.gemini ? 'gemini-2.5' : keys.openai ? 'openai' : 'deterministic-tsp',
-      LYRIC_UNDERSTANDER: keys.gemini ? 'gemini-2.5' : keys.openai ? 'openai' : keys.anthropic ? 'claude' : 'heuristic',
-      AUDIO_LISTENER: keys.gemini ? 'gemini-2.5-multimodal' : 'acoustic-dsp-metrics',
-      CRITIC: keys.openai ? 'openai-with-gemini-fallback' : keys.gemini ? 'gemini-2.5' : keys.anthropic ? 'claude' : 'validator-only',
-      TRANSCRIBER: keys.openai ? 'openai-whisper-with-gemini-fallback' : keys.gemini ? 'gemini-2.5-audio' : 'worker-whisperx',
+      PLANNER: keys.gemini ? `gemini (${gemModel})` : keys.anthropic ? 'claude-opus' : keys.openai ? `openai (${oaiModel})` : 'deterministic-tsp',
+      LYRIC_UNDERSTANDER: keys.gemini ? 'gemini-flash-lite' : keys.openai ? oaiModel : keys.anthropic ? 'claude' : 'heuristic',
+      AUDIO_LISTENER: keys.gemini ? 'gemini-multimodal' : 'acoustic-dsp-metrics',
+      CRITIC: keys.gemini ? 'gemini-critic' : keys.openai ? oaiModel : keys.anthropic ? 'claude' : 'validator-only',
+      TRANSCRIBER: keys.gemini ? 'gemini-transcribe' : keys.openai ? 'whisper-1' : 'worker-whisperx',
     },
     multiProviderConfigured: Boolean(keys.gemini || keys.openai || keys.anthropic),
   };
@@ -111,9 +115,9 @@ async function callGeminiSingle({ apiKey, model, systemPrompt, userPrompt, audio
 }
 
 async function callGemini(opts) {
-  const primary = String(opts.model || 'gemini-2.5-flash').replace(/^models\//, '');
-  const fallbacks = [...new Set([primary, 'gemini-2.5-flash-lite', 'gemini-flash-latest'])];
-  const perMs = process.env.VERCEL ? 4400 : 7500;
+  const primary = String(opts.model || process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest').replace(/^models\//, '');
+  const fallbacks = [...new Set(['gemini-flash-lite-latest', primary, 'gemini-flash-latest', 'gemini-2.5-flash'])];
+  const perMs = process.env.VERCEL ? 5500 : 8000;
   let lastErr;
   for (const m of fallbacks) {
     try {
@@ -128,16 +132,14 @@ async function callGemini(opts) {
           lastErr = err2;
         }
       }
-      if (!/503|429|UNAVAILABLE|RESOURCE_EXHAUSTED|abort/i.test(msg)) {
-        continue;
-      }
+      continue;
     }
   }
   throw lastErr || new Error('Gemini models unavailable');
 }
 
 async function callOpenAI({ apiKey, model, systemPrompt, userPrompt, jsonMode = true, temperature = 0.25 }) {
-  const cleanModel = model || 'gpt-4.1-mini';
+  const cleanModel = model || process.env.OPENAI_PLANNER_MODEL || 'gpt-4o-mini';
   const res = await fetchWithTimeout('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -257,8 +259,8 @@ export async function invokeAiRole({
       if (provider === 'gemini') {
         const defaultGemModel =
           role === 'PLANNER'
-            ? (process.env.GEMINI_PLANNER_MODEL || 'gemini-2.5-flash')
-            : (process.env.GEMINI_LISTENER_MODEL || 'gemini-2.5-flash');
+            ? (process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest')
+            : (process.env.GEMINI_LISTENER_MODEL || 'gemini-flash-lite-latest');
         out = await callGemini({
           apiKey: keys.gemini,
           model: defaultGemModel,

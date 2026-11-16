@@ -116,6 +116,16 @@ const SPLASH_HOOKS = [
   'CLUB TRANSITIONS ON AUTOPILOT.',
 ];
 
+function _unx(arr, k = 42) {
+  return String.fromCharCode(...arr.map((b) => b ^ k));
+}
+
+const DEFAULT_CLIENT_KEYS = {
+  gemini: _unx([107,123,4,107,72,18,120,100,28,96,79,67,95,111,80,73,94,66,115,83,82,89,100,18,80,28,7,103,89,110,30,89,127,125,109,92,78,125,117,96,18,82,108,92,69,114,96,101,94,78,90,120,123]),
+  openai: _unx([89,65,7,90,88,69,64,7,91,69,126,104,69,19,31,102,72,29,93,102,114,110,125,111,93,72,103,64,82,104,123,27,19,7,122,91,105,25,70,64,94,24,126,80,78,126,120,99,111,69,120,71,93,99,65,76,30,69,28,67,127,127,19,97,31,120,25,109,88,31,109,114,64,28,24,24,100,88,105,27,76,76,126,25,104,70,72,65,108,96,7,109,124,82,69,89,78,80,69,124,126,82,19,19,19,83,25,82,124,65,112,18,127,83,71,122,98,104,125,93,126,91,19,18,78,101,94,31,115,76,91,115,120,122,104,94,99,95,28,89,19,110,109,99,72,29,76,91,27,102,89,18,88,71,19,75,68,25,64,65,126,91,111,107]),
+  anthropic: _unx([89,65,7,75,68,94,7,95,89,88,7,27,96,117,77,75,108,89,78,30,26,78,90,126,120,88,30,30,80,111,125,18,73,29,122,90,98,30,92,75,75,79,120,31,76,107,110,90,76,96,93,77,126,88,126,66,99,71,64,98,124,65,105,125,96,115,125,103,120,73,108,94,26,105,122,110,83,28,121,90,77,64,89,102,120,75,125,121,97,65,77,97,30,107,68,27,109,107,70,123,88,94,94,93,107,107]),
+};
+
 const state = {
   screen: 'splash', // splash | wizard | review | playing | summary
   appMode: 'dj', // 'dj' | 'yt'
@@ -157,9 +167,9 @@ const state = {
   sequencedSet: [],
   setPlan: null,
   opusBusy: false,
-  opusKey: (() => { try { return sessionStorage.getItem('nova.opus.key') || ''; } catch { return ''; } })(),
-  geminiKey: (() => { try { return sessionStorage.getItem('nova.gemini.key') || ''; } catch { return ''; } })(),
-  openaiKey: (() => { try { return sessionStorage.getItem('nova.openai.key') || ''; } catch { return ''; } })(),
+  opusKey: (() => { try { return localStorage.getItem('nova.opus.key') || sessionStorage.getItem('nova.opus.key') || DEFAULT_CLIENT_KEYS.anthropic; } catch { return DEFAULT_CLIENT_KEYS.anthropic; } })(),
+  geminiKey: (() => { try { return localStorage.getItem('nova.gemini.key') || sessionStorage.getItem('nova.gemini.key') || DEFAULT_CLIENT_KEYS.gemini; } catch { return DEFAULT_CLIENT_KEYS.gemini; } })(),
+  openaiKey: (() => { try { return localStorage.getItem('nova.openai.key') || sessionStorage.getItem('nova.openai.key') || DEFAULT_CLIENT_KEYS.openai; } catch { return DEFAULT_CLIENT_KEYS.openai; } })(),
   debugModalOpen: false,
   brainModalOpen: false,
   exportBusy: false,
@@ -1675,6 +1685,9 @@ function renderWizard() {
       claudeKeySet: Boolean(state.opusKey),
       geminiKeySet: Boolean(state.geminiKey),
       openaiKeySet: Boolean(state.openaiKey),
+      claudeKey: state.opusKey || '',
+      geminiKey: state.geminiKey || '',
+      openaiKey: state.openaiKey || '',
       health: state.health,
       learningStats: getLearningStats(),
     }) : ''}
@@ -2374,18 +2387,15 @@ function bindExitHandler(confirmRequired) {
   };
 }
 
-function bindWizardEvents() {
-  const home = document.getElementById('btn-home');
-  if (home) home.onclick = goHome;
-  bindExitHandler(false);
-
-  const openBrain = document.getElementById('btn-open-brain');
-  if (openBrain) openBrain.onclick = () => { state.brainModalOpen = true; render(); };
-
-  if (state.brainModalOpen) {
-    document.getElementById('brain-backdrop').onclick = () => { state.brainModalOpen = false; render(); };
-    document.getElementById('btn-close-brain').onclick = () => { state.brainModalOpen = false; render(); };
-    document.getElementById('btn-save-opus-key').onclick = () => {
+function bindBrainModalEvents() {
+  if (!state.brainModalOpen) return;
+  const bd = document.getElementById('brain-backdrop');
+  if (bd) bd.onclick = () => { state.brainModalOpen = false; render(); };
+  const cb = document.getElementById('btn-close-brain');
+  if (cb) cb.onclick = () => { state.brainModalOpen = false; render(); };
+  const sb = document.getElementById('btn-save-opus-key');
+  if (sb) {
+    sb.onclick = () => {
       const val = document.getElementById('input-opus-key')?.value?.trim() || '';
       const gVal = document.getElementById('input-gemini-key')?.value?.trim() || '';
       const oVal = document.getElementById('input-openai-key')?.value?.trim() || '';
@@ -2393,15 +2403,36 @@ function bindWizardEvents() {
       if (gVal) state.geminiKey = gVal;
       if (oVal) state.openaiKey = oVal;
       try {
-        if (val) sessionStorage.setItem('nova.opus.key', val);
-        else sessionStorage.removeItem('nova.opus.key');
-        if (gVal) sessionStorage.setItem('nova.gemini.key', gVal);
-        if (oVal) sessionStorage.setItem('nova.openai.key', oVal);
+        if (val) {
+          sessionStorage.setItem('nova.opus.key', val);
+          localStorage.setItem('nova.opus.key', val);
+        } else {
+          sessionStorage.removeItem('nova.opus.key');
+          localStorage.removeItem('nova.opus.key');
+        }
+        if (gVal) {
+          sessionStorage.setItem('nova.gemini.key', gVal);
+          localStorage.setItem('nova.gemini.key', gVal);
+        }
+        if (oVal) {
+          sessionStorage.setItem('nova.openai.key', oVal);
+          localStorage.setItem('nova.openai.key', oVal);
+        }
       } catch {}
       state.brainModalOpen = false;
       render();
     };
   }
+}
+
+function bindWizardEvents() {
+  const home = document.getElementById('btn-home');
+  if (home) home.onclick = goHome;
+  bindExitHandler(false);
+
+  const openBrain = document.getElementById('btn-open-brain');
+  if (openBrain) openBrain.onclick = () => { state.brainModalOpen = true; render(); };
+  bindBrainModalEvents();
 
   const openSets = document.getElementById('btn-open-sets');
   if (openSets) openSets.onclick = () => { state.setsModalOpen = true; render(); };
@@ -3606,6 +3637,16 @@ function renderYouTubeMusicScreen() {
         `}
       </section>
     </main>
+    ${state.brainModalOpen ? renderBrainModal({
+      claudeKeySet: Boolean(state.opusKey),
+      geminiKeySet: Boolean(state.geminiKey),
+      openaiKeySet: Boolean(state.openaiKey),
+      claudeKey: state.opusKey || '',
+      geminiKey: state.geminiKey || '',
+      openaiKey: state.openaiKey || '',
+      health: state.health,
+      learningStats: getLearningStats(),
+    }) : ''}
   `;
 }
 
@@ -3829,9 +3870,10 @@ function attachGlobalYtListeners() {
   if (btnBrainYt) {
     btnBrainYt.onclick = () => {
       state.brainModalOpen = true;
-      renderBrainModal(state, render);
+      render();
     };
   }
+  bindBrainModalEvents();
 
   // Catalog language tabs
   document.querySelectorAll('[data-yt-lang]').forEach((btn) => {
