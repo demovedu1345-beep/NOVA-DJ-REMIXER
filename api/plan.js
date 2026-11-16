@@ -1,3 +1,5 @@
+export const maxDuration = 30;
+
 import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import { updateTrackCue } from './_lib/db.js';
 import { extractRequestKeys } from './_lib/env.js';

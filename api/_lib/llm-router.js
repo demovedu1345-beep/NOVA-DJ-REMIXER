@@ -15,7 +15,7 @@ export const AI_ROLE_CHAINS = {
   TRANSCRIBER: ['gemini', 'openai'],
 };
 
-const TIMEOUT_MS = process.env.VERCEL ? 7800 : 16000;
+const TIMEOUT_MS = process.env.VERCEL ? 12000 : 18000;
 
 export function getAiHealth(req = null) {
   const keys = req ? extractRequestKeys(req) : (() => {
@@ -116,8 +116,13 @@ async function callGeminiSingle({ apiKey, model, systemPrompt, userPrompt, audio
 
 async function callGemini(opts) {
   const primary = String(opts.model || process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest').replace(/^models\//, '');
-  const fallbacks = [...new Set(['gemini-flash-lite-latest', primary, 'gemini-flash-latest', 'gemini-2.5-flash'])];
-  const perMs = process.env.VERCEL ? 5500 : 8000;
+  const fallbacks = [...new Set([
+    'gemini-flash-lite-latest',
+    'gemini-3.1-flash-lite',
+    'gemini-3-flash-preview',
+    primary,
+  ])].filter((m) => !/2\.5-flash$|flash-latest$|pro-latest$/.test(m));
+  const perMs = process.env.VERCEL ? 11500 : 15000;
   let lastErr;
   for (const m of fallbacks) {
     try {

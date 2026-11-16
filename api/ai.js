@@ -1,3 +1,5 @@
+export const maxDuration = 30;
+
 import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import { getAiHealth, invokeAiRole } from './_lib/llm-router.js';
 import {
