@@ -489,24 +489,68 @@ export class NovaOrchestrator {
       }
     }
 
-    // Autonomous creative DJ phrase accents (runs only on high-confidence DSP tracks)
-    if (this.autoDjFxEnabled && liveSlot.engine === 'dsp' && !this.crossfading && liveSlot.position > 16) {
+    // Continuous Autonomous Performance Layer (acts musically every 4, 8, 16 bars between transitions)
+    if (this.autoDjFxEnabled && liveSlot.engine === 'dsp' && !this.crossfading && liveSlot.position > 12) {
       const bpm = (liveSlot.track?.bpm || 120);
       const beatSec = 60 / Math.max(55, bpm);
       const barSec = beatSec * 4;
       const currentBar = Math.floor(liveSlot.position / barSec);
-      const isPhraseBoundary = (currentBar > 0) && (currentBar % 16 === 15);
-      const fillKey = `${liveSlot.track?.id}_bar${currentBar}`;
-      if (isPhraseBoundary && !this.phraseFillDoneTrackIds.has(fillKey)) {
-        const timeUntilCut = (liveSlot.cutAt || 180) - liveSlot.position;
-        if (timeUntilCut > 18) {
+      const barIn16 = currentBar % 16;
+      const barIn8 = currentBar % 8;
+      const timeUntilCut = (liveSlot.cutAt || 180) - liveSlot.position;
+
+      if (timeUntilCut > 14) {
+        const genre = (liveSlot.track?.genre || '').toLowerCase();
+        const drumStyle = /punjabi|bhangra|dhol/i.test(genre) ? 'dhol'
+          : /bollywood|desi|indian/i.test(genre) ? 'tabla'
+          : /hip hop|trap/i.test(genre) ? 'trap' : 'house';
+
+        // 1. Bar 14: Riser sweep build leading into the 16-bar section drop
+        const riserKey = `${liveSlot.track?.id}_bar${currentBar}_riser`;
+        if (barIn16 === 14 && !this.phraseFillDoneTrackIds.has(riserKey)) {
+          this.phraseFillDoneTrackIds.add(riserKey);
+          this.proMixer.triggerRiserBuild(liveId, { durationBeats: 8, addImpactOnDrop: true });
+          this.#setAgent(`[AUTONOMOUS DJ] 8-BEAT RISER BUILD INTO DROP`);
+        }
+
+        // 2. Bar 15 beat 4 / Bar 7 beat 4: Sub-cut & drop slam
+        const subCutKey = `${liveSlot.track?.id}_bar${currentBar}_subcut`;
+        if ((barIn16 === 15 || (barIn16 === 7 && this.vibe === 'bangers')) && !this.phraseFillDoneTrackIds.has(subCutKey)) {
+          this.phraseFillDoneTrackIds.add(subCutKey);
+          this.proMixer.triggerSubCutSlam(liveId, { durationBeats: 1, addImpact: true });
+          this.#setAgent(`[AUTONOMOUS DJ] SUB-CUT & DOWNBEAT SLAM`);
+        }
+
+        // 3. Bar 7: Momentary filter touch (HPF rise creating phrase tension)
+        const filterKey = `${liveSlot.track?.id}_bar${currentBar}_filter`;
+        if (barIn8 === 7 && barIn16 !== 15 && !this.phraseFillDoneTrackIds.has(filterKey)) {
+          this.phraseFillDoneTrackIds.add(filterKey);
+          this.proMixer.triggerFilterTouch(liveId, { durationBeats: 2, maxSweep: 0.54 });
+          this.#setAgent(`[AUTONOMOUS DJ] 2-BEAT FILTER TOUCH (HPF TENSION)`);
+        }
+
+        // 4. Bar 8: Vocal / lead echo throw turnaround
+        const echoKey = `${liveSlot.track?.id}_bar${currentBar}_echo`;
+        if (barIn16 === 8 && !this.phraseFillDoneTrackIds.has(echoKey)) {
+          this.phraseFillDoneTrackIds.add(echoKey);
+          this.proMixer.triggerEchoThrow(liveId, { durationBeats: 2, sendLevel: 0.68 });
+          this.#setAgent(`[AUTONOMOUS DJ] PHRASE TURNAROUND ECHO THROW`);
+        }
+
+        // 5. Bar 12: Studio drum accent or tabla/dhol rhythmic fill
+        const fillKey = `${liveSlot.track?.id}_bar${currentBar}_accent`;
+        if (barIn16 === 12 && !this.phraseFillDoneTrackIds.has(fillKey)) {
           this.phraseFillDoneTrackIds.add(fillKey);
-          const genre = (liveSlot.track?.genre || '').toLowerCase();
-          const drumStyle = /punjabi|bhangra|dhol/i.test(genre) ? 'dhol'
-            : /bollywood|desi|indian/i.test(genre) ? 'tabla'
-            : /hip hop|trap/i.test(genre) ? 'trap' : 'house';
-          this.proMixer.triggerAutonomousPhraseOverlay(liveId, drumStyle, 2);
-          this.#setAgent(`AUTONOMOUS FILL: 2-BAR ${drumStyle.toUpperCase()} ACCENT`);
+          if (drumStyle === 'tabla') {
+            this.proMixer.triggerSampleAccent(liveId, 'tabla_bayan_slide', { peakGain: 0.28 });
+            this.#setAgent(`[AUTONOMOUS DJ] TABLA BAYAN BASS SLIDE ACCENT`);
+          } else if (drumStyle === 'dhol') {
+            this.proMixer.triggerAutonomousPhraseOverlay(liveId, 'dhol', 2);
+            this.#setAgent(`[AUTONOMOUS DJ] 2-BAR DHOL CHAAL ACCENT`);
+          } else {
+            this.proMixer.triggerAutonomousPhraseOverlay(liveId, drumStyle, 2);
+            this.#setAgent(`[AUTONOMOUS DJ] 2-BAR ${drumStyle.toUpperCase()} GROOVE ACCENT`);
+          }
         }
       }
     }

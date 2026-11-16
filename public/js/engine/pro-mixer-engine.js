@@ -5,7 +5,21 @@ import {
   getCachedAnalysisByHash,
   saveCachedAnalysisByHash,
 } from './analysis-cache.js';
-import { loadDrumSamplesForContext, scheduleStudioDrumBridge } from './drum-pack.js';
+import {
+  loadDrumSamplesForContext,
+  scheduleStudioAirWhoosh,
+  scheduleStudioCrashCymbal,
+  scheduleStudioDownlifter,
+  scheduleStudioDrumBridge,
+  scheduleStudioImpact,
+  scheduleStudioOneShot,
+  scheduleStudioReverseCymbal,
+  scheduleStudioRiserSweep,
+  scheduleStudioSirenWail,
+  scheduleStudioSnareRoll,
+  scheduleStudioSubDrop,
+  scheduleStudioTablaSlide,
+} from './drum-pack.js';
 import { createStemChannelStrip } from './stems-isolator.js';
 
 const STEM_NAMES = ['vocals', 'drums', 'bass', 'other'];
@@ -1873,6 +1887,268 @@ export class ProMixerEngine {
 
     this.#schedulePercussionBridge(startAt, bpm, bars, style, 0.22);
     return { startAt, durationSec: bars * barSec, style, bars };
+  }
+
+  triggerFilterTouch(deckId, { durationBeats = 2, maxSweep = 0.58 } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx || !deck.strip) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = durationBeats * beatSec;
+    const startAt = now + 0.03;
+    const peakAt = startAt + durSec * 0.72;
+    const endAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt,
+      category: 'filter',
+      deckId,
+      label: 'FILTER TOUCH (HPF SWEEP)',
+      detail: `${durationBeats}-beat high-pass build tension snapping to beat 1`,
+      params: { durationBeats, maxSweep },
+    });
+
+    deck.strip.setColorFilter(maxSweep, startAt, durSec * 0.65);
+    deck.strip.setColorFilter(0, peakAt, 0.025);
+    return { startAt, endAt, durationBeats };
+  }
+
+  triggerSubCutSlam(deckId, { durationBeats = 1, addImpact = true } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx || !deck.strip) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = durationBeats * beatSec;
+    const startAt = now + 0.02;
+    const slamAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt: slamAt + 0.9,
+      category: 'eq',
+      deckId,
+      label: 'SUB-CUT & DROP SLAM',
+      detail: `${durationBeats}-beat sub bass cut slamming back with impact on downbeat`,
+      params: { durationBeats, addImpact },
+    });
+
+    deck.strip.setEqKill('low', true, startAt);
+    deck.strip.setEqKill('low', false, slamAt);
+
+    if (addImpact && this.drumSamples) {
+      scheduleStudioImpact(this.ctx, this.masterFilter, {
+        when: slamAt,
+        peakGain: 0.32,
+        samples: this.drumSamples,
+      });
+      scheduleStudioSubDrop(this.ctx, this.masterFilter, {
+        when: slamAt,
+        peakGain: 0.28,
+        samples: this.drumSamples,
+      });
+    }
+    return { startAt, slamAt, durationBeats };
+  }
+
+  triggerEchoThrow(deckId, { durationBeats = 2, sendLevel = 0.72 } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx || !deck.strip?.echoSend) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = durationBeats * beatSec;
+    const startAt = now + 0.02;
+    const endAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt: endAt + 2.0,
+      category: 'fx',
+      deckId,
+      label: 'TEMPO ECHO THROW',
+      detail: `${durationBeats}-beat vocal/hook catch echoing into next phrase`,
+      params: { durationBeats, sendLevel },
+    });
+
+    const g = deck.strip.echoSend.gain;
+    g.cancelScheduledValues(startAt);
+    g.setValueAtTime(0.0001, startAt);
+    g.linearRampToValueAtTime(sendLevel, startAt + 0.04);
+    g.exponentialRampToValueAtTime(0.0001, endAt + 1.8);
+    return { startAt, endAt, durationBeats };
+  }
+
+  async triggerLoopRoll(deckId, { durationBeats = 4 } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx || !deck.analysis) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = durationBeats * beatSec;
+    const startAt = now + 0.03;
+    const endAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt,
+      category: 'loop',
+      deckId,
+      label: 'QUANTIZED LOOP ROLL',
+      detail: `${durationBeats}-beat stutter build (1/2 -> 1/4 -> 1/8) snapping to drop`,
+      params: { durationBeats },
+    });
+
+    const stretches = this.#getDeckStretches(deck);
+    if (stretches.length) {
+      const pos = this.getDeckPosition(deckId);
+      const halfBeat = beatSec * 0.5;
+      const quarterBeat = beatSec * 0.25;
+
+      await Promise.all(stretches.map((st) => st.schedule({
+        output: startAt,
+        outputTime: startAt,
+        loopStart: Math.max(0, pos),
+        loopEnd: Math.max(0, pos) + halfBeat,
+      })));
+
+      await Promise.all(stretches.map((st) => st.schedule({
+        output: startAt + durSec * 0.5,
+        outputTime: startAt + durSec * 0.5,
+        loopStart: Math.max(0, pos),
+        loopEnd: Math.max(0, pos) + quarterBeat,
+      })));
+
+      await Promise.all(stretches.map((st) => st.schedule({
+        output: endAt,
+        outputTime: endAt,
+        loopStart: 0,
+        loopEnd: 0,
+      })));
+    }
+    return { startAt, endAt, durationBeats };
+  }
+
+  triggerRiserBuild(deckId, { durationBeats = 8, addImpactOnDrop = true } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = durationBeats * beatSec;
+    const startAt = now + 0.03;
+    const dropAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt: dropAt + (addImpactOnDrop ? 1.5 : 0.2),
+      category: 'riser',
+      deckId,
+      label: 'WHITE NOISE RISER BUILD',
+      detail: `${durationBeats}-beat frequency tension sweep into phrase drop`,
+      params: { durationBeats, addImpactOnDrop },
+    });
+
+    scheduleStudioRiserSweep(this.ctx, this.masterFilter, {
+      when: startAt,
+      durationSec: durSec,
+      peakGain: 0.22,
+      samples: this.drumSamples,
+    });
+
+    if (deck.strip) {
+      deck.strip.setColorFilter(0.48, startAt, durSec * 0.85);
+      deck.strip.setColorFilter(0, dropAt - 0.05, 0.03);
+    }
+
+    if (addImpactOnDrop && this.drumSamples) {
+      scheduleStudioImpact(this.ctx, this.masterFilter, {
+        when: dropAt,
+        peakGain: 0.32,
+        samples: this.drumSamples,
+      });
+      scheduleStudioDownlifter(this.ctx, this.masterFilter, {
+        when: dropAt,
+        peakGain: 0.24,
+        samples: this.drumSamples,
+      });
+    }
+    return { startAt, dropAt, durationBeats };
+  }
+
+  triggerSampleAccent(deckId, sampleName, { peakGain = 0.26 } = {}) {
+    if (!this.ctx || !this.drumSamples) return null;
+    const now = this.ctx.currentTime;
+    const startAt = now + 0.02;
+
+    const labelMap = {
+      tabla_bayan_slide: 'TABLA BAYAN BASS SLIDE',
+      siren_wail: 'CLUB SIREN HYPE ACCENT',
+      air_whoosh: 'AIR WHOOSH SWEEP',
+      reverse_cymbal: 'REVERSE CYMBAL SWELL',
+      crash_cymbal: 'CRASH CYMBAL DOWNBEAT',
+      club_impact: 'CLUB IMPACT SLAM',
+      sub_drop: 'SUB BASS DROP BOOM',
+      downlifter_fall: 'DOWNLIFTER FALL',
+    };
+    const label = labelMap[sampleName] || `SAMPLE HIT: ${String(sampleName).toUpperCase()}`;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt: startAt + 1.8,
+      category: 'fx',
+      deckId,
+      label,
+      detail: `Royalty-free studio sound accent (${sampleName})`,
+      params: { sampleName, peakGain },
+    });
+
+    scheduleStudioOneShot(this.ctx, this.masterFilter, {
+      sampleName,
+      when: startAt,
+      peakGain,
+      samples: this.drumSamples,
+    });
+    return { startAt, sampleName };
+  }
+
+  triggerSnareRollBuild(deckId, { bars = 2, peakGain = 0.24 } = {}) {
+    const deck = this.decks[deckId];
+    if (!deck?.playing || !this.ctx || !this.drumSamples) return null;
+    const now = this.ctx.currentTime;
+    const bpm = (deck.analysis?.bpm || 120) * (deck.rate || 1);
+    const beatSec = 60 / Math.max(55, bpm);
+    const durSec = bars * 4 * beatSec;
+    const startAt = now + 0.02;
+    const dropAt = startAt + durSec;
+
+    this.recordScheduledEvent({
+      startAt,
+      endAt: dropAt + 1.2,
+      category: 'drum',
+      deckId,
+      label: 'SNARE ROLL BUILD',
+      detail: `${bars}-bar escalating quantized snare roll build`,
+      params: { bars, peakGain },
+    });
+
+    scheduleStudioSnareRoll(this.ctx, this.masterFilter, {
+      when: startAt,
+      bpm,
+      bars,
+      peakGain,
+      samples: this.drumSamples,
+    });
+
+    scheduleStudioCrashCymbal(this.ctx, this.masterFilter, {
+      when: dropAt,
+      peakGain: 0.28,
+      samples: this.drumSamples,
+    });
+
+    return { startAt, dropAt, bars };
   }
 
   getSpectrumEnergy() {

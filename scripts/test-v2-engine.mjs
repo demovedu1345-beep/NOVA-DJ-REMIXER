@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import {
+  PLAYBOOK_ENTRIES,
   TRANSITION_TYPES,
   applyManualGridOverride,
   buildRecipeFromCandidate,
+  findPlaybookMatches,
+  formatPlaybookForPrompt,
   generateCreativeIdeas,
   normalizeSongAnalysis,
   planSetHeuristic,
@@ -149,5 +152,14 @@ assert.equal(validateTransitionRecipe(badLowConf, lowConfSong, songB).valid, fal
 
 const { candidates: repairedCheck } = scorePairCandidates(songA, songB, { arc: 'peak', playMode: 'club' });
 assert.ok(songA.bar_count - repairedCheck[0].mix_out_bar >= 16, `mix_out_bar ${repairedCheck[0].mix_out_bar} should leave >= 16 bars before end (bar_count=${songA.bar_count})`);
+
+// 7. Transition Playbook (24 real-DJ curated transitions & k-NN retrieval)
+assert.ok(Array.isArray(PLAYBOOK_ENTRIES) && PLAYBOOK_ENTRIES.length >= 20, 'Playbook must contain at least 20 curated entries');
+const pbMatches = findPlaybookMatches(songA, songB, { limit: 5 });
+assert.equal(pbMatches.length, 5, 'Should return top 5 playbook matches');
+assert.ok(pbMatches[0].matchScore > 0, 'Top match should have positive score');
+assert.ok(pbMatches[0].title && pbMatches[0].technique, 'Playbook match must contain title and technique');
+const promptText = formatPlaybookForPrompt(pbMatches);
+assert.ok(promptText.includes('EXAMPLE 1'), 'formatPlaybookForPrompt must output structured few-shot text');
 
 console.log('ALL V2/V3 BRAIN, CREATIVITY & STRICT VALIDATOR UNIT TESTS PASSED ✓');

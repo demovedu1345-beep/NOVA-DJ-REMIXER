@@ -6,6 +6,8 @@ import {
   GENRE_PLAYBOOKS,
   TRANSITION_TYPES,
   buildCueCard,
+  findPlaybookMatches,
+  formatPlaybookForPrompt,
   generateCreativeIdeas,
   planSetHeuristic,
   repairOrFallbackRecipe,
@@ -22,9 +24,11 @@ You receive:
    - cue_card_out: precomputed shortlist of phrase ends, section boundaries, post-vocal phrase ends & bass dropouts.
    - cue_card_in: precomputed shortlist of harmonic restarts, chorus/drop onsets, verse entries & bass onsets.
    - top_5_candidates: mix points already scored by S = 0.25*T + 0.20*K + 0.15*E + 0.15*P + 0.15*V + 0.10*G - R.
+   - playbook_matches: k-NN retrieved battle-tested real-DJ transition examples for this specific genre pair, BPM and key relation.
 4. RATINGS: optional few-shot good/bad transition feedback examples from past sets.
 
 PRINCIPLES & CREATIVITY ENGINE:
+- PLAYBOOK-INFORMED PLANNING: Ground your creative choices in the provided real-world playbook matches whenever applicable.
 - MENU-BASED PLANNING (CUE CARDS): For each track pair, pick cue-out and cue-in bars strictly from the precomputed CUE CARDS. Never invent arbitrary cut points off phrase.
 - TIGHT TEMPO RULE: Long phrase blends (long_blend) strictly restricted to within +-3.2 BPM. For bigger jumps, use echo_out, power-down/tape stop, drum_loop_bridge, or breakdown/drop slam.
 - VOCAL INTEGRITY RULE: Never cut a sung phrase mid-line. Always respect 'do_not_cut_ranges'.
@@ -146,16 +150,22 @@ export default async function handler(req, res) {
 
   const compactSongs = heuristicPlan.analyses.map(compactSongForPrompt);
   const candidatePairs = [];
+  const allPlaybookHighlights = [];
   for (let i = 0; i < heuristicPlan.analyses.length - 1; i++) {
     const a = heuristicPlan.analyses[i];
     const b = heuristicPlan.analyses[i + 1];
+    const pbMatches = findPlaybookMatches(a, b, { limit: 3 });
     candidatePairs.push({
       from: a.song_id,
       to: b.song_id,
       cue_card_out: buildCueCard(a, 'out', brief.playMode),
       cue_card_in: buildCueCard(b, 'in', brief.playMode),
       top_5_candidates: scorePairCandidates(a, b, { arc: brief.vibe, playMode: brief.playMode, moodEnergy }).candidates,
+      playbook_matches: pbMatches,
     });
+    if (pbMatches.length) {
+      allPlaybookHighlights.push(`PAIR ${a.song_id} -> ${b.song_id}:\n${formatPlaybookForPrompt(pbMatches)}`);
+    }
   }
 
   const promptPayload = {
@@ -163,6 +173,7 @@ export default async function handler(req, res) {
     GENRE_PLAYBOOKS,
     SONGS: compactSongs,
     CANDIDATES: candidatePairs,
+    REAL_WORLD_PLAYBOOK_EXAMPLES: allPlaybookHighlights,
     RATINGS: fewShotExamples,
   };
 

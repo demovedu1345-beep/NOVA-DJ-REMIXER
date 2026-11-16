@@ -435,17 +435,23 @@ try {
   await sleep(3200);
 
   const reviewCheck = await evalJs(`(async () => {
-    document.getElementById('btn-wiz-next').click();
-    await new Promise(r => setTimeout(r, 120));
-    document.querySelector('[data-mode="club"]').click();
-    document.getElementById('btn-wiz-next').click();
-    await new Promise(r => setTimeout(r, 120));
-    document.querySelector('[data-vibe="peak"]').click();
-    await new Promise(r => setTimeout(r, 120));
-    document.querySelector('[data-crowd="medium"]').click();
-    await new Promise(r => setTimeout(r, 250));
-    document.getElementById('btn-review-debug').click();
-    await new Promise(r => setTimeout(r, 250));
+    const waitClick = async (sel, timeout = 4000) => {
+      const t0 = Date.now();
+      while (Date.now() - t0 < timeout) {
+        const el = document.querySelector(sel);
+        if (el) { el.click(); return el; }
+        await new Promise(r => setTimeout(r, 60));
+      }
+      throw new Error('Element not found to click: ' + sel);
+    };
+
+    await waitClick('#btn-wiz-next');
+    await waitClick('[data-mode="club"]');
+    await waitClick('#btn-wiz-next');
+    await waitClick('[data-vibe="peak"]');
+    await waitClick('[data-crowd="medium"]');
+    await waitClick('#btn-review-debug');
+    await new Promise(r => setTimeout(r, 400));
     const txt = document.body.innerText;
     const svgs = document.querySelectorAll('#debug-backdrop svg').length;
     const clickBtns = document.querySelectorAll('[data-click-check]').length;

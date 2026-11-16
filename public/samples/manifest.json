@@ -1,0 +1,186 @@
+{
+  "generatedAt": "2026-11-16T15:43:42.885Z",
+  "sampleCount": 18,
+  "samples": [
+    {
+      "file": "dhol_dagga.wav",
+      "name": "dhol_dagga",
+      "durationSec": 0.38,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "desi_percussion",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "dhol_tilli.wav",
+      "name": "dhol_tilli",
+      "durationSec": 0.16,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "desi_percussion",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "tabla_na.wav",
+      "name": "tabla_na",
+      "durationSec": 0.34,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "desi_percussion",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "tabla_ge.wav",
+      "name": "tabla_ge",
+      "durationSec": 0.36,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "desi_percussion",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "tabla_bayan_slide.wav",
+      "name": "tabla_bayan_slide",
+      "durationSec": 0.48,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "desi_percussion",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "house_kick.wav",
+      "name": "house_kick",
+      "durationSec": 0.28,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "house_clap.wav",
+      "name": "house_clap",
+      "durationSec": 0.24,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "house_hat.wav",
+      "name": "house_hat",
+      "durationSec": 0.07,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "trap_808.wav",
+      "name": "trap_808",
+      "durationSec": 0.55,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "snare_roll_hit.wav",
+      "name": "snare_roll_hit",
+      "durationSec": 0.22,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "white_noise_riser.wav",
+      "name": "white_noise_riser",
+      "durationSec": 2.6,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "transition_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "downlifter_fall.wav",
+      "name": "downlifter_fall",
+      "durationSec": 1.8,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "transition_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "sub_drop.wav",
+      "name": "sub_drop",
+      "durationSec": 1.5,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "drop_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "reverse_cymbal.wav",
+      "name": "reverse_cymbal",
+      "durationSec": 1.6,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "club_impact.wav",
+      "name": "club_impact",
+      "durationSec": 1.6,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "drop_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "air_whoosh.wav",
+      "name": "air_whoosh",
+      "durationSec": 0.48,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "transition_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "siren_wail.wav",
+      "name": "siren_wail",
+      "durationSec": 1.3,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "transition_fx",
+      "dateChecked": "2026-11-16"
+    },
+    {
+      "file": "crash_cymbal.wav",
+      "name": "crash_cymbal",
+      "durationSec": 1.8,
+      "source": "Deterministic Audio Synthesis (scripts/generate-drum-pack.mjs)",
+      "license": "CC0 / Custom Free Public Domain Code (Zero Royalty)",
+      "author": "NOVA Autonomous DJ Engine",
+      "category": "club_drums",
+      "dateChecked": "2026-11-16"
+    }
+  ]
+}

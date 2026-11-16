@@ -1,4 +1,11 @@
 import { camelotDistance, shiftCamelot } from './camelot.js';
+import {
+  PLAYBOOK_ENTRIES,
+  findPlaybookMatches,
+  formatPlaybookForPrompt,
+} from './dj-playbook.js';
+
+export { PLAYBOOK_ENTRIES, findPlaybookMatches, formatPlaybookForPrompt };
 
 export const TRANSITION_TYPES = [
   'bass_swap_blend',
@@ -528,6 +535,9 @@ export function scorePairCandidates(songA, songB, { arc = 'peak', playMode = 'cl
     songB.warnings.includes('low_confidence')
   );
 
+  const playbookMatches = findPlaybookMatches(songA, songB, { limit: 3 });
+  const topPlaybook = playbookMatches[0] || null;
+
   const scored = [];
   for (const cOut of cueOutCard) {
     const outBar = cOut.bar;
@@ -597,7 +607,8 @@ export function scorePairCandidates(songA, songB, { arc = 'peak', playMode = 'cl
         }
       }
 
-      const cueBonus = (cOut.scoreBias || 0) + (cIn.scoreBias || 0) - introTrap;
+      const pbBonus = (topPlaybook && topPlaybook.type === type && topPlaybook.matchScore >= 55) ? 0.03 : 0;
+      const cueBonus = (cOut.scoreBias || 0) + (cIn.scoreBias || 0) - introTrap + pbBonus;
       const rawScore = 0.25 * tempo.T + 0.2 * keyFit.K + 0.15 * E + 0.15 * P + 0.15 * V + 0.1 * G - R + cueBonus * 0.25;
       const protA = findProtectedRangeOverlap(songA, outBar, safeLen);
       const protB = findProtectedRangeOverlap(songB, inBar, safeLen);
@@ -630,6 +641,7 @@ export function scorePairCandidates(songA, songB, { arc = 'peak', playMode = 'cl
         vocal_clash_bars: clashBars,
         key_distance: keyFit.distance,
         unsafe: unsafeSong,
+        playbook_matched: topPlaybook?.type === type ? topPlaybook.title : null,
       });
     }
   }
@@ -638,6 +650,7 @@ export function scorePairCandidates(songA, songB, { arc = 'peak', playMode = 'cl
   return {
     bestScore: scored[0]?.score ?? 0.5,
     candidates: scored.slice(0, 5),
+    playbookMatches,
     cueOutCard,
     cueInCard,
   };
