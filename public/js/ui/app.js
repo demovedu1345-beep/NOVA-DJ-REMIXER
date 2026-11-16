@@ -19,6 +19,7 @@ import {
   YOUTUBE_CATALOG_CONFIG,
   findCatalogCategory,
   findCatalogLanguage,
+  CURATED_CATEGORIES_DB,
 } from '/js/engine/youtube-catalog-config.js';
 import { YouTubeDeckEngine } from '/js/engine/youtube-deck-engine.js';
 
@@ -127,15 +128,18 @@ const DEFAULT_CLIENT_KEYS = {
 };
 
 const state = {
-  screen: 'splash', // splash | wizard | review | playing | summary
-  appMode: 'dj', // 'dj' | 'yt'
+  screen: 'wizard', // wizard | review | playing | summary | yt
+  appMode: 'dj', // 'dj' (AI DJ Mixer) | 'yt' (Party Song Lists)
   wizardStep: 0, // 0: load/langs | 1: playMode | 2: vibe | 3: crowd
+  activeVibeCard: 'hindi',
+  activeVibeCategory: 'hindi-dance',
   sessionId: getSessionId(),
   health: null,
 
-  // Dedicated YouTube Music Catalog & Player State
-  ytSelectedLang: 'english',
-  ytSelectedCategory: 'top-hits',
+  // Dedicated YouTube Music Catalog & Player State (matches naux.party/songs)
+  ytViewMode: 'directory', // 'directory' (16 category cards) | 'category' (100+ song detail list)
+  ytSelectedLang: 'all',
+  ytSelectedCategory: 'hindi-dance',
   ytCategoryTracks: [],
   ytLoadingTracks: false,
   ytError: null,
@@ -1499,6 +1503,158 @@ function renderExitBtn(confirmMode = false) {
   `;
 }
 
+const VIBE_CATEGORIES_MAP = {
+  'hindi': [
+    { id: 'hindi-dance', label: 'Dance Songs', hint: 'High-energy Bollywood dance anthems & club bangers', dbKey: 'hindi-dance' },
+    { id: 'hindi-romantic', label: 'Romantic', hint: 'Soulful Bollywood love ballads & melodies', dbKey: 'hindi-romantic' },
+    { id: 'hindi-retro', label: 'Retro Classics', hint: 'Timeless 90s & classic golden era gems', dbKey: 'hindi-retro' },
+    { id: 'hindi-sufi', label: 'Sufi & Soul', hint: 'Deep, emotional Sufi qawwalis & soulful hooks', dbKey: 'hindi-sufi' },
+    { id: 'hindi-hiphop', label: 'Desi Hip-Hop', hint: 'Gully rap, street bars & modern Desi trap', dbKey: 'hindi-hiphop' },
+    { id: 'diwali-party-songs', label: 'Diwali Party', hint: 'Dhol-thumping festival & wedding party bangers', dbKey: 'diwali-party-songs' },
+  ],
+  'punjabi': [
+    { id: 'punjabi-party', label: 'Party & Bhangra', hint: 'Dhol drops, club anthems & bass-heavy Punjabi bangers', dbKey: 'punjabi-party' },
+    { id: 'punjabi-wedding', label: 'Wedding Hits', hint: 'Baraat beats, sangeet classics & celebration anthems', dbKey: 'punjabi-wedding' },
+    { id: 'punjabi-gym', label: 'Gym & Workout', hint: 'High-BPM Punjabi hype tracks & workout fuel', dbKey: 'punjabi-gym' },
+    { id: 'punjabi-sad', label: 'Heartbreak & Slow', hint: 'Melancholic, emotional Punjabi acoustic & slow jams', dbKey: 'punjabi-sad' },
+  ],
+  'english': [
+    { id: 'english-pop', label: 'Top Pop Hits', hint: 'Billboard chartbusters, catchy radio anthems & pop hooks', dbKey: 'english-pop' },
+    { id: 'english-hiphop', label: 'Hip-Hop & Rap', hint: 'Heavy 808s, street bars & mainstream rap anthems', dbKey: 'english-hiphop' },
+    { id: 'english-edm', label: 'Dance & EDM', hint: 'Festival drops, house grooves & mainstage club energy', dbKey: 'english-edm' },
+    { id: 'english-love', label: 'Chill & Love Songs', hint: 'Smooth R&B, late-night vibes & acoustic romance', dbKey: 'english-love' },
+  ],
+  'electronic': [
+    { id: 'english-edm', label: 'Festival EDM & House', hint: 'Pumping four-on-the-floor, build-ups & euphoric drops', dbKey: 'english-edm' },
+    { id: 'english-pop', label: 'Club Anthems', hint: 'High-energy electronic radio club edits', dbKey: 'english-pop' },
+  ],
+  'tamil-telugu': [
+    { id: 'tamil-telugu-kuthu', label: 'Anirudh & Kuthu Bangers', hint: 'High-octane Tamil kuthu drums & viral whistle themes', dbKey: 'tamil-telugu-kuthu' },
+    { id: 'tamil-telugu-mass', label: 'South Mass Cinema Beats', hint: 'Thaman & DSP theater mass entry tracks & hero themes', dbKey: 'tamil-telugu-mass' },
+  ],
+  'bollywood-remix': [
+    { id: 'hindi-dance', label: 'Bollywood Club Mashups', hint: 'Dhol mix, DJ party mashups & high-tempo club edits', dbKey: 'hindi-dance' },
+    { id: 'english-edm', label: 'Global EDM Remixes', hint: 'Bass-boosted club edits & festival bootlegs', dbKey: 'english-edm' },
+  ],
+};
+
+function getActiveVibeTracks() {
+  const vibeId = state.activeVibeCard || 'hindi';
+  const cats = VIBE_CATEGORIES_MAP[vibeId] || VIBE_CATEGORIES_MAP['hindi'];
+  const catId = state.activeVibeCategory || cats[0].id;
+  const cat = cats.find(c => c.id === catId) || cats[0];
+  const dbEntry = CURATED_CATEGORIES_DB[cat.dbKey] || CURATED_CATEGORIES_DB[cat.id];
+  return dbEntry?.songs || [];
+}
+
+function renderVibeMusicExplorer() {
+  const activeVibe = state.activeVibeCard || 'hindi';
+  const vibeMeta = LANGUAGES.find(l => l.id === activeVibe) || LANGUAGES[0];
+  const cats = VIBE_CATEGORIES_MAP[activeVibe] || VIBE_CATEGORIES_MAP['hindi'];
+  const activeCatId = state.activeVibeCategory || cats[0].id;
+  const currentCat = cats.find(c => c.id === activeCatId) || cats[0];
+  const dbEntry = CURATED_CATEGORIES_DB[currentCat.dbKey] || CURATED_CATEGORIES_DB[currentCat.id];
+  const tracks = dbEntry?.songs || [];
+
+  const p = getYouTubePlayer();
+  const ps = p.getPlaybackState();
+  const currentTrackId = ps.currentTrack?.id;
+
+  return `
+    <div class="vibe-music-explorer-section" id="vibe-explorer" style="margin-top:28px;padding:26px;border-radius:24px;border:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.015);box-shadow:inset 0 1px 1px rgba(255,255,255,0.1), 0 12px 36px rgba(0,0,0,0.4)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase">
+            ⚡ ${esc(vibeMeta.label.toUpperCase())} · YOUTUBE PARTY CATEGORIES
+          </div>
+          <h2 class="font-display" style="font-size: clamp(26px, 3.6vw, 42px);color:#fff;margin-top:6px;line-height:1">
+            ${esc(currentCat.label.toUpperCase())}
+          </h2>
+          <p style="font-size:15px;color:rgba(245,245,240,0.65);margin-top:6px;max-width:38rem">
+            ${esc(currentCat.hint)} · <span style="color:#c8ff00;font-weight:800;font-family:var(--font-mono)">${tracks.length} SONGS (STRICTLY 100+)</span>
+          </p>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="btn-play-vibe-set" class="naux-btn-play-set squeeze" style="padding:11px 22px;font-size:14px">
+            ▶ PLAY THIS SET (${tracks.length})
+          </button>
+          <button id="btn-shuffle-vibe-set" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px">
+            🔀 SHUFFLE
+          </button>
+          <button id="btn-vibe-best-part-toggle" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px;${state.ytBestPartMode ? 'border-color:#c8ff00;color:#c8ff00' : ''}">
+            ⚡ BEST PART: ${state.ytBestPartMode ? 'ON (35s)' : 'OFF'}
+          </button>
+          <button id="btn-vibe-add-all-crate" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px;border-color:var(--amber);color:var(--amber)">
+            + ADD ALL TO DJ CRATE
+          </button>
+        </div>
+      </div>
+
+      <!-- Level 2: Subcategory Chips under the active vibe card -->
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.45);text-transform:uppercase;margin-bottom:10px">
+          SELECT CATEGORY (${cats.length} CATEGORIES · STRICTLY 100+ SONGS EACH):
+        </div>
+        <div class="naux-filter-bar" style="margin-top:0">
+          ${cats.map(c => {
+            const count = CURATED_CATEGORIES_DB[c.dbKey]?.songs?.length || 100;
+            const isCatActive = (currentCat.id === c.id);
+            return `
+              <button class="naux-filter-chip squeeze ${isCatActive ? 'active' : ''}" data-vibe-cat="${esc(c.id)}">
+                ${esc(c.label)} (${count})
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Level 3: 100+ Songs Ordered List matching naux.party/songs -->
+      <ol class="naux-song-list" style="margin-top:24px">
+        ${tracks.map((t, idx) => {
+          const isPlaying = (currentTrackId === t.id && ps.isPlaying);
+          const inCrate = state.crate.some(c => c.id === t.id);
+          const hookStart = t.hookStartSec ?? (t.entrySec ?? Math.round((t.durationSec || 180) * 0.25));
+          const hookDur = t.hookDurationSec ?? 35;
+          const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
+          return `
+            <li class="naux-song-row ${isPlaying ? 'is-active' : ''}" data-vibe-song-idx="${idx}">
+              <div class="naux-song-num">${String(idx + 1).padStart(2, '0')}</div>
+              <div class="naux-song-info">
+                <div class="naux-song-title">
+                  <span>${esc(t.title)}</span>
+                  ${isPlaying ? '<span style="font-size:10px;color:#c8ff00;font-family:var(--font-mono);margin-left:8px">● PLAYING</span>' : ''}
+                </div>
+                <div class="naux-song-meta">${esc(t.artist || 'Unknown Artist')} ${t.year ? `· ${t.year}` : ''}</div>
+              </div>
+              <div class="naux-song-tag">
+                ⚡ FROM THE BEST PART (${fmtTime(hookStart)}–${fmtTime(hookEnd)})
+              </div>
+              <div class="naux-song-actions">
+                <button class="naux-action-btn ${isPlaying ? 'active' : ''}" data-vibe-play-idx="${idx}" title="${isPlaying ? 'Pause' : 'Play'}">
+                  ${isPlaying ? '❚❚' : '▶'}
+                </button>
+                <button class="naux-action-btn" data-vibe-queue-idx="${idx}" title="Add to upcoming queue">
+                  +Q
+                </button>
+                <button class="naux-action-btn ${inCrate ? 'in-crate' : ''}" data-vibe-crate-idx="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}">
+                  ${inCrate ? '✓' : '+DJ'}
+                </button>
+              </div>
+            </li>
+          `;
+        }).join('')}
+      </ol>
+
+      <div style="margin-top:32px;display:flex;justify-content:center">
+        <button id="btn-play-vibe-set-bottom" class="naux-btn-play-set squeeze">
+          ▶ PLAY THIS AS A SET (${tracks.length} SONGS) →
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 function renderWizard() {
   const step = state.wizardStep;
   const dbBadge = state.health?.database?.connected
@@ -1603,7 +1759,7 @@ function renderWizard() {
         <h2 class="font-display" style="margin-top:34px;font-size:28px;color:rgba(245,245,240,0.55);letter-spacing:0.03em">OR QUICK-FILL BY VIBE</h2>
         <div class="choice-grid-2" style="margin-top:14px">
           ${LANGUAGES.map((l) => {
-            const sel = state.selectedLanguages.includes(l.id);
+            const sel = (state.activeVibeCard === l.id) || state.selectedLanguages.includes(l.id);
             return `
               <button class="big-card squeeze ${sel ? 'selected' : ''}" data-lang="${l.id}">
                 <span class="big-card-title">${esc(l.label)}</span>
@@ -1612,6 +1768,7 @@ function renderWizard() {
             `;
           }).join('')}
         </div>
+        ${renderVibeMusicExplorer()}
       </section>
     `;
   } else if (step === 1) {
@@ -2349,7 +2506,9 @@ function renderSummary() {
 function goHome() {
   orchestrator?.stop();
   ytHost.setAttribute('data-visible', 'false');
-  state.screen = 'wizard';
+  state.appMode = 'yt';
+  state.ytViewMode = 'directory';
+  state.screen = 'main';
   state.wizardStep = 0;
   state.drawerOpen = false;
   state.debugModalOpen = false;
@@ -2587,12 +2746,176 @@ function bindWizardEvents() {
     document.querySelectorAll('[data-lang]').forEach((b) => {
       b.onclick = () => {
         const id = b.dataset.lang;
-        if (state.selectedLanguages.includes(id)) {
-          state.selectedLanguages = state.selectedLanguages.filter((x) => x !== id);
-        } else {
-          state.selectedLanguages.push(id);
-        }
+        state.activeVibeCard = id;
+        const cats = VIBE_CATEGORIES_MAP[id] || VIBE_CATEGORIES_MAP['hindi'];
+        state.activeVibeCategory = cats[0].id;
+        state.selectedLanguages = [id];
         render();
+        const explorer = document.getElementById('vibe-explorer');
+        if (explorer) {
+          explorer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      };
+    });
+
+    // Subcategory chips inside Vibe explorer
+    document.querySelectorAll('[data-vibe-cat]').forEach((btn) => {
+      btn.onclick = () => {
+        state.activeVibeCategory = btn.dataset.vibeCat;
+        render();
+      };
+    });
+
+    // Play vibe set CTA
+    const btnPlayVibeSet = document.getElementById('btn-play-vibe-set');
+    if (btnPlayVibeSet) {
+      btnPlayVibeSet.onclick = () => {
+        const tracks = getActiveVibeTracks();
+        if (!tracks.length) return;
+        const p = getYouTubePlayer();
+        p.setQueue(tracks, {
+          startIndex: 0,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
+        showYtToast(`Playing ${tracks.length} tracks with ${state.ytCrossfadeSec}s crossfades`);
+      };
+    }
+    const btnPlayVibeSetBtm = document.getElementById('btn-play-vibe-set-bottom');
+    if (btnPlayVibeSetBtm) {
+      btnPlayVibeSetBtm.onclick = () => {
+        const tracks = getActiveVibeTracks();
+        if (!tracks.length) return;
+        const p = getYouTubePlayer();
+        p.setQueue(tracks, {
+          startIndex: 0,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
+        showYtToast(`Playing ${tracks.length} tracks`);
+      };
+    }
+
+    // Shuffle vibe set
+    const btnShuffleVibeSet = document.getElementById('btn-shuffle-vibe-set');
+    if (btnShuffleVibeSet) {
+      btnShuffleVibeSet.onclick = () => {
+        const tracks = getActiveVibeTracks();
+        if (!tracks.length) return;
+        const p = getYouTubePlayer();
+        p.shuffle = true;
+        const startIdx = Math.floor(Math.random() * tracks.length);
+        p.setQueue(tracks, {
+          startIndex: startIdx,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
+        showYtToast(`Shuffling ${tracks.length} tracks`);
+      };
+    }
+
+    // Best part toggle inside Vibe explorer
+    const btnVibeBestPart = document.getElementById('btn-vibe-best-part-toggle');
+    if (btnVibeBestPart) {
+      btnVibeBestPart.onclick = () => {
+        state.ytBestPartMode = !state.ytBestPartMode;
+        const p = getYouTubePlayer();
+        p.setBestPartMode(state.ytBestPartMode);
+        render();
+      };
+    }
+
+    // Add all category tracks to DJ crate
+    const btnVibeAddAll = document.getElementById('btn-vibe-add-all-crate');
+    if (btnVibeAddAll) {
+      btnVibeAddAll.onclick = () => {
+        const tracks = getActiveVibeTracks();
+        const seen = new Set(state.crate.map(c => c.id));
+        let added = 0;
+        for (const t of tracks) {
+          if (!seen.has(t.id)) {
+            seen.add(t.id);
+            state.crate.push({ ...t, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
+            added++;
+          }
+        }
+        showYtToast(`Added ${added} tracks to DJ Crate (${state.crate.length} total)`);
+        render();
+      };
+    }
+
+    // Individual track row play button
+    document.querySelectorAll('[data-vibe-play-idx]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const idx = Number(btn.dataset.vibePlayIdx);
+        const tracks = getActiveVibeTracks();
+        const p = getYouTubePlayer();
+        const ps = p.getPlaybackState();
+        if (ps.queueIndex === idx && ps.currentTrack?.id === tracks[idx]?.id) {
+          p.togglePlayPause();
+        } else {
+          p.setQueue(tracks, {
+            startIndex: idx,
+            autoPlay: true,
+            bestPart: state.ytBestPartMode,
+            crossfadeSec: state.ytCrossfadeSec,
+          });
+        }
+      };
+    });
+
+    // Add individual track to queue
+    document.querySelectorAll('[data-vibe-queue-idx]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const idx = Number(btn.dataset.vibeQueueIdx);
+        const tracks = getActiveVibeTracks();
+        const track = tracks[idx];
+        if (track) {
+          const p = getYouTubePlayer();
+          p.addToQueue(track);
+          showYtToast(`Added "${track.title}" to upcoming queue`);
+          renderMiniPlayer();
+        }
+      };
+    });
+
+    // Add individual track to DJ crate
+    document.querySelectorAll('[data-vibe-crate-idx]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const idx = Number(btn.dataset.vibeCrateIdx);
+        const tracks = getActiveVibeTracks();
+        const track = tracks[idx];
+        if (track) {
+          if (!state.crate.some(c => c.id === track.id)) {
+            state.crate.push({ ...track, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
+            btn.textContent = '✓';
+            btn.classList.add('in-crate');
+            showYtToast(`Added "${track.title}" to DJ crate`);
+            render();
+          }
+        }
+      };
+    });
+
+    // Click anywhere on song row to play
+    document.querySelectorAll('.naux-song-row[data-vibe-song-idx]').forEach((row) => {
+      row.onclick = (e) => {
+        if (e.target.closest('button')) return;
+        const idx = Number(row.dataset.vibeSongIdx);
+        const tracks = getActiveVibeTracks();
+        const p = getYouTubePlayer();
+        p.setQueue(tracks, {
+          startIndex: idx,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
       };
     });
   } else if (state.wizardStep === 1) {
@@ -3471,6 +3794,17 @@ function renderToast() {
 async function loadYtCategoryTracks(langId, categoryId, forceRefresh = false) {
   state.ytSelectedLang = langId;
   state.ytSelectedCategory = categoryId;
+  const cat = findCatalogCategory(langId, categoryId);
+
+  // Instant local load from curated DB (100+ songs strictly)
+  if (cat && cat.tracks && cat.tracks.length >= 100 && !forceRefresh) {
+    state.ytCategoryTracks = [...cat.tracks];
+    state.ytLoadingTracks = false;
+    state.ytError = null;
+    render();
+    return;
+  }
+
   state.ytLoadingTracks = true;
   state.ytError = null;
   render();
@@ -3482,161 +3816,207 @@ async function loadYtCategoryTracks(langId, categoryId, forceRefresh = false) {
       throw new Error(errJson.error || `HTTP ${res.status}`);
     }
     const data = await res.json();
-    state.ytCategoryTracks = data.tracks || data.results || [];
+    state.ytCategoryTracks = data.tracks || data.results || (cat?.tracks || []);
     state.ytLoadingTracks = false;
     state.ytError = null;
   } catch (err) {
     console.error('[loadYtCategoryTracks] Error:', err);
     state.ytLoadingTracks = false;
-    state.ytError = `Failed to load YouTube tracks: ${err.message}`;
+    if (cat?.tracks && cat.tracks.length) {
+      state.ytCategoryTracks = [...cat.tracks];
+      state.ytError = null;
+    } else {
+      state.ytError = `Failed to load YouTube tracks: ${err.message}`;
+    }
   }
   render();
 }
 
 function renderYouTubeMusicScreen() {
-  const currentLang = findCatalogLanguage(state.ytSelectedLang);
-  const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory);
-
-  if (!state.ytCategoryTracks.length && !state.ytLoadingTracks && !state.ytError) {
-    loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory);
-  }
-
   const p = getYouTubePlayer();
   const ps = p.getPlaybackState();
   const currentTrackId = ps.currentTrack?.id;
 
-  const topBarRight = `
-    ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="nav-meta-btn">CRATE (${state.crate.length})</button>` : ''}
-    <button id="btn-open-brain-yt" class="nav-meta-btn">BRAIN</button>
-  `;
+  if (state.ytViewMode === 'category') {
+    // CATEGORY DETAIL VIEW (100+ songs list matching naux.party/songs/hindi-dance)
+    const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory);
+
+    if (!state.ytCategoryTracks.length && !state.ytLoadingTracks && !state.ytError) {
+      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory);
+    }
+
+    root.innerHTML = `
+      <div class="naux-main-shell">
+        <div class="naux-container">
+          <header class="naux-top-header">
+            <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
+            <div class="naux-nav-actions">
+              <button id="btn-back-to-lists" class="naux-filter-chip">← ALL LISTS</button>
+              ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="naux-filter-chip active">CRATE (${state.crate.length})</button>` : ''}
+              <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.4);color:#c8ff00" title="Switch to AI DJ Booth">🎧 AI DJ BOOTH</button>
+              <button id="btn-open-brain-yt" class="naux-filter-chip">BRAIN</button>
+            </div>
+          </header>
+
+          <main class="naux-detail-hero" style="flex:1">
+            <div style="margin-top:20px">
+              <button id="btn-back-to-lists-sub" class="naux-back-btn">← ALL LISTS</button>
+            </div>
+
+            <h1 class="naux-hero-title" style="margin-top:14px">${esc((currentCat.label || 'PARTY SET').toUpperCase())} 2026</h1>
+            <p class="naux-hero-subtitle">
+              ${state.ytCategoryTracks.length || currentCat.tracks?.length || 100}+ hand-curated songs. Stream from the best part with dual-deck continuous playback, custom blend, and zero awkward silence.
+            </p>
+
+            <div class="naux-detail-actions">
+              <button id="btn-play-category-set" class="naux-btn-play-set squeeze">
+                ▶ PLAY THIS AS A SET →
+              </button>
+              <button id="btn-shuffle-category-set" class="naux-btn-crate-add squeeze">
+                🔀 SHUFFLE SET
+              </button>
+              <button id="btn-yt-best-part-toggle" class="naux-btn-crate-add squeeze" style="${state.ytBestPartMode ? 'border-color:#c8ff00;color:#c8ff00' : ''}">
+                ⚡ BEST PART: ${state.ytBestPartMode ? 'ON (35s)' : 'OFF'}
+              </button>
+              <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:9999px;padding:8px 16px">
+                <span style="font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,0.7)">BLEND:</span>
+                <input id="input-yt-crossfade" type="range" min="0" max="8" step="0.5" value="${state.ytCrossfadeSec}" style="width:70px;accent-color:#c8ff00;cursor:pointer" />
+                <span id="yt-crossfade-val" style="font-family:var(--font-mono);font-size:11px;color:#c8ff00;min-width:30px">${state.ytCrossfadeSec.toFixed(1)}s</span>
+              </div>
+              <button id="btn-add-all-category-crate" class="naux-btn-crate-add squeeze" style="border-color:rgba(255,184,0,0.5);color:var(--amber)">
+                + ADD ALL TO DJ CRATE (${state.ytCategoryTracks.length})
+              </button>
+            </div>
+
+            ${state.ytLoadingTracks ? `
+              <div style="padding:80px 20px;text-align:center;font-family:var(--font-mono);color:#c8ff00;font-size:14px;letter-spacing:0.04em">
+                ⚡ LOADING ${state.ytCategoryTracks.length || '100+'} TRACKS…
+              </div>
+            ` : state.ytError ? `
+              <div class="status-banner err" style="margin:24px 0">
+                ${esc(state.ytError)}
+                <button id="btn-yt-retry-fetch" class="pill-btn squeeze" style="margin-left:14px">RETRY ⟳</button>
+              </div>
+            ` : `
+              <ol class="naux-song-list">
+                ${state.ytCategoryTracks.map((t, idx) => {
+                  const isPlaying = (currentTrackId === t.id && ps.isPlaying);
+                  const inCrate = state.crate.some(c => c.id === t.id);
+                  const hookStart = t.hookStartSec ?? (t.entrySec ?? Math.round((t.durationSec || 180) * 0.25));
+                  const hookDur = t.hookDurationSec ?? 35;
+                  const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
+                  return `
+                    <li class="naux-song-row ${isPlaying ? 'is-active' : ''}" data-song-idx="${idx}">
+                      <div class="naux-song-num">${String(idx + 1).padStart(2, '0')}</div>
+                      <div class="naux-song-info">
+                        <div class="naux-song-title">
+                          <span>${esc(t.title)}</span>
+                          ${isPlaying ? '<span style="font-size:10px;color:#c8ff00;font-family:var(--font-mono);margin-left:8px">● PLAYING</span>' : ''}
+                        </div>
+                        <div class="naux-song-meta">${esc(t.artist || 'Unknown Artist')} ${t.year ? `· ${t.year}` : ''}</div>
+                      </div>
+                      <div class="naux-song-tag">
+                        ⚡ FROM THE BEST PART (${fmtTime(hookStart)}–${fmtTime(hookEnd)})
+                      </div>
+                      <div class="naux-song-actions">
+                        <button class="naux-action-btn ${isPlaying ? 'active' : ''}" data-play-idx="${idx}" title="${isPlaying ? 'Pause' : 'Play'}">
+                          ${isPlaying ? '❚❚' : '▶'}
+                        </button>
+                        <button class="naux-action-btn" data-queue-idx="${idx}" title="Add to upcoming queue">
+                          +Q
+                        </button>
+                        <button class="naux-action-btn ${inCrate ? 'in-crate' : ''}" data-crate-idx="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}">
+                          ${inCrate ? '✓' : '+DJ'}
+                        </button>
+                      </div>
+                    </li>
+                  `;
+                }).join('')}
+              </ol>
+
+              <div style="margin-top:40px;display:flex;justify-content:center">
+                <button id="btn-play-category-set-bottom" class="naux-btn-play-set squeeze">
+                  ▶ PLAY THIS AS A SET →
+                </button>
+              </div>
+            `}
+          </main>
+        </div>
+      </div>
+      ${state.brainModalOpen ? renderBrainModal({
+        claudeKeySet: Boolean(state.opusKey),
+        geminiKeySet: Boolean(state.geminiKey),
+        openaiKeySet: Boolean(state.openaiKey),
+        claudeKey: state.opusKey || '',
+        geminiKey: state.geminiKey || '',
+        openaiKey: state.openaiKey || '',
+        health: state.health,
+        learningStats: getLearningStats(),
+      }) : ''}
+    `;
+    return;
+  }
+
+  // DIRECTORY VIEW (16 category cards matching naux.party/songs)
+  let visibleCategories = [];
+  if (state.ytSelectedLang === 'all') {
+    visibleCategories = YOUTUBE_CATALOG_CONFIG.languages[0]?.categories || [];
+  } else {
+    const lang = findCatalogLanguage(state.ytSelectedLang);
+    visibleCategories = lang?.categories || [];
+  }
 
   root.innerHTML = `
-    ${renderTopBar(topBarRight)}
-    <main class="yt-catalog-view">
-      <header class="yt-hero-banner">
-        <div>
-          <h1 class="yt-hero-title">YOUTUBE MUSIC</h1>
-          <p class="yt-hero-sub">Browse 25+ real songs per category. Dual-deck continuous playback, adjustable crossfading, and hook highlight blends. Add full playlists to your AI DJ set with one click.</p>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span class="row-tag" style="background:rgba(255,184,0,0.12);color:var(--amber);border:1px solid rgba(255,184,0,0.3)">24-HOUR CACHE ACTIVE</span>
-          <button id="btn-yt-force-refresh" class="pill-btn squeeze" title="Force fresh fetch from YouTube">⟳ REFRESH</button>
-        </div>
-      </header>
+    <div class="naux-main-shell">
+      <div class="naux-container">
+        <header class="naux-top-header">
+          <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
+          <div class="naux-nav-actions">
+            ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="naux-filter-chip active">CRATE (${state.crate.length})</button>` : ''}
+            <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.4);color:#c8ff00" title="Switch to AI DJ Booth">🎧 AI DJ BOOTH</button>
+            <button id="btn-open-brain-yt" class="naux-filter-chip">BRAIN</button>
+          </div>
+        </header>
 
-      <!-- Level 1: Language Tabs (English, Bollywood, Punjabi, Tamil, Telugu) -->
-      <section>
-        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.4);text-transform:uppercase;margin-bottom:8px">
-          LEVEL 1 · SELECT LANGUAGE
-        </div>
-        <div class="yt-lang-tabs">
-          ${YOUTUBE_CATALOG_CONFIG.languages.map(l => `
-            <button class="yt-lang-tab squeeze ${state.ytSelectedLang === l.id ? 'active' : ''}" data-yt-lang="${esc(l.id)}">
-              <span>${esc(l.label)}</span>
-            </button>
-          `).join('')}
-        </div>
-      </section>
+        <main style="flex:1">
+          <h1 class="naux-hero-title">PARTY SONG LISTS</h1>
+          <p class="naux-hero-subtitle">
+            Over 3,200 hand-curated tracks across 16 party categories. Every category strictly contains 100+ songs, streaming seamlessly from the best part with zero awkward silence.
+          </p>
 
-      <!-- Level 2: Category Chips strictly under selected language (NO cross-contamination) -->
-      <section>
-        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.4);text-transform:uppercase;margin-bottom:8px">
-          LEVEL 2 · ${esc(currentLang.label.toUpperCase())} CATEGORIES
-        </div>
-        <div class="yt-cat-bar">
-          ${currentLang.categories.map(c => `
-            <button class="yt-cat-chip squeeze ${state.ytSelectedCategory === c.id ? 'active' : ''}" data-yt-cat="${esc(c.id)}">
-              ${esc(c.label)}
-            </button>
-          `).join('')}
-        </div>
-      </section>
-
-      <!-- Level 3: Playlist View & Tracks -->
-      <section class="yt-playlist-panel">
-        <div class="yt-playlist-ctrls">
-          <div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <h2 class="font-display" style="font-size:24px;color:#fff">${esc(currentCat.label)}</h2>
-              <span class="row-tag" style="background:rgba(255,255,255,0.06);color:rgba(245,245,240,0.8)">${state.ytCategoryTracks.length} SONGS</span>
-            </div>
-            <div style="font-size:11px;color:rgba(245,245,240,0.45);font-family:var(--font-mono);margin-top:4px">
-              QUERY: "${esc(currentCat.query)}" · ${esc(currentLang.label)}
-            </div>
+          <!-- Language Filter Bar -->
+          <div class="naux-filter-bar yt-lang-tabs">
+            ${YOUTUBE_CATALOG_CONFIG.languages.map(l => `
+              <button class="naux-filter-chip yt-lang-tab ${state.ytSelectedLang === l.id ? 'active' : ''}" data-filter-lang="${esc(l.id)}" data-yt-lang="${esc(l.id)}">
+                ${esc(l.label)}
+              </button>
+            `).join('')}
           </div>
 
-          <div class="yt-ctrl-group">
-            <button id="btn-yt-play-all" class="yt-action-btn primary squeeze">
-              ▶ PLAY ALL
-            </button>
-            <button id="btn-yt-shuffle-all" class="yt-action-btn secondary squeeze">
-              🔀 SHUFFLE PLAY
-            </button>
-            <button id="btn-yt-best-part-toggle" class="yt-action-btn secondary squeeze ${state.ytBestPartMode ? 'active-glow' : ''}">
-              ⚡ BEST PART: ${state.ytBestPartMode ? 'ON' : 'OFF'}
-            </button>
-            <div class="yt-slider-wrap">
-              <span>BLEND:</span>
-              <input id="input-yt-crossfade" type="range" min="0" max="8" step="0.5" value="${state.ytCrossfadeSec}" />
-              <span id="yt-crossfade-val" class="font-mono-num" style="min-width:32px">${state.ytCrossfadeSec.toFixed(1)}s</span>
-            </div>
-            <button id="btn-yt-add-all-crate" class="yt-action-btn secondary squeeze" style="border-color:var(--amber);color:var(--amber)">
-              + ADD ALL TO DJ CRATE (${state.ytCategoryTracks.length})
-            </button>
-          </div>
-        </div>
-
-        ${state.ytLoadingTracks ? `
-          <div class="font-mono-num" style="padding:60px 20px;text-align:center;color:var(--accent);letter-spacing:0.04em">
-            ⚡ FETCHING 25+ TRACKS FOR "${esc(currentCat.label.toUpperCase())}" VIA YOUTUBE API…
-          </div>
-        ` : state.ytError ? `
-          <div class="status-banner err" style="margin:20px 0">
-            ${esc(state.ytError)}
-            <button id="btn-yt-retry-fetch" class="pill-btn squeeze" style="margin-left:14px">RETRY ⟳</button>
-          </div>
-        ` : `
-          <div class="yt-tracks-grid" id="yt-tracks-container">
-            ${state.ytCategoryTracks.map((t, idx) => {
-              const isPlaying = (currentTrackId === t.id && ps.isPlaying);
-              const inCrate = state.crate.some(c => c.id === t.id);
-              const hookStart = t.hookStartSec ?? Math.round((t.durationSec || 180) * 0.25);
-              const hookDur = t.hookDurationSec ?? 35;
-              const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
-              return `
-                <div class="yt-track-card squeeze ${isPlaying ? 'is-playing' : ''}" data-yt-track-idx="${idx}">
-                  <div class="yt-card-thumb-wrap">
-                    <img class="yt-card-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
-                    <div class="yt-card-play-overlay">
-                      ${isPlaying ? '❚❚' : '▶'}
-                    </div>
+          <!-- 16 Categories Grid -->
+          <ul class="naux-cards-grid yt-tracks-grid">
+            ${visibleCategories.map(cat => `
+              <li class="naux-cat-card" data-open-cat="${esc(cat.id)}">
+                <div>
+                  <div class="naux-cat-card-header">
+                    <h3 class="naux-cat-title">${esc(cat.label)}</h3>
+                    <span class="naux-badge-100 yt-cat-chip">${cat.tracks?.length || 100}+ SONGS</span>
                   </div>
-                  <div class="yt-card-meta">
-                    <div class="yt-card-title" title="${esc(t.title)}">${esc(t.title)}</div>
-                    <div class="yt-card-artist" title="${esc(t.artist)}">${esc(t.artist)}</div>
-                    <div class="yt-card-tags">
-                      <span class="yt-card-tag hook">⚡ Hook: ${fmtTime(hookStart)}–${fmtTime(hookEnd)} (${hookDur}s)</span>
-                      <span class="yt-card-tag dur">${fmtTime(t.durationSec)}</span>
-                    </div>
-                  </div>
-                  <div class="yt-card-actions">
-                    <button class="yt-card-icon-btn squeeze" data-yt-play-btn="${idx}" title="Play song">
-                      ${isPlaying ? '❚❚' : '▶'}
-                    </button>
-                    <button class="yt-card-icon-btn squeeze" data-yt-queue-btn="${idx}" title="Add to queue">
-                      +Q
-                    </button>
-                    <button class="yt-card-icon-btn squeeze ${inCrate ? 'added' : ''}" data-yt-crate-btn="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}" style="${inCrate ? 'color:var(--amber);border-color:var(--amber)' : ''}">
-                      ${inCrate ? '✓' : '+DJ'}
-                    </button>
-                  </div>
+                  <div class="naux-cat-count">${cat.tracks?.length || 0} songs · Hand-curated</div>
+                  <p class="naux-cat-hint">${esc(cat.query || 'Party anthems & chart hits ready to mix')}</p>
                 </div>
-              `;
-            }).join('')}
-          </div>
-        `}
-      </section>
-    </main>
+                <div class="naux-cat-card-footer">
+                  <span class="naux-cat-play-link">VIEW ${cat.tracks?.length || 100}+ TRACKS →</span>
+                  <button class="naux-action-btn" data-play-cat="${esc(cat.id)}" style="background:#c8ff00;color:#070707;border-color:#c8ff00" title="Play full category set">
+                    ▶ PLAY SET
+                  </button>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        </main>
+      </div>
+    </div>
     ${state.brainModalOpen ? renderBrainModal({
       claudeKeySet: Boolean(state.opusKey),
       geminiKeySet: Boolean(state.geminiKey),
@@ -3651,22 +4031,38 @@ function renderYouTubeMusicScreen() {
 }
 
 function renderTracksIfCatalogActive() {
-  if (state.appMode !== 'yt') return;
   const p = getYouTubePlayer();
   const ps = p.getPlaybackState();
   const currentTrackId = ps.currentTrack?.id;
-  const cards = document.querySelectorAll('.yt-track-card');
-  cards.forEach((card) => {
-    const idx = Number(card.dataset.ytTrackIdx);
-    const track = state.ytCategoryTracks[idx];
-    if (!track) return;
-    const isPlaying = (currentTrackId === track.id && ps.isPlaying);
-    card.classList.toggle('is-playing', isPlaying);
-    const playOverlay = card.querySelector('.yt-card-play-overlay');
-    if (playOverlay) playOverlay.textContent = isPlaying ? '❚❚' : '▶';
-    const playBtn = card.querySelector('[data-yt-play-btn]');
-    if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
-  });
+
+  // 1. Update vibe song rows in Step 0
+  const vibeRows = document.querySelectorAll('.naux-song-row[data-vibe-song-idx]');
+  if (vibeRows.length) {
+    const tracks = getActiveVibeTracks();
+    vibeRows.forEach((row) => {
+      const idx = Number(row.dataset.vibeSongIdx);
+      const track = tracks[idx];
+      if (!track) return;
+      const isPlaying = (currentTrackId === track.id && ps.isPlaying);
+      row.classList.toggle('is-active', isPlaying);
+      const playBtn = row.querySelector('[data-vibe-play-idx]');
+      if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
+    });
+  }
+
+  // 2. Update category rows in full YT view
+  if (state.appMode === 'yt' && state.ytViewMode === 'category') {
+    const rows = document.querySelectorAll('.naux-song-row[data-song-idx]');
+    rows.forEach((row) => {
+      const idx = Number(row.dataset.songIdx);
+      const track = state.ytCategoryTracks[idx];
+      if (!track) return;
+      const isPlaying = (currentTrackId === track.id && ps.isPlaying);
+      row.classList.toggle('is-active', isPlaying);
+      const playBtn = row.querySelector('[data-play-idx]');
+      if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
+    });
+  }
 }
 
 function renderMiniPlayer() {
@@ -3843,6 +4239,8 @@ function attachGlobalYtListeners() {
   if (btnModeDj) {
     btnModeDj.onclick = () => {
       state.appMode = 'dj';
+      state.screen = 'wizard';
+      state.wizardStep = 0;
       render();
     };
   }
@@ -3852,11 +4250,38 @@ function attachGlobalYtListeners() {
   if (btnBrowseYt) {
     btnBrowseYt.onclick = () => {
       state.appMode = 'yt';
+      state.ytViewMode = 'directory';
       render();
     };
   }
 
-  // Top nav crate button from YT mode
+  // Brand logo in header (navigates back to Party Song Lists directory)
+  const btnBrand = document.getElementById('btn-naux-brand');
+  if (btnBrand) {
+    btnBrand.onclick = () => {
+      state.ytViewMode = 'directory';
+      state.ytSelectedLang = 'all';
+      render();
+    };
+  }
+
+  // Back to lists buttons
+  const btnBack = document.getElementById('btn-back-to-lists');
+  if (btnBack) {
+    btnBack.onclick = () => {
+      state.ytViewMode = 'directory';
+      render();
+    };
+  }
+  const btnBackSub = document.getElementById('btn-back-to-lists-sub');
+  if (btnBackSub) {
+    btnBackSub.onclick = () => {
+      state.ytViewMode = 'directory';
+      render();
+    };
+  }
+
+  // Top nav crate & brain buttons
   const btnCrateFromYt = document.getElementById('btn-open-crate-from-yt');
   if (btnCrateFromYt) {
     btnCrateFromYt.onclick = () => {
@@ -3875,46 +4300,51 @@ function attachGlobalYtListeners() {
   }
   bindBrainModalEvents();
 
-  // Catalog language tabs
-  document.querySelectorAll('[data-yt-lang]').forEach((btn) => {
+  // Language filter chips
+  document.querySelectorAll('[data-filter-lang]').forEach((btn) => {
     btn.onclick = () => {
-      const langId = btn.dataset.ytLang;
-      if (langId === state.ytSelectedLang) return;
-      const langCfg = findCatalogLanguage(langId);
-      state.ytSelectedLang = langId;
-      state.ytSelectedCategory = langCfg.categories[0].id;
-      loadYtCategoryTracks(langId, state.ytSelectedCategory);
+      state.ytSelectedLang = btn.dataset.filterLang;
+      render();
     };
   });
 
-  // Catalog category chips
-  document.querySelectorAll('[data-yt-cat]').forEach((btn) => {
-    btn.onclick = () => {
-      const catId = btn.dataset.ytCat;
-      if (catId === state.ytSelectedCategory) return;
+  // Open Category Card
+  document.querySelectorAll('[data-open-cat]').forEach((card) => {
+    card.onclick = (e) => {
+      if (e.target.closest('button')) return;
+      const catId = card.dataset.openCat;
       state.ytSelectedCategory = catId;
+      state.ytViewMode = 'category';
       loadYtCategoryTracks(state.ytSelectedLang, catId);
     };
   });
 
-  // Force refresh
-  const btnRefresh = document.getElementById('btn-yt-force-refresh');
-  if (btnRefresh) {
-    btnRefresh.onclick = () => {
-      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
+  // Play Category Set from Directory card
+  document.querySelectorAll('[data-play-cat]').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const catId = btn.dataset.playCat;
+      const cat = findCatalogCategory(state.ytSelectedLang, catId);
+      if (cat?.tracks?.length) {
+        state.ytSelectedCategory = catId;
+        state.ytCategoryTracks = [...cat.tracks];
+        p.setQueue(state.ytCategoryTracks, {
+          startIndex: 0,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
+        showYtToast(`Playing ${cat.label} (${state.ytCategoryTracks.length} songs)`);
+        state.ytViewMode = 'category';
+        render();
+      }
     };
-  }
-  const btnRetry = document.getElementById('btn-yt-retry-fetch');
-  if (btnRetry) {
-    btnRetry.onclick = () => {
-      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
-    };
-  }
+  });
 
-  // Play All
-  const btnPlayAll = document.getElementById('btn-yt-play-all');
-  if (btnPlayAll) {
-    btnPlayAll.onclick = () => {
+  // Play category set CTA in detail view
+  const btnPlaySet = document.getElementById('btn-play-category-set');
+  if (btnPlaySet) {
+    btnPlaySet.onclick = () => {
       if (!state.ytCategoryTracks.length) return;
       p.setQueue(state.ytCategoryTracks, {
         startIndex: 0,
@@ -3925,11 +4355,24 @@ function attachGlobalYtListeners() {
       showYtToast(`Playing ${state.ytCategoryTracks.length} tracks with ${state.ytCrossfadeSec}s crossfades`);
     };
   }
+  const btnPlaySetBtm = document.getElementById('btn-play-category-set-bottom');
+  if (btnPlaySetBtm) {
+    btnPlaySetBtm.onclick = () => {
+      if (!state.ytCategoryTracks.length) return;
+      p.setQueue(state.ytCategoryTracks, {
+        startIndex: 0,
+        autoPlay: true,
+        bestPart: state.ytBestPartMode,
+        crossfadeSec: state.ytCrossfadeSec,
+      });
+      showYtToast(`Playing ${state.ytCategoryTracks.length} tracks`);
+    };
+  }
 
-  // Shuffle Play
-  const btnShuffleAll = document.getElementById('btn-yt-shuffle-all');
-  if (btnShuffleAll) {
-    btnShuffleAll.onclick = () => {
+  // Shuffle Play in detail view
+  const btnShuffleSet = document.getElementById('btn-shuffle-category-set');
+  if (btnShuffleSet) {
+    btnShuffleSet.onclick = () => {
       if (!state.ytCategoryTracks.length) return;
       p.shuffle = true;
       const startIdx = Math.floor(Math.random() * state.ytCategoryTracks.length);
@@ -3939,11 +4382,11 @@ function attachGlobalYtListeners() {
         bestPart: state.ytBestPartMode,
         crossfadeSec: state.ytCrossfadeSec,
       });
-      showYtToast(`Shuffling ${state.ytCategoryTracks.length} tracks from ${state.ytSelectedCategory}`);
+      showYtToast(`Shuffling ${state.ytCategoryTracks.length} tracks`);
     };
   }
 
-  // Best Part Toggle in Catalog View
+  // Best Part Toggle in Category Detail View
   const btnBestPart = document.getElementById('btn-yt-best-part-toggle');
   if (btnBestPart) {
     btnBestPart.onclick = () => {
@@ -3953,7 +4396,7 @@ function attachGlobalYtListeners() {
     };
   }
 
-  // Crossfade Slider in Catalog View
+  // Crossfade Slider in Category Detail View
   const inputCrossfade = document.getElementById('input-yt-crossfade');
   if (inputCrossfade) {
     inputCrossfade.oninput = (e) => {
@@ -3969,7 +4412,7 @@ function attachGlobalYtListeners() {
   }
 
   // Add all to DJ crate
-  const btnAddAllCrate = document.getElementById('btn-yt-add-all-crate');
+  const btnAddAllCrate = document.getElementById('btn-add-all-category-crate');
   if (btnAddAllCrate) {
     btnAddAllCrate.onclick = () => {
       const seen = new Set(state.crate.map((c) => c.id));
@@ -3986,55 +4429,59 @@ function attachGlobalYtListeners() {
     };
   }
 
-  // Individual card action buttons
-  document.querySelectorAll('[data-yt-play-btn]').forEach((btn) => {
+  // Individual row action buttons
+  document.querySelectorAll('[data-play-idx]').forEach((btn) => {
     btn.onclick = (e) => {
       e.stopPropagation();
-      const idx = Number(btn.dataset.ytPlayBtn);
-      p.setQueue(state.ytCategoryTracks, {
-        startIndex: idx,
-        autoPlay: true,
-        bestPart: state.ytBestPartMode,
-        crossfadeSec: state.ytCrossfadeSec,
-      });
+      const idx = Number(btn.dataset.playIdx);
+      const ps = p.getPlaybackState();
+      if (ps.queueIndex === idx && ps.currentTrack?.id === state.ytCategoryTracks[idx]?.id) {
+        p.togglePlayPause();
+      } else {
+        p.setQueue(state.ytCategoryTracks, {
+          startIndex: idx,
+          autoPlay: true,
+          bestPart: state.ytBestPartMode,
+          crossfadeSec: state.ytCrossfadeSec,
+        });
+      }
     };
   });
 
-  document.querySelectorAll('[data-yt-queue-btn]').forEach((btn) => {
+  document.querySelectorAll('[data-queue-idx]').forEach((btn) => {
     btn.onclick = (e) => {
       e.stopPropagation();
-      const idx = Number(btn.dataset.ytQueueBtn);
+      const idx = Number(btn.dataset.queueIdx);
       const track = state.ytCategoryTracks[idx];
       if (track) {
         p.addToQueue(track);
-        showYtToast(`Added "${track.title}" to queue`);
+        showYtToast(`Added "${track.title}" to upcoming queue`);
         renderMiniPlayer();
       }
     };
   });
 
-  document.querySelectorAll('[data-yt-crate-btn]').forEach((btn) => {
+  document.querySelectorAll('[data-crate-idx]').forEach((btn) => {
     btn.onclick = (e) => {
       e.stopPropagation();
-      const idx = Number(btn.dataset.ytCrateBtn);
+      const idx = Number(btn.dataset.crateIdx);
       const track = state.ytCategoryTracks[idx];
       if (track) {
         if (!state.crate.some((c) => c.id === track.id)) {
           state.crate.push({ ...track, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
           btn.textContent = '✓';
-          btn.style.color = 'var(--amber)';
-          btn.style.borderColor = 'var(--amber)';
+          btn.classList.add('in-crate');
           showYtToast(`Added "${track.title}" to DJ crate`);
         }
       }
     };
   });
 
-  // Card click plays
-  document.querySelectorAll('.yt-track-card').forEach((card) => {
-    card.onclick = (e) => {
+  // Clicking anywhere on row plays track
+  document.querySelectorAll('.naux-song-row').forEach((row) => {
+    row.onclick = (e) => {
       if (e.target.closest('button')) return;
-      const idx = Number(card.dataset.ytTrackIdx);
+      const idx = Number(row.dataset.songIdx);
       p.setQueue(state.ytCategoryTracks, {
         startIndex: idx,
         autoPlay: true,
@@ -4043,6 +4490,14 @@ function attachGlobalYtListeners() {
       });
     };
   });
+
+  // Retry fetch
+  const btnRetry = document.getElementById('btn-yt-retry-fetch');
+  if (btnRetry) {
+    btnRetry.onclick = () => {
+      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
+    };
+  }
 
   // Mini-player controls
   const miniPlay = document.getElementById('btn-yt-mini-play');

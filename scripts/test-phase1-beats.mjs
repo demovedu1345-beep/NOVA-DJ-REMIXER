@@ -259,15 +259,16 @@ try {
   // Serve generated WAVs via a small static helper or fetch base64 directly into Browser ProMixerEngine!
   console.log('\n--- PHASE 1: TESTING SOURCE CHOICE 1 (YOUTUBE BLOCKING) ---');
   for (let i = 0; i < 40; i++) {
-    const ready = await evalJs(`Boolean(document.getElementById('input-source') || document.getElementById('btn-splash-start'))`);
+    const ready = await evalJs(`Boolean(document.getElementById('input-source') || document.getElementById('btn-splash-start') || document.getElementById('btn-mode-dj'))`);
     if (ready) break;
     await sleep(150);
   }
   const snapInit = await evalJs(`({ html: document.body.innerHTML, errCount: ${consoleErrors.length} })`);
-  if (!snapInit.html.includes('btn-splash-start') && !snapInit.html.includes('input-source')) {
+  if (!snapInit.html.includes('btn-splash-start') && !snapInit.html.includes('input-source') && !snapInit.html.includes('btn-mode-dj')) {
     throw new Error(`UI failed to boot cleanly: ${snapInit.html.slice(0, 400)} | errors=${consoleErrors.join('; ')}`);
   }
   await evalJs(`
+    document.getElementById('btn-mode-dj')?.click();
     document.getElementById('btn-splash-start')?.click();
     true;
   `);

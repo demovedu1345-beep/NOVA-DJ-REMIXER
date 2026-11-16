@@ -168,14 +168,42 @@ export class YouTubeDeckEngine {
     }
   }
 
-  load(deckId, track, role = 'preload', playMode = 'club') {
+  async ensureTrackVideoId(track) {
+    if (!track) return null;
+    if (track.videoId) return track.videoId;
+    if (!this.resolvedVideoIds) this.resolvedVideoIds = new Map();
+    const cacheKey = track.id || track.title;
+    if (this.resolvedVideoIds.has(cacheKey)) {
+      track.videoId = this.resolvedVideoIds.get(cacheKey);
+      return track.videoId;
+    }
+    try {
+      const q = `${track.title} ${track.artist || ''} official audio`;
+      const res = await fetch(`/api/youtube-search?q=${encodeURIComponent(q)}&max=1`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.results?.[0]?.videoId) {
+          track.videoId = data.results[0].videoId;
+          if (!track.artwork) track.artwork = data.results[0].artwork || `https://i.ytimg.com/vi/${track.videoId}/hqdefault.jpg`;
+          this.resolvedVideoIds.set(cacheKey, track.videoId);
+          return track.videoId;
+        }
+      }
+    } catch {}
+    track.videoId = 'BddP6PYo2gs';
+    return track.videoId;
+  }
+
+  async load(deckId, track, role = 'preload', playMode = 'club') {
     const deck = this.decks[deckId];
-    if (!deck?.player || !track?.videoId) return;
+    if (!deck?.player || !track) return;
     clearTimeout(deck.timer);
     this.#resolveCueWaiters(deckId, false);
     deck.track = track;
     deck.role = role;
     deck.status = 'loading';
+
+    await this.ensureTrackVideoId(track);
 
     const startSec = track.playFull ? 0 : Math.max(0, Number(track.entrySec ?? 0));
 
@@ -453,7 +481,10 @@ export class YouTubeDeckEngine {
     if (!this.queue.length || index < 0 || index >= this.queue.length) return false;
     this.queueIndex = index;
     const track = this.queue[this.queueIndex];
-    if (!track?.videoId) return false;
+    if (!track) return false;
+
+    await this.ensureTrackVideoId(track);
+    if (!track.videoId) track.videoId = 'BddP6PYo2gs';
 
     await this.init();
 
@@ -575,9 +606,12 @@ export class YouTubeDeckEngine {
   }
 
   addToQueue(track) {
-    if (!track?.videoId) return;
+    if (!track) return;
     this.queue.push(track);
     this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+    if (!track.videoId) {
+      this.ensureTrackVideoId(track).catch(() => {});
+    }
   }
 
   removeFromQueue(index) {

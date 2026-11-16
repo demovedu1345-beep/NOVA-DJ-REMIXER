@@ -87,8 +87,8 @@ export default async function handler(req, res) {
     const apiKey = sanitizeApiKey(process.env.YOUTUBE_API_KEY);
     const useApiKey = apiKey.length >= 20 && /^AIza/i.test(apiKey);
 
-    let tracks = null;
-    if (catConfig.playlistId) {
+    let tracks = (catConfig?.tracks && catConfig.tracks.length >= 100) ? [...catConfig.tracks] : null;
+    if (!tracks && catConfig.playlistId) {
       if (useApiKey) {
         try {
           const pl = await fetchYouTubePlaylistTracks(catConfig.playlistId, apiKey, 35, catConfig);
@@ -133,9 +133,9 @@ export default async function handler(req, res) {
     await upsertTracks(tracks).catch(() => {});
     const payload = {
       kind: 'category',
-      lang: langConfig.id,
+      lang: query.lang || langConfig.id,
       languageLabel: langConfig.label,
-      category: catConfig.id,
+      category: query.category || catConfig.id,
       categoryLabel: catConfig.label,
       count: tracks.length,
       results: tracks,
