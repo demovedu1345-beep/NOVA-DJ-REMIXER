@@ -98,7 +98,13 @@ try {
   };
 
   await evalJs(`document.getElementById('btn-splash-start')?.click()`);
-  await sleep(300);
+  // Wait until wizard input is in the DOM
+  for (let i = 0; i < 30; i++) {
+    const hasInput = await evalJs(`Boolean(document.getElementById('input-source'))`);
+    if (hasInput) break;
+    await sleep(200);
+  }
+  await sleep(150);
 
   // Click Bollywood genre chip -> Load More page 2 cleanly in UI
   await evalJs(`document.querySelector('[data-genre-id="bollywood"]')?.click()`);

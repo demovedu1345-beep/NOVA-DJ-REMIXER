@@ -47,6 +47,16 @@ function esc(str) {
   }[m]));
 }
 
+const DEFAULT_ARTWORK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230e1015' stroke='%23252836' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='38' fill='none' stroke='%23191c24' stroke-width='1.5' stroke-dasharray='4,2'/%3E%3Ccircle cx='50' cy='50' r='26' fill='none' stroke='%23222530' stroke-width='1'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%23ff4d00'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23060608'/%3E%3C/svg%3E";
+
+window.handleImgError = (img) => {
+  if (img) {
+    img.onerror = null;
+    img.src = DEFAULT_ARTWORK;
+    img.style.opacity = '0.85';
+  }
+};
+
 const LANGUAGES = [
   { id: 'hindi', label: 'Hindi', hint: 'Bollywood · Indie · Retro', query: 'bollywood' },
   { id: 'punjabi', label: 'Punjabi', hint: 'Bhangra · Hip-Hop · Anthems', query: 'punjabi' },
@@ -1530,7 +1540,7 @@ function renderWizard() {
                 const isYt = isYtTrack(t);
                 return `
                   <button class="result-card squeeze ${inCrate ? 'added' : ''}" data-result-idx="${idx}">
-                    <img class="result-thumb" src="${esc(t.artwork || '')}" alt="" onerror="this.style.opacity=0.2" />
+                    <img class="result-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
                     <div class="result-info">
                       <div class="result-title">${esc(t.title)}</div>
                       <div class="result-sub">${esc(t.artist)} · ${fmtTime(t.durationSec)}</div>
@@ -1569,7 +1579,7 @@ function renderWizard() {
       <section class="wizard-body">
         <button class="back-btn" id="btn-wiz-back">← BACK</button>
         <h1 class="hero-h1">HOW SHOULD NOVA MIX?</h1>
-        <p class="hero-sub">Pick how deep NOVA blends each track in your ${state.crate.length}-song crate.</p>
+        <p class="hero-sub">Pick how deep NOVA blends each track in your ${state.crate.length}-${state.crate.length === 1 ? 'song' : 'song'} crate.</p>
         <div class="choice-grid-3">
           ${MIX_STYLES.map((m) => `
             <button class="big-card tall squeeze ${state.playMode === m.id ? 'selected' : ''}" data-mode="${m.id}">
@@ -1602,7 +1612,7 @@ function renderWizard() {
         <h1 class="hero-h1">HOW MANY PEOPLE?</h1>
         <div class="choice-grid-3">
           ${CROWD_SIZES.map((c) => `
-            <button class="big-card tall squeeze" data-crowd="${c.id}">
+            <button class="big-card tall squeeze ${state.crowd === c.id ? 'selected' : ''}" data-crowd="${c.id}">
               <span class="big-card-title">${esc(c.label)}</span>
               <span class="big-card-hint">${esc(c.hint)}</span>
             </button>
@@ -1616,12 +1626,12 @@ function renderWizard() {
     ? (state.crate.length >= 1 || state.selectedLanguages.length >= 1) && !state.searchBusy
     : true;
 
-  const floatingNext = (step === 0 || step === 1) ? `
+  const floatingNext = `
     <div class="floating-next-wrap">
-      ${state.crate.length ? `<button id="btn-open-crate" class="crate-floating-pill squeeze" title="Inspect &amp; edit crate"><span>${state.crate.length}</span> TRACKS READY ▾</button>` : '<div></div>'}
-      <button id="btn-wiz-next" class="floating-next-btn squeeze" ${canNext ? '' : 'disabled'}>NEXT →</button>
+      ${state.crate.length ? `<button id="btn-open-crate" class="crate-floating-pill squeeze" title="Inspect &amp; edit crate"><span>${state.crate.length}</span> ${state.crate.length === 1 ? 'TRACK' : 'TRACKS'} READY ▾</button>` : '<div></div>'}
+      <button id="btn-wiz-next" class="floating-next-btn squeeze" ${canNext ? '' : 'disabled'}>${step === 3 ? 'FINALIZE SET →' : 'NEXT →'}</button>
     </div>
-  ` : '';
+  `;
 
   root.innerHTML = `
     <main class="stage-shell">
@@ -1681,7 +1691,7 @@ function renderSetsModal() {
             <div class="review-row" style="justify-content:space-between">
               <div class="row-main">
                 <div class="row-title">${esc(s.name)}</div>
-                <div class="row-meta">${s.tracks?.length || 0} songs · ${esc(s.vibe?.playMode || 'club').toUpperCase()}</div>
+                <div class="row-meta">${s.tracks?.length || 0} ${(s.tracks?.length || 0) === 1 ? 'song' : 'songs'} · ${esc(s.vibe?.playMode || 'club').toUpperCase()}</div>
               </div>
               <button class="ingest-btn squeeze" style="height:46px;font-size:20px;padding:0 18px" data-load-set="${idx}">LOAD →</button>
             </div>
@@ -1709,13 +1719,14 @@ function renderReview() {
   const recipes = state.setPlan?.transitions || [];
 
   const mins = Math.max(1, Math.round(totalSec / 60));
+  const songCount = state.sequencedSet.length;
 
   root.innerHTML = `
     <main class="stage-shell">
       ${renderTopBar(right)}
       <h1 class="hero-h1" style="margin-top:4vh">TONIGHT'S SET</h1>
       <p class="hero-sub">
-        ${state.sequencedSet.length} songs · about ${mins} ${mins === 1 ? 'minute' : 'minutes'} ·
+        ${songCount} ${songCount === 1 ? 'song' : 'songs'} · about ${mins} ${mins === 1 ? 'minute' : 'minutes'} ·
         <span class="text-accent">${esc(state.playMode.toUpperCase())}</span>
         · <span class="text-amber">${dspCount} FULL DSP</span>
         ${state.setPlan?.validation?.valid ? ' · <span style="color:#6bff95">VALIDATOR ✓</span>' : ''}
@@ -2404,9 +2415,11 @@ function bindWizardEvents() {
   if (next) {
     next.onclick = () => {
       if (state.wizardStep === 0) advanceFromStep0();
-      else {
+      else if (state.wizardStep < 3) {
         state.wizardStep += 1;
         render();
+      } else {
+        buildReviewSet();
       }
     };
   }
@@ -2529,15 +2542,25 @@ function bindWizardEvents() {
     document.querySelectorAll('[data-vibe]').forEach((b) => {
       b.onclick = () => {
         state.vibe = b.dataset.vibe;
-        state.wizardStep = 3;
         render();
+        setTimeout(() => {
+          if (state.wizardStep === 2) {
+            state.wizardStep = 3;
+            render();
+          }
+        }, 220);
       };
     });
   } else if (state.wizardStep === 3) {
     document.querySelectorAll('[data-crowd]').forEach((b) => {
       b.onclick = () => {
         state.crowd = b.dataset.crowd;
-        buildReviewSet();
+        render();
+        setTimeout(() => {
+          if (state.wizardStep === 3) {
+            buildReviewSet();
+          }
+        }, 220);
       };
     });
   }

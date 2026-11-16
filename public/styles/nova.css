@@ -214,12 +214,12 @@ button {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 40px 24px 148px;
+  padding: 40px 24px 220px;
 }
 
 @media (min-width: 768px) {
   .stage-shell {
-    padding: 40px 40px 176px;
+    padding: 40px 40px 240px;
   }
 }
 
@@ -531,20 +531,28 @@ button {
   flex-direction: column;
   justify-content: space-between;
   min-height: 126px;
-  padding: 22px 24px;
+  padding: 24px 26px;
   border-radius: 24px;
-  border: 4px solid rgba(245, 245, 240, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: left;
-  background: transparent;
+  background: var(--surface-glass);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, background-color 0.22s, box-shadow 0.24s;
 }
 .big-card.tall {
   min-height: clamp(140px, 25vh, 260px);
 }
-.big-card:hover { border-color: rgba(245, 245, 240, 0.62); }
+.big-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18), 0 12px 32px rgba(0, 0, 0, 0.45);
+}
 .big-card.selected {
   border-color: var(--accent);
-  background: var(--accent);
-  color: var(--ink);
+  background: linear-gradient(135deg, rgba(255, 77, 0, 0.26) 0%, rgba(255, 77, 0, 0.08) 100%), var(--surface-glass);
+  color: var(--bone);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 0 28px rgba(255, 77, 0, 0.28);
 }
 .big-card-title {
   font-family: var(--font-display);
@@ -558,16 +566,26 @@ button {
 .big-card-hint {
   margin-top: 12px;
   font-size: 18px;
-  color: rgba(245, 245, 240, 0.56);
+  color: rgba(245, 245, 240, 0.6);
 }
 .big-card.selected .big-card-hint {
-  color: rgba(6, 6, 8, 0.76);
+  color: rgba(245, 245, 240, 0.9);
 }
 
 /* Floating NEXT button */
 .floating-next-wrap {
   position: fixed;
   inset-inline: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 44px 24px max(20px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--ink) 72%, rgba(6, 6, 8, 0.85) 45%, transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
   bottom: 0;
   z-index: 30;
   padding: 44px 24px max(18px, env(safe-area-inset-bottom));

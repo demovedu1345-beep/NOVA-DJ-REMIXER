@@ -170,14 +170,22 @@ try {
 
   // Step 1: Enter Wizard (splash auto-advances after 2.4s, so use optional chaining)
   await evalJs(`document.getElementById('btn-splash-start')?.click()`);
-  await sleep(300);
+  // Wait until wizard input is in the DOM (may take a re-render cycle)
+  for (let i = 0; i < 30; i++) {
+    const hasInput = await evalJs(`Boolean(document.getElementById('input-source'))`);
+    if (hasInput) break;
+    await sleep(200);
+  }
+  await sleep(200);
 
   // Step 2: Verify YouTube URL loads honestly in YT Video Mode (No Fake DSP) then clear crate
   await evalJs(`
     const inp = document.getElementById('input-source');
-    inp.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-    inp.dispatchEvent(new Event('input', { bubbles: true }));
-    document.getElementById('btn-fetch-source').click();
+    if (inp) {
+      inp.value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    document.getElementById('btn-fetch-source')?.click();
   `);
   let ytStatus = '';
   for (let i = 0; i < 50; i++) {
