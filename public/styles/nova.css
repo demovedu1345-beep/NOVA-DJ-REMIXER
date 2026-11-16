@@ -1995,3 +1995,766 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ==========================================================================
+   YOUTUBE MUSIC CATALOG & PERSISTENT MINI-PLAYER (ULTRA-TIER ANTI-SLOP UI)
+   ========================================================================== */
+
+/* Top bar app mode switcher */
+.app-mode-switcher {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 3px;
+}
+.mode-switch-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  color: rgba(245, 245, 240, 0.6);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mode-switch-btn:hover {
+  color: var(--bone);
+  background: rgba(255, 255, 255, 0.05);
+}
+.mode-switch-btn.active {
+  color: #060608;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* YouTube Catalog Layout */
+.yt-catalog-view {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 140px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.yt-hero-banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.yt-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.5vw, 44px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 30%, rgba(245, 245, 240, 0.65) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.yt-hero-sub {
+  font-size: 13px;
+  color: rgba(245, 245, 240, 0.55);
+  margin-top: 6px;
+  max-width: 620px;
+  line-height: 1.45;
+}
+
+/* Level 1: Language Tabs */
+.yt-lang-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.yt-lang-tabs::-webkit-scrollbar { display: none; }
+.yt-lang-tab {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(245, 245, 240, 0.7);
+  white-space: nowrap;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.yt-lang-tab:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.yt-lang-tab.active {
+  background: rgba(255, 77, 0, 0.12);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 77, 0, 0.22);
+}
+
+/* Level 2: Category Chips (strictly filtered per language) */
+.yt-cat-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: thin;
+}
+.yt-cat-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(20, 22, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(245, 245, 240, 0.65);
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-cat-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.yt-cat-chip.active {
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--ink);
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(245, 245, 240, 0.18);
+}
+
+/* Level 3: Playlist View & Action Controls */
+.yt-playlist-panel {
+  background: rgba(14, 16, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.yt-playlist-ctrls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.yt-ctrl-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.yt-action-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-action-btn.primary {
+  background: var(--accent);
+  color: #060608;
+  box-shadow: 0 2px 14px var(--accent-glow);
+}
+.yt-action-btn.primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.yt-action-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--bone);
+}
+.yt-action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.yt-action-btn.active-glow {
+  background: rgba(255, 184, 0, 0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 14px var(--amber-glow);
+}
+
+.yt-slider-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(245, 245, 240, 0.7);
+}
+.yt-slider-wrap input[type="range"] {
+  width: 80px;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Track Cards Grid */
+.yt-tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.yt-track-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(18, 20, 27, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.yt-track-card:hover {
+  background: rgba(26, 29, 38, 0.9);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.yt-track-card.is-playing {
+  border-color: var(--accent);
+  background: rgba(255, 77, 0, 0.08);
+  box-shadow: 0 0 20px rgba(255, 77, 0, 0.2);
+}
+
+.yt-card-thumb-wrap {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #000;
+}
+.yt-card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.yt-card-play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s;
+  color: #fff;
+  font-size: 16px;
+}
+.yt-track-card:hover .yt-card-play-overlay,
+.yt-track-card.is-playing .yt-card-play-overlay {
+  opacity: 1;
+}
+
+.yt-card-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.yt-card-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+.yt-card-artist {
+  font-size: 11px;
+  color: rgba(245, 245, 240, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yt-card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.yt-card-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.yt-card-tag.hook {
+  background: rgba(255, 184, 0, 0.14);
+  color: var(--amber);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+}
+.yt-card-tag.dur {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(245, 245, 240, 0.6);
+}
+
+.yt-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.yt-card-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(245, 245, 240, 0.7);
+  font-size: 13px;
+  transition: all 0.18s;
+}
+.yt-card-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* ==========================================================================
+   PERSISTENT MINI-PLAYER (BOTTOM FIXED GLASS BAR)
+   ========================================================================== */
+.yt-mini-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  background: rgba(10, 12, 16, 0.95);
+  backdrop-filter: blur(24px) saturate(160%);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.6);
+  padding: 10px 18px 12px 18px;
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-mini-player.hidden {
+  transform: translateY(110%);
+}
+
+.yt-mini-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Mini player Left: Artwork + Track info */
+.yt-mini-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.yt-mini-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #000;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.yt-mini-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.yt-mini-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yt-mini-artist {
+  font-size: 11px;
+  color: rgba(245, 245, 240, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yt-deck-pill {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 77, 0, 0.16);
+  color: var(--accent);
+  border: 1px solid rgba(255, 77, 0, 0.3);
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* Mini player Center: Transport & Progress Scrubber */
+.yt-mini-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.yt-transport {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.yt-transport-btn {
+  color: rgba(245, 245, 240, 0.7);
+  font-size: 15px;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+}
+.yt-transport-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+.yt-transport-btn.active {
+  color: var(--accent);
+}
+.yt-play-pause-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bone);
+  color: var(--ink);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  box-shadow: 0 2px 10px rgba(245, 245, 240, 0.3);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-play-pause-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.yt-timeline-row {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.yt-time-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(245, 245, 240, 0.5);
+  min-width: 32px;
+}
+.yt-scrub-track {
+  flex: 1;
+  position: relative;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.yt-scrub-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.1s linear;
+}
+.yt-scrub-hook-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 184, 0, 0.35);
+  border-left: 1px solid var(--amber);
+  border-right: 1px solid var(--amber);
+  pointer-events: none;
+}
+
+/* Mini player Right: Mode Toggles & Queue */
+.yt-mini-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.yt-pill-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(245, 245, 240, 0.7);
+  transition: all 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.yt-pill-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.yt-pill-toggle.active {
+  background: rgba(255, 184, 0, 0.16);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.yt-queue-trigger-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s;
+}
+.yt-queue-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.yt-queue-badge {
+  background: var(--accent);
+  color: #060608;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   QUEUE DRAWER MODAL
+   ========================================================================== */
+.yt-queue-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-queue-drawer.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.yt-queue-panel {
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: #0d0f14;
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 16px;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-queue-drawer.open .yt-queue-panel {
+  transform: translateX(0);
+}
+
+.yt-queue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.yt-queue-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.yt-queue-items {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+.yt-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.18s;
+}
+.yt-queue-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.yt-queue-item.active {
+  background: rgba(255, 77, 0, 0.1);
+  border-color: var(--accent);
+}
+.yt-queue-item-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.yt-queue-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.yt-queue-item-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yt-queue-item-artist {
+  font-size: 10px;
+  color: rgba(245, 245, 240, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.yt-queue-item-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.yt-queue-sm-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: rgba(245, 245, 240, 0.6);
+  transition: all 0.15s;
+}
+.yt-queue-sm-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.yt-queue-sm-btn.remove:hover {
+  background: rgba(255, 60, 60, 0.2);
+  color: #ff5555;
+}
+
+/* Floating Notification Toast */
+.yt-toast {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 1200;
+  background: #141720;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--bone);
+  max-width: 420px;
+  animation: slideToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideToast {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .yt-mini-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .yt-mini-right {
+    justify-content: center;
+  }
+  .yt-mini-track {
+    justify-content: center;
+    text-align: center;
+  }
+}

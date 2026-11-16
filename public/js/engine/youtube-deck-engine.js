@@ -44,6 +44,20 @@ export class YouTubeDeckEngine {
     this.fadeTimer = null;
     this.readyResolvers = { A: null, B: null };
     this.cueWaiters = { A: [], B: [] };
+
+    // Playlist & continuous playback state
+    this.queue = [];
+    this.queueIndex = 0;
+    this.activeDeckId = 'A';
+    this.isPlaying = false;
+    this.shuffle = false;
+    this.repeat = 'off'; // 'off' | 'all' | 'one'
+    this.bestPart = true;
+    this.crossfadeSec = 4;
+    this.playbackTimer = null;
+    this.isCrossfading = false;
+    this.preloadingNext = false;
+    this.lastPreloadedTrackId = null;
   }
 
   async init() {
@@ -143,7 +157,15 @@ export class YouTubeDeckEngine {
       this.readyResolvers[deck.id](false);
       this.readyResolvers[deck.id] = null;
     }
+    const unplayableCodes = [100, 101, 150, 'timeout'];
+    const isUnplayable = unplayableCodes.includes(code);
     this.cb.onDeckError?.(deck.id, deck.track, code);
+    if (isUnplayable && deck.track) {
+      this.cb.onAutoSkipped?.(deck.track, code);
+      if (this.queue.length > 0 && deck.id === this.activeDeckId && this.isPlaying) {
+        setTimeout(() => this.nextTrack(true), 200);
+      }
+    }
   }
 
   load(deckId, track, role = 'preload', playMode = 'club') {
@@ -361,6 +383,11 @@ export class YouTubeDeckEngine {
   }
 
   stopAll() {
+    this.#stopPlaybackLoop();
+    this.isPlaying = false;
+    this.isCrossfading = false;
+    this.preloadingNext = false;
+    this.lastPreloadedTrackId = null;
     if (this.fadeTimer) clearInterval(this.fadeTimer);
     for (const id of ['A', 'B']) {
       clearTimeout(this.decks[id].timer);
@@ -372,5 +399,345 @@ export class YouTubeDeckEngine {
       this.decks[id].status = 'empty';
       this.decks[id].track = null;
     }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  // ==========================================
+  // PLAYLIST, QUEUE & BEST-PART PLAYBACK ENGINE
+  // ==========================================
+
+  setQueue(tracks = [], { startIndex = 0, autoPlay = true, bestPart = true, crossfadeSec = 4 } = {}) {
+    this.queue = Array.isArray(tracks) ? [...tracks] : [];
+    this.queueIndex = Math.max(0, Math.min(Math.max(0, this.queue.length - 1), startIndex));
+    this.bestPart = Boolean(bestPart);
+    this.crossfadeSec = Math.max(0, Math.min(8, Number(crossfadeSec) || 0));
+    this.preloadingNext = false;
+    this.lastPreloadedTrackId = null;
+
+    if (autoPlay && this.queue.length > 0) {
+      this.playTrackAtIndex(this.queueIndex);
+    }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  getCurrentTrack() {
+    return this.queue[this.queueIndex] || this.decks[this.activeDeckId]?.track || null;
+  }
+
+  getPlaybackState() {
+    const liveDeck = this.decks[this.activeDeckId];
+    let currentTime = 0;
+    let duration = 0;
+    try {
+      currentTime = liveDeck?.player?.getCurrentTime?.() || 0;
+      duration = liveDeck?.player?.getDuration?.() || liveDeck?.track?.durationSec || 0;
+    } catch {}
+
+    return {
+      currentTrack: this.getCurrentTrack(),
+      activeDeckId: this.activeDeckId,
+      isPlaying: this.isPlaying,
+      currentTime,
+      duration,
+      queue: [...this.queue],
+      queueIndex: this.queueIndex,
+      shuffle: this.shuffle,
+      repeat: this.repeat,
+      bestPart: this.bestPart,
+      crossfadeSec: this.crossfadeSec,
+      isCrossfading: this.isCrossfading,
+    };
+  }
+
+  async playTrackAtIndex(index, immediate = false) {
+    if (!this.queue.length || index < 0 || index >= this.queue.length) return false;
+    this.queueIndex = index;
+    const track = this.queue[this.queueIndex];
+    if (!track?.videoId) return false;
+
+    await this.init();
+
+    const currentDeckId = this.activeDeckId;
+    const targetDeckId = (immediate || !this.isPlaying) ? currentDeckId : (currentDeckId === 'A' ? 'B' : 'A');
+
+    const startSec = this.bestPart
+      ? Number(track.hookStartSec ?? (track.entrySec ?? Math.round((track.durationSec || 180) * 0.25)))
+      : 0;
+
+    this.load(targetDeckId, { ...track, entrySec: startSec, playFull: !this.bestPart }, 'live');
+    this.activeDeckId = targetDeckId;
+    this.isPlaying = true;
+    this.preloadingNext = false;
+    this.lastPreloadedTrackId = null;
+    this.isCrossfading = false;
+
+    if (targetDeckId !== currentDeckId && this.decks[currentDeckId].status === 'live') {
+      try {
+        this.decks[currentDeckId].player?.pauseVideo();
+        this.decks[currentDeckId].player?.mute();
+        this.decks[currentDeckId].status = 'empty';
+      } catch {}
+    }
+
+    this.#startPlaybackLoop();
+    this.cb.onTrackChange?.(track, this.queueIndex);
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+    return true;
+  }
+
+  togglePlayPause() {
+    const deck = this.decks[this.activeDeckId];
+    if (this.isPlaying) {
+      this.pause(this.activeDeckId);
+      this.isPlaying = false;
+      this.#stopPlaybackLoop();
+    } else {
+      if (!deck?.track && this.queue.length > 0) {
+        return this.playTrackAtIndex(this.queueIndex);
+      }
+      this.resume(this.activeDeckId);
+      this.isPlaying = true;
+      this.#startPlaybackLoop();
+    }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+    return this.isPlaying;
+  }
+
+  nextTrack(autoSkipped = false) {
+    if (!this.queue.length) return;
+    const nextIdx = this.#getNextIndex();
+    if (nextIdx >= 0) {
+      this.playTrackAtIndex(nextIdx);
+    } else {
+      this.stopAll();
+    }
+  }
+
+  prevTrack() {
+    if (!this.queue.length) return;
+    const deck = this.decks[this.activeDeckId];
+    let curTime = 0;
+    try { curTime = deck?.player?.getCurrentTime?.() || 0; } catch {}
+    const startSec = this.bestPart
+      ? Number(deck?.track?.hookStartSec ?? Math.round((deck?.track?.durationSec || 180) * 0.25))
+      : 0;
+
+    if (curTime > startSec + 3) {
+      this.seekTo(startSec);
+      return;
+    }
+
+    const prevIdx = this.queueIndex > 0 ? this.queueIndex - 1 : (this.repeat === 'all' ? this.queue.length - 1 : 0);
+    this.playTrackAtIndex(prevIdx);
+  }
+
+  seekTo(seconds) {
+    const sec = Math.max(0, Number(seconds) || 0);
+    this.seek(this.activeDeckId, sec);
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  setCrossfadeSec(seconds) {
+    this.crossfadeSec = Math.max(0, Math.min(8, Number(seconds) || 0));
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  setBestPartMode(enabled) {
+    this.bestPart = Boolean(enabled);
+    const track = this.getCurrentTrack();
+    if (this.isPlaying && track) {
+      const liveDeck = this.decks[this.activeDeckId];
+      if (liveDeck?.player) {
+        try {
+          const cur = liveDeck.player.getCurrentTime?.() || 0;
+          const hookStart = Number(track.hookStartSec ?? Math.round((track.durationSec || 180) * 0.25));
+          if (this.bestPart && cur < hookStart) {
+            liveDeck.player.seekTo(hookStart, true);
+          }
+        } catch {}
+      }
+    }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  toggleShuffle() {
+    this.shuffle = !this.shuffle;
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+    return this.shuffle;
+  }
+
+  toggleRepeat() {
+    const modes = ['off', 'all', 'one'];
+    const idx = modes.indexOf(this.repeat);
+    this.repeat = modes[(idx + 1) % modes.length];
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+    return this.repeat;
+  }
+
+  addToQueue(track) {
+    if (!track?.videoId) return;
+    this.queue.push(track);
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  removeFromQueue(index) {
+    if (index < 0 || index >= this.queue.length) return;
+    const isCurrent = (index === this.queueIndex);
+    this.queue.splice(index, 1);
+    if (isCurrent) {
+      if (this.queue.length === 0) {
+        this.stopAll();
+      } else {
+        this.queueIndex = Math.min(this.queueIndex, this.queue.length - 1);
+        this.playTrackAtIndex(this.queueIndex);
+      }
+    } else if (index < this.queueIndex) {
+      this.queueIndex = Math.max(0, this.queueIndex - 1);
+    }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  reorderQueue(fromIdx, toIdx) {
+    if (fromIdx < 0 || fromIdx >= this.queue.length || toIdx < 0 || toIdx >= this.queue.length) return;
+    const currentTrack = this.queue[this.queueIndex];
+    const [moved] = this.queue.splice(fromIdx, 1);
+    this.queue.splice(toIdx, 0, moved);
+    if (currentTrack) {
+      this.queueIndex = this.queue.findIndex(t => t.id === currentTrack.id);
+    }
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+  }
+
+  #getNextIndex() {
+    if (!this.queue.length) return -1;
+    if (this.repeat === 'one') return this.queueIndex;
+    if (this.shuffle && this.queue.length > 1) {
+      let rand = Math.floor(Math.random() * this.queue.length);
+      if (rand === this.queueIndex) rand = (rand + 1) % this.queue.length;
+      return rand;
+    }
+    if (this.queueIndex + 1 < this.queue.length) return this.queueIndex + 1;
+    if (this.repeat === 'all') return 0;
+    return -1;
+  }
+
+  #getNextTrack() {
+    const idx = this.#getNextIndex();
+    return idx >= 0 ? this.queue[idx] : null;
+  }
+
+  #startPlaybackLoop() {
+    if (this.playbackTimer) clearInterval(this.playbackTimer);
+    this.playbackTimer = setInterval(() => this.#onPlaybackTick(), 200);
+  }
+
+  #stopPlaybackLoop() {
+    if (this.playbackTimer) {
+      clearInterval(this.playbackTimer);
+      this.playbackTimer = null;
+    }
+  }
+
+  async #onPlaybackTick() {
+    if (!this.isPlaying || this.isCrossfading) return;
+    const liveDeck = this.decks[this.activeDeckId];
+    if (!liveDeck?.player || liveDeck.status !== 'live') return;
+
+    let curTime = 0;
+    let dur = 0;
+    try {
+      curTime = liveDeck.player.getCurrentTime?.() || 0;
+      dur = liveDeck.player.getDuration?.() || liveDeck.track?.durationSec || 0;
+    } catch {
+      return;
+    }
+
+    const track = liveDeck.track;
+    if (!track) return;
+
+    this.cb.onTimeUpdate?.(curTime, dur, track);
+
+    let targetEnd = dur || track.durationSec || 180;
+    if (this.bestPart) {
+      const hookStart = Number(track.hookStartSec ?? (track.entrySec ?? Math.round((dur || 180) * 0.25)));
+      const hookDur = Number(track.hookDurationSec ?? 35);
+      const hookEnd = Number(track.hookEndSec ?? (hookStart + hookDur));
+      targetEnd = Math.min(dur > 15 ? dur : hookEnd, hookEnd);
+    }
+
+    const timeLeft = targetEnd - curTime;
+
+    const preloadThreshold = Math.max(3.5, this.crossfadeSec + 3);
+    if (timeLeft <= preloadThreshold && !this.preloadingNext) {
+      const nextTrack = this.#getNextTrack();
+      if (nextTrack && this.lastPreloadedTrackId !== nextTrack.id) {
+        this.preloadingNext = true;
+        this.lastPreloadedTrackId = nextTrack.id;
+        const otherDeckId = this.activeDeckId === 'A' ? 'B' : 'A';
+        const nextStart = this.bestPart
+          ? Number(nextTrack.hookStartSec ?? Math.round((nextTrack.durationSec || 180) * 0.25))
+          : 0;
+        this.load(otherDeckId, { ...nextTrack, entrySec: nextStart, playFull: !this.bestPart }, 'preload');
+      }
+    }
+
+    if (timeLeft <= Math.max(0.3, this.crossfadeSec)) {
+      await this.#triggerAutoTransition();
+    }
+  }
+
+  async #triggerAutoTransition() {
+    if (this.isCrossfading) return;
+    this.isCrossfading = true;
+
+    const fromDeckId = this.activeDeckId;
+    const toDeckId = fromDeckId === 'A' ? 'B' : 'A';
+    const nextIdx = this.#getNextIndex();
+
+    if (nextIdx < 0) {
+      await this.fadeOutDeck(fromDeckId, Math.max(1000, this.crossfadeSec * 1000));
+      this.isPlaying = false;
+      this.isCrossfading = false;
+      this.#stopPlaybackLoop();
+      this.cb.onPlaybackStateChange?.(this.getPlaybackState());
+      return;
+    }
+
+    const nextTrack = this.queue[nextIdx];
+    this.queueIndex = nextIdx;
+
+    if (this.decks[toDeckId].track?.id !== nextTrack.id || this.decks[toDeckId].status !== 'ready') {
+      const nextStart = this.bestPart
+        ? Number(nextTrack.hookStartSec ?? Math.round((nextTrack.durationSec || 180) * 0.25))
+        : 0;
+      this.load(toDeckId, { ...nextTrack, entrySec: nextStart, playFull: !this.bestPart }, 'preload');
+      await this.waitForReady(toDeckId, 3500);
+    }
+
+    await this.playPreloaded(toDeckId);
+
+    if (this.crossfadeSec <= 0.1) {
+      try {
+        this.decks[fromDeckId].player?.pauseVideo();
+        this.decks[fromDeckId].player?.mute();
+      } catch {}
+      this.decks[fromDeckId].status = 'empty';
+      this.decks[toDeckId].status = 'live';
+      this.decks[toDeckId].role = 'live';
+      try {
+        this.decks[toDeckId].player?.unMute();
+        this.decks[toDeckId].player?.setVolume(100);
+      } catch {}
+    } else {
+      await this.crossfade(fromDeckId, toDeckId, this.crossfadeSec * 1000, 'phrase');
+    }
+
+    this.activeDeckId = toDeckId;
+    this.isCrossfading = false;
+    this.preloadingNext = false;
+    this.lastPreloadedTrackId = null;
+
+    this.cb.onTrackChange?.(nextTrack, this.queueIndex);
+    this.cb.onPlaybackStateChange?.(this.getPlaybackState());
   }
 }

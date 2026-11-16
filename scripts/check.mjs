@@ -28,3 +28,6 @@ for (const dir of dirs) {
 
 const unit = spawnSync(process.execPath, [path.join(root, 'scripts/test-v2-engine.mjs')], { stdio: 'inherit' });
 if (unit.status !== 0) process.exit(unit.status ?? 1);
+
+const ytUnit = spawnSync(process.execPath, [path.join(root, 'scripts/test-youtube-integration.mjs')], { stdio: 'inherit' });
+if (ytUnit.status !== 0) process.exit(ytUnit.status ?? 1);

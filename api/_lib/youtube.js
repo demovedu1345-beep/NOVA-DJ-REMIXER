@@ -1,3 +1,5 @@
+import { computeTrackHookOffsets } from '../../public/js/engine/youtube-catalog-config.js';
+
 const JUNK_PARENS = /^(?:feat\.?|ft\.?|featuring|from|official|video|audio|lyrics?|lyrical|full\s+song|full\s+video|4k|hd|hq|original\s+motion\s+picture(?:\s+soundtrack)?|video\s+song|audio\s+song|music\s+video|latest\s+.*songs?|new\s+.*songs?|mp3cut|320\s*kbps|free\s+download)\b/i;
 const LANG_ONLY_PARENS = /^(?:hindi|punjabi|english|tamil|telugu|gujarati|bhojpuri|haryanvi|marathi|bengali|kannada|malayalam)(?:\s*[+/&,]\s*(?:hindi|punjabi|english|tamil|telugu|gujarati|bhojpuri|haryanvi|marathi|bengali|kannada|malayalam))*(?:\s+(?:version|ver\.?))?$/i;
 const TRAILING_TAGS = /\s*(?:\||::|—|-)\s*(?:official\s+(?:music\s+)?(?:video|audio|song)|full\s+(?:video|song|audio)|lyrical(?:\s+video)?|4k(?:\s+video)?|hd\s+video|latest\s+.*songs?|new\s+.*songs?|t-series|zee music|yrf|sony music|tips official|speed records|saregama).*$/i;
@@ -112,12 +114,21 @@ export function parseYouTubeInput(input) {
   return { kind: 'query', query: raw };
 }
 
-function makeTrack({ videoId, rawTitle, channelTitle, durationSec, artwork }) {
+export function makeTrack({
+  videoId,
+  rawTitle,
+  channelTitle,
+  durationSec,
+  artwork,
+  hookOffsets = null,
+  categoryConfig = null,
+}) {
   const { title, artist } = cleanTrackMetadata(rawTitle, channelTitle);
   const rawDur = Number(durationSec) || 0;
   const safeDur = rawDur >= 20 && rawDur <= 3600 ? rawDur : 210;
-  const defaultEntry = Math.min(Math.round(safeDur * 0.22), 45);
-  const defaultExit = Math.min(safeDur - 3, Math.max(defaultEntry + 42, Math.round(safeDur * 0.78)));
+  const hook = computeTrackHookOffsets({ videoId, durationSec: safeDur, hookOffsets }, categoryConfig);
+  const defaultEntry = hook.hookStartSec;
+  const defaultExit = hook.hookEndSec;
 
   return {
     id: `yt-${videoId}`,
@@ -137,6 +148,9 @@ function makeTrack({ videoId, rawTitle, channelTitle, durationSec, artwork }) {
     duration: safeDur,
     entrySec: defaultEntry,
     exitSec: defaultExit,
+    hookStartSec: hook.hookStartSec,
+    hookDurationSec: hook.hookDurationSec,
+    hookEndSec: hook.hookEndSec,
     playFull: false,
     bpm: null,
     key: null,
@@ -184,14 +198,15 @@ export async function fetchVideoDetailsBatch(videoIds, apiKey) {
   return detailsMap;
 }
 
-export async function searchYouTubeTracks(query, apiKey, limit = 15) {
+export async function searchYouTubeTracks(query, apiKey, limit = 25, options = {}) {
+  const targetLimit = Math.max(1, Math.min(50, limit));
   let searchData = await fetchYtJson(
     'search',
     {
       part: 'snippet',
       type: 'video',
       q: query,
-      maxResults: String(Math.min(25, Math.max(1, limit))),
+      maxResults: String(Math.min(50, Math.max(10, targetLimit + 10))),
       videoEmbeddable: 'true',
       videoCategoryId: '10',
       safeSearch: 'none',
@@ -200,14 +215,14 @@ export async function searchYouTubeTracks(query, apiKey, limit = 15) {
   );
 
   let items = Array.isArray(searchData.items) ? searchData.items : [];
-  if (items.length < 4) {
+  if (items.length < 5) {
     searchData = await fetchYtJson(
       'search',
       {
         part: 'snippet',
         type: 'video',
         q: query,
-        maxResults: String(Math.min(25, Math.max(1, limit))),
+        maxResults: String(Math.min(50, Math.max(10, targetLimit + 10))),
         videoEmbeddable: 'true',
       },
       apiKey
@@ -215,25 +230,76 @@ export async function searchYouTubeTracks(query, apiKey, limit = 15) {
     items = Array.isArray(searchData.items) ? searchData.items : [];
   }
 
+  // Paging if under target limit
+  if (items.length < targetLimit && searchData.nextPageToken) {
+    try {
+      const page2 = await fetchYtJson(
+        'search',
+        {
+          part: 'snippet',
+          type: 'video',
+          q: query,
+          maxResults: '50',
+          pageToken: searchData.nextPageToken,
+          videoEmbeddable: 'true',
+          videoCategoryId: '10',
+        },
+        apiKey
+      );
+      if (Array.isArray(page2.items)) {
+        items.push(...page2.items);
+      }
+    } catch {}
+  }
+
   const ids = items.map((x) => x?.id?.videoId).filter(Boolean);
   const detailsMap = ids.length ? await fetchVideoDetailsBatch(ids, apiKey) : {};
 
-  return items
-    .map((item) => {
-      const videoId = item?.id?.videoId;
-      if (!videoId) return null;
-      const details = detailsMap[videoId];
-      if (details?.status?.embeddable === false) return null;
-      const thumbs = item.snippet?.thumbnails || {};
-      return makeTrack({
+  const isShortOrNonMusic = (rawTitle, durSec, snippet, details) => {
+    if (durSec < 45 || durSec > 1800) return true;
+    const combined = `${rawTitle || ''} ${snippet?.title || ''}`.toLowerCase();
+    if (/#shorts\b|#short\b/i.test(combined)) return true;
+    if (snippet?.liveBroadcastContent === 'live' || details?.snippet?.liveBroadcastContent === 'live') return true;
+    if (!options.allowRemixes) {
+      if (/\b(cover|karaoke|instrumental\s*cover|guitar\s*cover|piano\s*cover|drum\s*cover|acoustic\s*cover|parody|tribute)\b/i.test(combined)) {
+        return true;
+      }
+      if (/\b(slowed\s*(?:and|\+)?\s*reverb|8d\s*audio|nightcore|lofi\s*remix|bass\s*boosted)\b/i.test(combined)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const results = [];
+  const seenIds = new Set();
+  for (const item of items) {
+    const videoId = item?.id?.videoId;
+    if (!videoId || seenIds.has(videoId)) continue;
+    seenIds.add(videoId);
+
+    const details = detailsMap[videoId];
+    if (details?.status?.embeddable === false) continue;
+    const durSec = parseIsoDuration(details?.contentDetails?.duration || '');
+    if (isShortOrNonMusic(item.snippet?.title, durSec, item.snippet, details)) continue;
+
+    const thumbs = item.snippet?.thumbnails || {};
+    const hookOffsets = options.trackOffsets?.[videoId] || null;
+    results.push(
+      makeTrack({
         videoId,
         rawTitle: item.snippet?.title,
         channelTitle: item.snippet?.channelTitle,
-        durationSec: parseIsoDuration(details?.contentDetails?.duration || ''),
+        durationSec: durSec,
         artwork: thumbs.maxres?.url || thumbs.high?.url || thumbs.medium?.url || thumbs.default?.url,
-      });
-    })
-    .filter(Boolean);
+        hookOffsets,
+        categoryConfig: options,
+      })
+    );
+    if (results.length >= targetLimit) break;
+  }
+
+  return results;
 }
 
 export async function fetchYouTubePlaylistTracks(playlistId, apiKey, maxItems = 150) {
@@ -390,26 +456,51 @@ function extractInnertubeKey(html) {
 }
 
 const CURATED_YT_CATALOG = [
-  { videoId: 'dQw4w9WgXcQ', rawTitle: 'Rick Astley - Never Gonna Give You Up', channelTitle: 'Rick Astley', durationSec: 212, genre: 'pop' },
-  { videoId: 'kJQP7kiw5Fk', rawTitle: 'Luis Fonsi ft. Daddy Yankee - Despacito', channelTitle: 'Luis Fonsi', durationSec: 282, genre: 'latin' },
-  { videoId: '9bZkp7q19f0', rawTitle: 'PSY - GANGNAM STYLE', channelTitle: 'officialpsy', durationSec: 252, genre: 'kpop' },
-  { videoId: 'JGwWNGJdvx8', rawTitle: 'Ed Sheeran - Shape of You', channelTitle: 'Ed Sheeran', durationSec: 233, genre: 'pop' },
-  { videoId: 'fJ9rUzIMcZQ', rawTitle: 'Queen - Bohemian Rhapsody', channelTitle: 'Queen Official', durationSec: 359, genre: 'rock' },
-  { videoId: 'OPf0YbXqDm0', rawTitle: 'Mark Ronson ft. Bruno Mars - Uptown Funk', channelTitle: 'Mark Ronson', durationSec: 270, genre: 'funk' },
-  { videoId: 'CevxZvSJLk8', rawTitle: 'Katy Perry - Roar', channelTitle: 'Katy Perry', durationSec: 223, genre: 'pop' },
-  { videoId: 'hT_nvWreIhg', rawTitle: 'OneRepublic - Counting Stars', channelTitle: 'OneRepublic', durationSec: 257, genre: 'pop' },
-  { videoId: 'k2qgadSvNyU', rawTitle: 'Dua Lipa - New Rules', channelTitle: 'Dua Lipa', durationSec: 225, genre: 'pop' },
-  { videoId: '7PCkvCPvDXk', rawTitle: 'Badshah, Payal Dev - Genda Phool', channelTitle: 'Sony Music India', durationSec: 191, genre: 'hindi' },
-  { videoId: 'VAdGW7QDJUI', rawTitle: 'Diljit Dosanjh - Lover', channelTitle: 'Diljit Dosanjh', durationSec: 201, genre: 'punjabi' },
-  { videoId: 'Umhl_GQ76o4', rawTitle: 'Arijit Singh - Tum Hi Ho', channelTitle: 'T-Series', durationSec: 262, genre: 'hindi' },
-  { videoId: 'vX2cDW8LUWk', rawTitle: 'Badshah, Akanksha Sharma - Jugnu', channelTitle: 'Badshah', durationSec: 230, genre: 'hindi' },
-  { videoId: '0I4nC4G_2Wc', rawTitle: 'Shreya Ghoshal - Deewani Mastani', channelTitle: 'Eros Now Music', durationSec: 340, genre: 'hindi' },
-  { videoId: 'LsoLEjrDogU', rawTitle: "Bruno Mars - That's What I Like", channelTitle: 'Bruno Mars', durationSec: 210, genre: 'rnb' },
-  { videoId: '09R8_2nJtjg', rawTitle: 'Maroon 5 - Sugar', channelTitle: 'Maroon 5', durationSec: 301, genre: 'pop' },
-  { videoId: '2Vv-BfVoq4g', rawTitle: 'Ed Sheeran - Perfect', channelTitle: 'Ed Sheeran', durationSec: 263, genre: 'pop' },
+  // English / Hollywood Pop, Rock, Hip-Hop, EDM
+  { videoId: 'JGwWNGJdvx8', rawTitle: 'Ed Sheeran - Shape of You', channelTitle: 'Ed Sheeran', durationSec: 233, genre: 'english pop' },
+  { videoId: 'kJQP7kiw5Fk', rawTitle: 'Luis Fonsi ft. Daddy Yankee - Despacito', channelTitle: 'Luis Fonsi', durationSec: 282, genre: 'latin pop' },
+  { videoId: 'fJ9rUzIMcZQ', rawTitle: 'Queen - Bohemian Rhapsody', channelTitle: 'Queen Official', durationSec: 359, genre: 'rock classic' },
+  { videoId: 'OPf0YbXqDm0', rawTitle: 'Mark Ronson ft. Bruno Mars - Uptown Funk', channelTitle: 'Mark Ronson', durationSec: 270, genre: 'english funk pop' },
+  { videoId: 'hT_nvWreIhg', rawTitle: 'OneRepublic - Counting Stars', channelTitle: 'OneRepublic', durationSec: 257, genre: 'english pop' },
+  { videoId: 'k2qgadSvNyU', rawTitle: 'Dua Lipa - New Rules', channelTitle: 'Dua Lipa', durationSec: 225, genre: 'english pop' },
+  { videoId: 'dQw4w9WgXcQ', rawTitle: 'Rick Astley - Never Gonna Give You Up', channelTitle: 'Rick Astley', durationSec: 212, genre: 'english 90s pop' },
+  { videoId: '9bZkp7q19f0', rawTitle: 'PSY - GANGNAM STYLE', channelTitle: 'officialpsy', durationSec: 252, genre: 'kpop dance' },
+  { videoId: 'CevxZvSJLk8', rawTitle: 'Katy Perry - Roar', channelTitle: 'Katy Perry', durationSec: 223, genre: 'english pop' },
+  { videoId: 'LsoLEjrDogU', rawTitle: "Bruno Mars - That's What I Like", channelTitle: 'Bruno Mars', durationSec: 210, genre: 'english rnb' },
+  { videoId: '09R8_2nJtjg', rawTitle: 'Maroon 5 - Sugar', channelTitle: 'Maroon 5', durationSec: 301, genre: 'english pop' },
+  { videoId: '2Vv-BfVoq4g', rawTitle: 'Ed Sheeran - Perfect', channelTitle: 'Ed Sheeran', durationSec: 263, genre: 'english love songs' },
+  { videoId: 'YQHsXMglC9A', rawTitle: 'Adele - Hello', channelTitle: 'Adele', durationSec: 367, genre: 'english breakup songs' },
+  { videoId: 'e-ORhEE9VVg', rawTitle: 'Taylor Swift - Blank Space', channelTitle: 'Taylor Swift', durationSec: 272, genre: 'english pop' },
+  { videoId: 'IcrbM1l_BoI', rawTitle: 'Avicii - Wake Me Up', channelTitle: 'Avicii', durationSec: 272, genre: 'dance edm' },
+  { videoId: '1w7OgIMMRc4', rawTitle: 'Guns N Roses - Sweet Child O Mine', channelTitle: 'Guns N Roses', durationSec: 302, genre: 'rock' },
+
+  // Bollywood / Hindi
+  { videoId: 'Umhl_GQ76o4', rawTitle: 'Arijit Singh - Tum Hi Ho', channelTitle: 'T-Series', durationSec: 262, genre: 'bollywood love romantic' },
+  { videoId: 'BddP6PYo2gs', rawTitle: 'Arijit Singh - Kesariya', channelTitle: 'Sony Music India', durationSec: 268, genre: 'bollywood love latest' },
+  { videoId: 'V7LwfY5U5WI', rawTitle: 'Arijit Singh, Shilpa Rao - Chaleya', channelTitle: 'T-Series', durationSec: 200, genre: 'bollywood romantic latest' },
+  { videoId: '7PCkvCPvDXk', rawTitle: 'Badshah, Payal Dev - Genda Phool', channelTitle: 'Sony Music India', durationSec: 191, genre: 'bollywood party dance' },
+  { videoId: 'vX2cDW8LUWk', rawTitle: 'Badshah, Akanksha Sharma - Jugnu', channelTitle: 'Badshah', durationSec: 230, genre: 'bollywood party dance' },
+  { videoId: '0I4nC4G_2Wc', rawTitle: 'Shreya Ghoshal - Deewani Mastani', channelTitle: 'Eros Now Music', durationSec: 340, genre: 'bollywood romantic' },
+  { videoId: 'JFcgOboQZ08', rawTitle: 'KK - Aankhon Mein Teri', channelTitle: 'T-Series', durationSec: 244, genre: 'bollywood 2000s love' },
+  { videoId: '6k8CPUkKK4c', rawTitle: 'Kumar Sanu, Alka Yagnik - Chura Ke Dil Mera', channelTitle: 'Venus', durationSec: 320, genre: '90s bollywood' },
+  { videoId: 'a4z6lOtxxVU', rawTitle: 'Sonu Nigam - Kal Ho Naa Ho', channelTitle: 'Sony Music India', durationSec: 321, genre: 'bollywood sad emotional' },
+  { videoId: 'kJl0a_eD1w0', rawTitle: 'Neha Kakkar - O Saki Saki', channelTitle: 'T-Series', durationSec: 192, genre: 'bollywood party workout' },
+
+  // Punjabi
+  { videoId: 'VAdGW7QDJUI', rawTitle: 'Diljit Dosanjh - Lover', channelTitle: 'Diljit Dosanjh', durationSec: 201, genre: 'punjabi romantic latest' },
+  { videoId: 'cl0a3i2wFzA', rawTitle: 'Karan Aujla - Softly', channelTitle: 'Karan Aujla', durationSec: 156, genre: 'punjabi bhangra latest' },
+  { videoId: 'm4r_bN9zQoY', rawTitle: 'AP Dhillon, Gurinder Gill - Brown Munde', channelTitle: 'Run-Up Records', durationSec: 268, genre: 'punjabi hiphop' },
+  { videoId: 'dCmp56tSSmA', rawTitle: 'Sidhu Moose Wala - 295', channelTitle: 'Sidhu Moose Wala', durationSec: 270, genre: 'punjabi hiphop' },
+  { videoId: '1OAMcGwHkPQ', rawTitle: 'Shubh - No Love', channelTitle: 'SHUBH', durationSec: 170, genre: 'punjabi sad heartbreak' },
+
+  // Tamil & Telugu
+  { videoId: 'KUN5Uf9mObQ', rawTitle: 'Anirudh - Arabic Kuthu (Halamithi Habibo)', channelTitle: 'Sun TV', durationSec: 280, genre: 'tamil kuthu mass' },
+  { videoId: 'vxjT81b-w4A', rawTitle: 'Anirudh - Vaathi Coming', channelTitle: 'Sony Music South', durationSec: 230, genre: 'tamil mass kuthu' },
+  { videoId: 'OsU0CGZoV8E', rawTitle: 'Rahul Sipligunj, Kaala Bhairava - Naatu Naatu', channelTitle: 'Lahari Music', durationSec: 275, genre: 'telugu mass party' },
+  { videoId: '2mDCVzruYzQ', rawTitle: 'Armaan Malik - Butta Bomma', channelTitle: 'Aditya Music', durationSec: 198, genre: 'telugu romantic melodies' },
 ];
 
-export function getCuratedYouTubeFallback(query = '', limit = 15) {
+export function getCuratedYouTubeFallback(query = '', limit = 25, options = {}) {
   const qLower = String(query || '').toLowerCase();
   let matched = CURATED_YT_CATALOG.filter((item) =>
     !qLower ||
@@ -417,8 +508,11 @@ export function getCuratedYouTubeFallback(query = '', limit = 15) {
     item.channelTitle.toLowerCase().includes(qLower) ||
     item.genre.toLowerCase().includes(qLower)
   );
-  if (matched.length === 0) {
-    matched = CURATED_YT_CATALOG;
+  if (matched.length < Math.min(limit, 25)) {
+    for (const item of CURATED_YT_CATALOG) {
+      if (!matched.some((m) => m.videoId === item.videoId)) matched.push(item);
+      if (matched.length >= limit) break;
+    }
   }
   return matched.slice(0, limit).map((v) =>
     makeTrack({
@@ -427,11 +521,13 @@ export function getCuratedYouTubeFallback(query = '', limit = 15) {
       channelTitle: v.channelTitle,
       durationSec: v.durationSec,
       artwork: `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
+      hookOffsets: options.trackOffsets?.[v.videoId] || null,
+      categoryConfig: options,
     })
   );
 }
 
-export async function searchYouTubePublic(query, limit = 15) {
+export async function searchYouTubePublic(query, limit = 25, options = {}) {
   try {
     const res = await fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, {
       headers: PUBLIC_HEADERS,
@@ -454,6 +550,14 @@ export async function searchYouTubePublic(query, limit = 15) {
           .filter((v) => {
             if (!v.videoId || seen.has(v.videoId)) return false;
             seen.add(v.videoId);
+            const title = v.title?.runs?.map((r) => r.text).join('') || v.title?.simpleText || '';
+            const durText = v.lengthText?.simpleText || '';
+            const durSec = parseClockDuration(durText);
+            if (durSec < 45 || durSec > 1800) return false;
+            if (/#shorts\b/i.test(title)) return false;
+            if (!options.allowRemixes) {
+              if (/\b(cover|karaoke|instrumental\s*cover|acoustic\s*cover|parody|tribute)\b/i.test(title)) return false;
+            }
             return true;
           })
           .slice(0, limit)
@@ -468,16 +572,18 @@ export async function searchYouTubePublic(query, limit = 15) {
               channelTitle: channel,
               durationSec: parseClockDuration(durText),
               artwork: thumbs[thumbs.length - 1]?.url,
+              hookOffsets: options.trackOffsets?.[v.videoId] || null,
+              categoryConfig: options,
             });
           });
-        if (results.length > 0) return results;
+        if (results.length >= 10) return results;
       }
     }
   } catch (err) {
     console.warn('[searchYouTubePublic] Live scrape failed, falling back to curated video results:', err?.message);
   }
 
-  return getCuratedYouTubeFallback(query, limit);
+  return getCuratedYouTubeFallback(query, limit, options);
 }
 
 export async function fetchYouTubePlaylistPublic(playlistId, maxItems = 150) {

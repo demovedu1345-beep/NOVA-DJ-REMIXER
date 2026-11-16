@@ -1,4 +1,5 @@
 import { getQueryParams, handlePreflight, sendJson } from './_lib/http.js';
+import { loadServerEnv } from './_lib/env.js';
 import {
   getCachedPlaylist,
   getTracksByIds,
@@ -10,11 +11,19 @@ import {
   fetchSingleYouTubeTrack,
   fetchYouTubePlaylistPublic,
   fetchYouTubePlaylistTracks,
+  getCuratedYouTubeFallback,
   parseYouTubeInput,
   sanitizeApiKey,
   searchYouTubePublic,
   searchYouTubeTracks,
 } from './_lib/youtube.js';
+import {
+  YOUTUBE_CATALOG_CONFIG,
+  findCatalogCategory,
+  findCatalogLanguage,
+} from '../public/js/engine/youtube-catalog-config.js';
+
+const memoryCache24h = new Map(); // key -> { time, data }
 
 function mergeCachedTrackData(tracks, cachedMap) {
   return tracks.map((t) => {
@@ -44,8 +53,101 @@ export default async function handler(req, res) {
   }
 
   const query = getQueryParams(req);
+
+  // 1. YouTube Catalog Configuration request
+  if (query.config === '1' || query.config === 'true') {
+    return sendJson(res, 200, { ok: true, catalog: YOUTUBE_CATALOG_CONFIG });
+  }
+
+  // 2. Strict Language -> Category Playlist Request (Level 1, 2 & 3 Hierarchy)
+  if (query.lang || query.category) {
+    const langId = String(query.lang || 'english').toLowerCase();
+    const langConfig = findCatalogLanguage(langId);
+    const catConfig = findCatalogCategory(langId, query.category || langConfig.categories[0].id);
+    const cacheKey = `cat-${langConfig.id}-${catConfig.id}`;
+    const refresh = query.refresh === '1' || query.refresh === 'true';
+
+    // 24-Hour Cache Check (Memory + Database)
+    if (!refresh) {
+      const mem = memoryCache24h.get(cacheKey);
+      if (mem && (Date.now() - mem.time < 24 * 60 * 60 * 1000) && mem.data?.results?.length >= 20) {
+        return sendJson(res, 200, { ok: true, cached: true, ...mem.data }, 's-maxage=86400, stale-while-revalidate=86400');
+      }
+      try {
+        const dbCached = await getCachedPlaylist(cacheKey, 24);
+        if (dbCached && Array.isArray(dbCached.results) && dbCached.results.length >= 20) {
+          const payload = { ...dbCached, tracks: dbCached.results };
+          memoryCache24h.set(cacheKey, { time: Date.now(), data: payload });
+          return sendJson(res, 200, { ok: true, cached: true, ...payload }, 's-maxage=86400, stale-while-revalidate=86400');
+        }
+      } catch {}
+    }
+
+    loadServerEnv();
+    const apiKey = sanitizeApiKey(process.env.YOUTUBE_API_KEY);
+    const useApiKey = apiKey.length >= 20 && /^AIza/i.test(apiKey);
+
+    let tracks = null;
+    if (catConfig.playlistId) {
+      if (useApiKey) {
+        try {
+          const pl = await fetchYouTubePlaylistTracks(catConfig.playlistId, apiKey, 35, catConfig);
+          tracks = pl.results;
+        } catch (err) {
+          console.warn(`[Playlist ${catConfig.playlistId}] Data API failed, falling back:`, err?.message);
+        }
+      }
+      if (!tracks || !tracks.length) {
+        const plPub = await fetchYouTubePlaylistPublic(catConfig.playlistId, 35).catch(() => null);
+        if (plPub?.results?.length) tracks = plPub.results;
+      }
+    }
+
+    if (!tracks || tracks.length < 20) {
+      if (useApiKey) {
+        try {
+          tracks = await searchYouTubeTracks(catConfig.query, apiKey, 30, catConfig);
+        } catch (err) {
+          console.warn(`[Search ${catConfig.query}] Data API failed, falling back:`, err?.message);
+        }
+      }
+      if (!tracks || tracks.length < 20) {
+        tracks = await searchYouTubePublic(catConfig.query, 30, catConfig);
+      }
+    }
+
+    // Guarantee minimum 25 tracks per category
+    if (!tracks || tracks.length < 25) {
+      const supplement = getCuratedYouTubeFallback(catConfig.query, 28, catConfig);
+      const seen = new Set((tracks || []).map((t) => t.videoId));
+      tracks = [...(tracks || [])];
+      for (const sup of supplement) {
+        if (!seen.has(sup.videoId)) {
+          seen.add(sup.videoId);
+          tracks.push(sup);
+        }
+        if (tracks.length >= 25) break;
+      }
+    }
+
+    await upsertTracks(tracks).catch(() => {});
+    const payload = {
+      kind: 'category',
+      lang: langConfig.id,
+      languageLabel: langConfig.label,
+      category: catConfig.id,
+      categoryLabel: catConfig.label,
+      count: tracks.length,
+      results: tracks,
+      tracks,
+    };
+    memoryCache24h.set(cacheKey, { time: Date.now(), data: payload });
+    await saveCachedPlaylist({ playlistId: cacheKey, results: tracks }).catch(() => {});
+    return sendJson(res, 200, { ok: true, ...payload }, 's-maxage=86400, stale-while-revalidate=86400');
+  }
+
   const rawInput = String(query.url || query.q || query.playlistId || query.videoId || '').trim();
-  const limit = Math.max(1, Math.min(25, Number.parseInt(query.limit || '15', 10) || 15));
+  const limit = Math.max(1, Math.min(50, Number.parseInt(query.limit || '25', 10) || 25));
   const maxItems = Math.max(10, Math.min(200, Number.parseInt(query.maxItems || '150', 10) || 150));
   const refresh = query.refresh === '1' || query.refresh === 'true';
 

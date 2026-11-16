@@ -15,6 +15,12 @@ import {
   renderTransitionClipBase64,
 } from '/js/engine/offline-exporter.js';
 import { renderBrainModal, renderDebugModal } from '/js/ui/debug-studio.js';
+import {
+  YOUTUBE_CATALOG_CONFIG,
+  findCatalogCategory,
+  findCatalogLanguage,
+} from '/js/engine/youtube-catalog-config.js';
+import { YouTubeDeckEngine } from '/js/engine/youtube-deck-engine.js';
 
 const root = document.getElementById('app');
 const ytHost = document.getElementById('yt-deck-host');
@@ -112,9 +118,23 @@ const SPLASH_HOOKS = [
 
 const state = {
   screen: 'splash', // splash | wizard | review | playing | summary
+  appMode: 'dj', // 'dj' | 'yt'
   wizardStep: 0, // 0: load/langs | 1: playMode | 2: vibe | 3: crowd
   sessionId: getSessionId(),
   health: null,
+
+  // Dedicated YouTube Music Catalog & Player State
+  ytSelectedLang: 'english',
+  ytSelectedCategory: 'top-hits',
+  ytCategoryTracks: [],
+  ytLoadingTracks: false,
+  ytError: null,
+  ytQueueDrawerOpen: false,
+  ytBestPartMode: true,
+  ytCrossfadeSec: 4,
+  ytPlaybackState: null,
+  ytToast: null,
+  ytToastTimer: null,
 
   // Source & Crate (Full-DSP Audio/Video + Honest Optional YouTube IFrame Video Mode)
   searchInput: '',
@@ -1444,9 +1464,18 @@ function renderSplash() {
 }
 
 function renderTopBar(rightHtml) {
+  const modeSwitcher = `
+    <div class="app-mode-switcher">
+      <button class="mode-switch-btn squeeze ${state.appMode === 'yt' ? 'active' : ''}" id="btn-mode-yt">🎵 YOUTUBE MUSIC</button>
+      <button class="mode-switch-btn squeeze ${state.appMode === 'dj' ? 'active' : ''}" id="btn-mode-dj">🎚 AI DJ BOOTH</button>
+    </div>
+  `;
   return `
     <header class="top-nav">
-      <button class="wordmark squeeze" id="btn-home" aria-label="NOVA home">NOVA</button>
+      <div style="display:flex;align-items:center;gap:18px">
+        <button class="wordmark squeeze" id="btn-home" aria-label="NOVA home">NOVA</button>
+        ${modeSwitcher}
+      </div>
       <div class="nav-right">${rightHtml}</div>
     </header>
   `;
@@ -1506,6 +1535,7 @@ function renderWizard() {
             <button class="pill-btn squeeze ${state.searchProvider === 'itunes' ? 'active' : ''}" data-provider="itunes">🍎 Apple Music</button>
             <button class="pill-btn squeeze ${state.searchProvider === 'all' ? 'active' : ''}" data-provider="all">All Full-DSP</button>
             <button class="pill-btn squeeze ${state.searchProvider === 'youtube' ? 'active' : ''}" data-provider="youtube">YouTube Video (Vol/Cue Only)</button>
+            <button id="btn-open-yt-catalog" class="pill-btn squeeze" style="border-color:var(--accent);color:var(--accent);font-weight:700">▶ BROWSE YOUTUBE CATALOG (25+ TRACKS / GENRE) →</button>
             ${state.searchResults.length ? `<button id="btn-add-all-results" class="pill-btn squeeze" style="border-color:var(--amber);color:var(--amber)">+ ADD ALL ${state.searchResults.length} TO CRATE</button>` : ''}
             ${state.crate.length ? `<button id="btn-clear-crate" class="pill-btn squeeze">CLEAR CRATE (${state.crate.length})</button>` : ''}
           </div>
@@ -3319,12 +3349,789 @@ function bindPlayingEvents() {
   bindDebugModalEvents();
 }
 
+// ============================================================================
+// DEDICATED YOUTUBE MUSIC CATALOG & PERSISTENT MINI-PLAYER ENGINE
+// ============================================================================
+
+let ytPlayer = null;
+
+function getYouTubePlayer() {
+  if (!ytPlayer) {
+    let host = document.getElementById('yt-deck-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'yt-deck-host';
+      host.className = 'naux-players';
+      host.dataset.visible = 'false';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+    }
+    ytPlayer = new YouTubeDeckEngine(host, {
+      onTrackChange: (track, index) => {
+        state.ytPlaybackState = ytPlayer.getPlaybackState();
+        renderMiniPlayer();
+        renderTracksIfCatalogActive();
+      },
+      onPlaybackStateChange: (ps) => {
+        state.ytPlaybackState = ps;
+        renderMiniPlayer();
+        renderTracksIfCatalogActive();
+      },
+      onAutoSkipped: (track, code) => {
+        showYtToast(`Auto-skipped unplayable track "${track?.title || 'Unknown'}" (Error ${code})`);
+      },
+      onTimeUpdate: (cur, dur, track) => {
+        updateMiniPlayerTime(cur, dur, track);
+      },
+      onDeckError: (deckId, track, err) => {
+        console.warn(`[YouTube Deck ${deckId} Error]`, track?.title, err);
+      },
+    });
+  }
+  return ytPlayer;
+}
+
+function showYtToast(msg, retryFn = null) {
+  if (state.ytToastTimer) clearTimeout(state.ytToastTimer);
+  state.ytToast = { msg, retryFn };
+  renderToast();
+  state.ytToastTimer = setTimeout(() => {
+    state.ytToast = null;
+    renderToast();
+  }, 4200);
+}
+
+function renderToast() {
+  let toastEl = document.getElementById('nova-yt-toast');
+  if (!state.ytToast) {
+    if (toastEl) toastEl.remove();
+    return;
+  }
+  if (!toastEl) {
+    toastEl = document.createElement('div');
+    toastEl.id = 'nova-yt-toast';
+    toastEl.className = 'yt-toast';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.innerHTML = `
+    <span style="color:var(--amber)">⚡</span>
+    <span style="flex:1">${esc(state.ytToast.msg)}</span>
+    ${state.ytToast.retryFn ? `<button id="btn-toast-retry" class="pill-btn squeeze" style="padding:2px 8px;font-size:10px">RETRY</button>` : ''}
+    <button id="btn-toast-close" style="opacity:0.6;font-size:14px">✕</button>
+  `;
+  const btnRetry = document.getElementById('btn-toast-retry');
+  if (btnRetry && state.ytToast.retryFn) {
+    btnRetry.onclick = () => {
+      const fn = state.ytToast.retryFn;
+      state.ytToast = null;
+      renderToast();
+      fn();
+    };
+  }
+  const btnClose = document.getElementById('btn-toast-close');
+  if (btnClose) {
+    btnClose.onclick = () => {
+      state.ytToast = null;
+      renderToast();
+    };
+  }
+}
+
+async function loadYtCategoryTracks(langId, categoryId, forceRefresh = false) {
+  state.ytSelectedLang = langId;
+  state.ytSelectedCategory = categoryId;
+  state.ytLoadingTracks = true;
+  state.ytError = null;
+  render();
+
+  try {
+    const res = await fetch(`/api/youtube-search?lang=${encodeURIComponent(langId)}&category=${encodeURIComponent(categoryId)}${forceRefresh ? '&refresh=1' : ''}`);
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.error || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    state.ytCategoryTracks = data.tracks || data.results || [];
+    state.ytLoadingTracks = false;
+    state.ytError = null;
+  } catch (err) {
+    console.error('[loadYtCategoryTracks] Error:', err);
+    state.ytLoadingTracks = false;
+    state.ytError = `Failed to load YouTube tracks: ${err.message}`;
+  }
+  render();
+}
+
+function renderYouTubeMusicScreen() {
+  const currentLang = findCatalogLanguage(state.ytSelectedLang);
+  const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory);
+
+  if (!state.ytCategoryTracks.length && !state.ytLoadingTracks && !state.ytError) {
+    loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory);
+  }
+
+  const p = getYouTubePlayer();
+  const ps = p.getPlaybackState();
+  const currentTrackId = ps.currentTrack?.id;
+
+  const topBarRight = `
+    ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="nav-meta-btn">CRATE (${state.crate.length})</button>` : ''}
+    <button id="btn-open-brain-yt" class="nav-meta-btn">BRAIN</button>
+  `;
+
+  root.innerHTML = `
+    ${renderTopBar(topBarRight)}
+    <main class="yt-catalog-view">
+      <header class="yt-hero-banner">
+        <div>
+          <h1 class="yt-hero-title">YOUTUBE MUSIC</h1>
+          <p class="yt-hero-sub">Browse 25+ real songs per category. Dual-deck continuous playback, adjustable crossfading, and hook highlight blends. Add full playlists to your AI DJ set with one click.</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="row-tag" style="background:rgba(255,184,0,0.12);color:var(--amber);border:1px solid rgba(255,184,0,0.3)">24-HOUR CACHE ACTIVE</span>
+          <button id="btn-yt-force-refresh" class="pill-btn squeeze" title="Force fresh fetch from YouTube">⟳ REFRESH</button>
+        </div>
+      </header>
+
+      <!-- Level 1: Language Tabs (English, Bollywood, Punjabi, Tamil, Telugu) -->
+      <section>
+        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.4);text-transform:uppercase;margin-bottom:8px">
+          LEVEL 1 · SELECT LANGUAGE
+        </div>
+        <div class="yt-lang-tabs">
+          ${YOUTUBE_CATALOG_CONFIG.languages.map(l => `
+            <button class="yt-lang-tab squeeze ${state.ytSelectedLang === l.id ? 'active' : ''}" data-yt-lang="${esc(l.id)}">
+              <span>${esc(l.label)}</span>
+            </button>
+          `).join('')}
+        </div>
+      </section>
+
+      <!-- Level 2: Category Chips strictly under selected language (NO cross-contamination) -->
+      <section>
+        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.4);text-transform:uppercase;margin-bottom:8px">
+          LEVEL 2 · ${esc(currentLang.label.toUpperCase())} CATEGORIES
+        </div>
+        <div class="yt-cat-bar">
+          ${currentLang.categories.map(c => `
+            <button class="yt-cat-chip squeeze ${state.ytSelectedCategory === c.id ? 'active' : ''}" data-yt-cat="${esc(c.id)}">
+              ${esc(c.label)}
+            </button>
+          `).join('')}
+        </div>
+      </section>
+
+      <!-- Level 3: Playlist View & Tracks -->
+      <section class="yt-playlist-panel">
+        <div class="yt-playlist-ctrls">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <h2 class="font-display" style="font-size:24px;color:#fff">${esc(currentCat.label)}</h2>
+              <span class="row-tag" style="background:rgba(255,255,255,0.06);color:rgba(245,245,240,0.8)">${state.ytCategoryTracks.length} SONGS</span>
+            </div>
+            <div style="font-size:11px;color:rgba(245,245,240,0.45);font-family:var(--font-mono);margin-top:4px">
+              QUERY: "${esc(currentCat.query)}" · ${esc(currentLang.label)}
+            </div>
+          </div>
+
+          <div class="yt-ctrl-group">
+            <button id="btn-yt-play-all" class="yt-action-btn primary squeeze">
+              ▶ PLAY ALL
+            </button>
+            <button id="btn-yt-shuffle-all" class="yt-action-btn secondary squeeze">
+              🔀 SHUFFLE PLAY
+            </button>
+            <button id="btn-yt-best-part-toggle" class="yt-action-btn secondary squeeze ${state.ytBestPartMode ? 'active-glow' : ''}">
+              ⚡ BEST PART: ${state.ytBestPartMode ? 'ON' : 'OFF'}
+            </button>
+            <div class="yt-slider-wrap">
+              <span>BLEND:</span>
+              <input id="input-yt-crossfade" type="range" min="0" max="8" step="0.5" value="${state.ytCrossfadeSec}" />
+              <span id="yt-crossfade-val" class="font-mono-num" style="min-width:32px">${state.ytCrossfadeSec.toFixed(1)}s</span>
+            </div>
+            <button id="btn-yt-add-all-crate" class="yt-action-btn secondary squeeze" style="border-color:var(--amber);color:var(--amber)">
+              + ADD ALL TO DJ CRATE (${state.ytCategoryTracks.length})
+            </button>
+          </div>
+        </div>
+
+        ${state.ytLoadingTracks ? `
+          <div class="font-mono-num" style="padding:60px 20px;text-align:center;color:var(--accent);letter-spacing:0.04em">
+            ⚡ FETCHING 25+ TRACKS FOR "${esc(currentCat.label.toUpperCase())}" VIA YOUTUBE API…
+          </div>
+        ` : state.ytError ? `
+          <div class="status-banner err" style="margin:20px 0">
+            ${esc(state.ytError)}
+            <button id="btn-yt-retry-fetch" class="pill-btn squeeze" style="margin-left:14px">RETRY ⟳</button>
+          </div>
+        ` : `
+          <div class="yt-tracks-grid" id="yt-tracks-container">
+            ${state.ytCategoryTracks.map((t, idx) => {
+              const isPlaying = (currentTrackId === t.id && ps.isPlaying);
+              const inCrate = state.crate.some(c => c.id === t.id);
+              const hookStart = t.hookStartSec ?? Math.round((t.durationSec || 180) * 0.25);
+              const hookDur = t.hookDurationSec ?? 35;
+              const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
+              return `
+                <div class="yt-track-card squeeze ${isPlaying ? 'is-playing' : ''}" data-yt-track-idx="${idx}">
+                  <div class="yt-card-thumb-wrap">
+                    <img class="yt-card-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
+                    <div class="yt-card-play-overlay">
+                      ${isPlaying ? '❚❚' : '▶'}
+                    </div>
+                  </div>
+                  <div class="yt-card-meta">
+                    <div class="yt-card-title" title="${esc(t.title)}">${esc(t.title)}</div>
+                    <div class="yt-card-artist" title="${esc(t.artist)}">${esc(t.artist)}</div>
+                    <div class="yt-card-tags">
+                      <span class="yt-card-tag hook">⚡ Hook: ${fmtTime(hookStart)}–${fmtTime(hookEnd)} (${hookDur}s)</span>
+                      <span class="yt-card-tag dur">${fmtTime(t.durationSec)}</span>
+                    </div>
+                  </div>
+                  <div class="yt-card-actions">
+                    <button class="yt-card-icon-btn squeeze" data-yt-play-btn="${idx}" title="Play song">
+                      ${isPlaying ? '❚❚' : '▶'}
+                    </button>
+                    <button class="yt-card-icon-btn squeeze" data-yt-queue-btn="${idx}" title="Add to queue">
+                      +Q
+                    </button>
+                    <button class="yt-card-icon-btn squeeze ${inCrate ? 'added' : ''}" data-yt-crate-btn="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}" style="${inCrate ? 'color:var(--amber);border-color:var(--amber)' : ''}">
+                      ${inCrate ? '✓' : '+DJ'}
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `}
+      </section>
+    </main>
+  `;
+}
+
+function renderTracksIfCatalogActive() {
+  if (state.appMode !== 'yt') return;
+  const p = getYouTubePlayer();
+  const ps = p.getPlaybackState();
+  const currentTrackId = ps.currentTrack?.id;
+  const cards = document.querySelectorAll('.yt-track-card');
+  cards.forEach((card) => {
+    const idx = Number(card.dataset.ytTrackIdx);
+    const track = state.ytCategoryTracks[idx];
+    if (!track) return;
+    const isPlaying = (currentTrackId === track.id && ps.isPlaying);
+    card.classList.toggle('is-playing', isPlaying);
+    const playOverlay = card.querySelector('.yt-card-play-overlay');
+    if (playOverlay) playOverlay.textContent = isPlaying ? '❚❚' : '▶';
+    const playBtn = card.querySelector('[data-yt-play-btn]');
+    if (playBtn) playBtn.textContent = isPlaying ? '❚❚' : '▶';
+  });
+}
+
+function renderMiniPlayer() {
+  let miniEl = document.getElementById('nova-yt-mini-player');
+  if (!miniEl) {
+    miniEl = document.createElement('div');
+    miniEl.id = 'nova-yt-mini-player';
+    miniEl.className = 'yt-mini-player';
+    document.body.appendChild(miniEl);
+  }
+
+  const p = getYouTubePlayer();
+  const ps = p.getPlaybackState();
+  const track = ps.currentTrack;
+
+  if (!track) {
+    miniEl.classList.add('hidden');
+    return;
+  }
+  miniEl.classList.remove('hidden');
+
+  const dur = ps.duration || track.durationSec || 180;
+  const cur = ps.currentTime || 0;
+  const pct = Math.max(0, Math.min(100, dur > 0 ? (cur / dur) * 100 : 0));
+
+  const hookStart = Number(track.hookStartSec ?? Math.round(dur * 0.25));
+  const hookDur = Number(track.hookDurationSec ?? 35);
+  const hookStartPct = Math.max(0, Math.min(100, (hookStart / dur) * 100));
+  const hookWidthPct = Math.max(0, Math.min(100 - hookStartPct, (hookDur / dur) * 100));
+
+  miniEl.innerHTML = `
+    <div class="yt-mini-grid">
+      <!-- Left: Artwork & Track info -->
+      <div class="yt-mini-track">
+        <img class="yt-mini-thumb" src="${esc(track.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
+        <div class="yt-mini-info">
+          <div class="yt-mini-title" title="${esc(track.title)}">${esc(track.title)}</div>
+          <div class="yt-mini-artist" title="${esc(track.artist)}">${esc(track.artist)}</div>
+          <span class="yt-deck-pill">DECK ${esc(ps.activeDeckId)} ${ps.isCrossfading ? '· BLENDING' : ''}</span>
+        </div>
+      </div>
+
+      <!-- Center: Controls & Scrubber -->
+      <div class="yt-mini-center">
+        <div class="yt-transport">
+          <button id="btn-yt-mini-shuffle" class="yt-transport-btn squeeze ${ps.shuffle ? 'active' : ''}" title="Shuffle (${ps.shuffle ? 'ON' : 'OFF'})">
+            🔀
+          </button>
+          <button id="btn-yt-mini-prev" class="yt-transport-btn squeeze" title="Previous track">
+            ⏮
+          </button>
+          <button id="btn-yt-mini-play" class="yt-play-pause-btn squeeze" title="${ps.isPlaying ? 'Pause' : 'Play'}">
+            ${ps.isPlaying ? '❚❚' : '▶'}
+          </button>
+          <button id="btn-yt-mini-next" class="yt-transport-btn squeeze" title="Next track">
+            ⏭
+          </button>
+          <button id="btn-yt-mini-repeat" class="yt-transport-btn squeeze ${ps.repeat !== 'off' ? 'active' : ''}" title="Repeat mode (${ps.repeat.toUpperCase()})">
+            🔁 <span style="font-size:8px;font-family:var(--font-mono)">${ps.repeat === 'one' ? '1' : ps.repeat === 'all' ? 'ALL' : ''}</span>
+          </button>
+        </div>
+
+        <div class="yt-timeline-row">
+          <span class="yt-time-label font-mono-num" id="yt-mini-cur-time">${fmtTime(cur)}</span>
+          <div class="yt-scrub-track" id="yt-mini-scrub-track">
+            <div class="yt-scrub-fill" id="yt-mini-scrub-fill" style="width:${pct}%"></div>
+            ${ps.bestPart ? `<div class="yt-scrub-hook-zone" style="left:${hookStartPct}%;width:${hookWidthPct}%" title="Hook highlight zone"></div>` : ''}
+          </div>
+          <span class="yt-time-label font-mono-num" id="yt-mini-total-time" style="text-align:right">${fmtTime(dur)}</span>
+        </div>
+      </div>
+
+      <!-- Right: Toggles & Queue -->
+      <div class="yt-mini-right">
+        <button id="btn-yt-mini-best-part" class="yt-pill-toggle squeeze ${ps.bestPart ? 'active' : ''}" title="Toggle Best-part chorus highlight mode">
+          ⚡ ${ps.bestPart ? 'BEST PART' : 'FULL SONG'}
+        </button>
+        <div class="yt-slider-wrap" style="padding:4px 8px">
+          <span style="font-size:9px">BLEND:</span>
+          <input id="input-yt-mini-crossfade" type="range" min="0" max="8" step="0.5" value="${ps.crossfadeSec}" style="width:60px" />
+          <span id="yt-mini-crossfade-val" class="font-mono-num" style="font-size:9px">${ps.crossfadeSec.toFixed(1)}s</span>
+        </div>
+        <button id="btn-yt-mini-queue" class="yt-queue-trigger-btn squeeze">
+          QUEUE <span class="yt-queue-badge">${ps.queue.length}</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  renderQueueDrawer();
+}
+
+function updateMiniPlayerTime(cur, dur, track) {
+  const curEl = document.getElementById('yt-mini-cur-time');
+  const durEl = document.getElementById('yt-mini-total-time');
+  const fillEl = document.getElementById('yt-mini-scrub-fill');
+  if (curEl) curEl.textContent = fmtTime(cur);
+  if (durEl && dur > 0) durEl.textContent = fmtTime(dur);
+  if (fillEl && dur > 0) {
+    const pct = Math.max(0, Math.min(100, (cur / dur) * 100));
+    fillEl.style.width = `${pct}%`;
+  }
+}
+
+function renderQueueDrawer() {
+  let drawerEl = document.getElementById('nova-yt-queue-drawer');
+  if (!drawerEl) {
+    drawerEl = document.createElement('div');
+    drawerEl.id = 'nova-yt-queue-drawer';
+    drawerEl.className = 'yt-queue-drawer';
+    document.body.appendChild(drawerEl);
+  }
+
+  drawerEl.classList.toggle('open', Boolean(state.ytQueueDrawerOpen));
+  if (!state.ytQueueDrawerOpen) return;
+
+  const p = getYouTubePlayer();
+  const ps = p.getPlaybackState();
+  const queue = ps.queue;
+  const currentIdx = ps.queueIndex;
+
+  drawerEl.innerHTML = `
+    <div class="yt-queue-panel">
+      <div class="yt-queue-header">
+        <div>
+          <div class="yt-queue-title">UPCOMING QUEUE</div>
+          <div style="font-size:11px;font-family:var(--font-mono);color:rgba(245,245,240,0.4)">${queue.length} SONGS · SEAMLESS BLEND</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${queue.length ? `<button id="btn-yt-queue-clear" class="pill-btn squeeze" style="font-size:10px;padding:4px 8px">CLEAR</button>` : ''}
+          <button id="btn-yt-queue-close" class="pill-btn squeeze" style="font-size:12px;padding:4px 8px">✕</button>
+        </div>
+      </div>
+
+      <div class="yt-queue-items nova-scroll">
+        ${queue.length === 0 ? `
+          <div style="padding:40px 10px;text-align:center;color:rgba(245,245,240,0.4);font-family:var(--font-mono);font-size:12px">
+            QUEUE IS EMPTY.<br/>CLICK "+Q" ON ANY SONG CARD TO ADD IT.
+          </div>
+        ` : queue.map((t, idx) => {
+          const isCurrent = (idx === currentIdx);
+          return `
+            <div class="yt-queue-item ${isCurrent ? 'active' : ''}">
+              <img class="yt-queue-item-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
+              <div class="yt-queue-item-info">
+                <div class="yt-queue-item-title">${esc(t.title)} ${isCurrent ? '<span style="color:var(--accent);font-size:9px">● NOW PLAYING</span>' : ''}</div>
+                <div class="yt-queue-item-artist">${esc(t.artist)} · ${fmtTime(t.durationSec)}</div>
+              </div>
+              <div class="yt-queue-item-ctrls">
+                ${idx > 0 ? `<button class="yt-queue-sm-btn squeeze" data-queue-up="${idx}" title="Move up">▲</button>` : ''}
+                ${idx < queue.length - 1 ? `<button class="yt-queue-sm-btn squeeze" data-queue-down="${idx}" title="Move down">▼</button>` : ''}
+                <button class="yt-queue-sm-btn remove squeeze" data-queue-del="${idx}" title="Remove from queue">✕</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function attachGlobalYtListeners() {
+  const p = getYouTubePlayer();
+
+  // Mode switcher in top bar
+  const btnModeYt = document.getElementById('btn-mode-yt');
+  if (btnModeYt) {
+    btnModeYt.onclick = () => {
+      state.appMode = 'yt';
+      render();
+    };
+  }
+  const btnModeDj = document.getElementById('btn-mode-dj');
+  if (btnModeDj) {
+    btnModeDj.onclick = () => {
+      state.appMode = 'dj';
+      render();
+    };
+  }
+
+  // Open catalog button in wizard
+  const btnBrowseYt = document.getElementById('btn-open-yt-catalog');
+  if (btnBrowseYt) {
+    btnBrowseYt.onclick = () => {
+      state.appMode = 'yt';
+      render();
+    };
+  }
+
+  // Top nav crate button from YT mode
+  const btnCrateFromYt = document.getElementById('btn-open-crate-from-yt');
+  if (btnCrateFromYt) {
+    btnCrateFromYt.onclick = () => {
+      state.appMode = 'dj';
+      state.screen = 'wizard';
+      state.wizardStep = 0;
+      render();
+    };
+  }
+  const btnBrainYt = document.getElementById('btn-open-brain-yt');
+  if (btnBrainYt) {
+    btnBrainYt.onclick = () => {
+      state.brainModalOpen = true;
+      renderBrainModal(state, render);
+    };
+  }
+
+  // Catalog language tabs
+  document.querySelectorAll('[data-yt-lang]').forEach((btn) => {
+    btn.onclick = () => {
+      const langId = btn.dataset.ytLang;
+      if (langId === state.ytSelectedLang) return;
+      const langCfg = findCatalogLanguage(langId);
+      state.ytSelectedLang = langId;
+      state.ytSelectedCategory = langCfg.categories[0].id;
+      loadYtCategoryTracks(langId, state.ytSelectedCategory);
+    };
+  });
+
+  // Catalog category chips
+  document.querySelectorAll('[data-yt-cat]').forEach((btn) => {
+    btn.onclick = () => {
+      const catId = btn.dataset.ytCat;
+      if (catId === state.ytSelectedCategory) return;
+      state.ytSelectedCategory = catId;
+      loadYtCategoryTracks(state.ytSelectedLang, catId);
+    };
+  });
+
+  // Force refresh
+  const btnRefresh = document.getElementById('btn-yt-force-refresh');
+  if (btnRefresh) {
+    btnRefresh.onclick = () => {
+      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
+    };
+  }
+  const btnRetry = document.getElementById('btn-yt-retry-fetch');
+  if (btnRetry) {
+    btnRetry.onclick = () => {
+      loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
+    };
+  }
+
+  // Play All
+  const btnPlayAll = document.getElementById('btn-yt-play-all');
+  if (btnPlayAll) {
+    btnPlayAll.onclick = () => {
+      if (!state.ytCategoryTracks.length) return;
+      p.setQueue(state.ytCategoryTracks, {
+        startIndex: 0,
+        autoPlay: true,
+        bestPart: state.ytBestPartMode,
+        crossfadeSec: state.ytCrossfadeSec,
+      });
+      showYtToast(`Playing ${state.ytCategoryTracks.length} tracks with ${state.ytCrossfadeSec}s crossfades`);
+    };
+  }
+
+  // Shuffle Play
+  const btnShuffleAll = document.getElementById('btn-yt-shuffle-all');
+  if (btnShuffleAll) {
+    btnShuffleAll.onclick = () => {
+      if (!state.ytCategoryTracks.length) return;
+      p.shuffle = true;
+      const startIdx = Math.floor(Math.random() * state.ytCategoryTracks.length);
+      p.setQueue(state.ytCategoryTracks, {
+        startIndex: startIdx,
+        autoPlay: true,
+        bestPart: state.ytBestPartMode,
+        crossfadeSec: state.ytCrossfadeSec,
+      });
+      showYtToast(`Shuffling ${state.ytCategoryTracks.length} tracks from ${state.ytSelectedCategory}`);
+    };
+  }
+
+  // Best Part Toggle in Catalog View
+  const btnBestPart = document.getElementById('btn-yt-best-part-toggle');
+  if (btnBestPart) {
+    btnBestPart.onclick = () => {
+      state.ytBestPartMode = !state.ytBestPartMode;
+      p.setBestPartMode(state.ytBestPartMode);
+      render();
+    };
+  }
+
+  // Crossfade Slider in Catalog View
+  const inputCrossfade = document.getElementById('input-yt-crossfade');
+  if (inputCrossfade) {
+    inputCrossfade.oninput = (e) => {
+      state.ytCrossfadeSec = Number(e.target.value);
+      p.setCrossfadeSec(state.ytCrossfadeSec);
+      const valEl = document.getElementById('yt-crossfade-val');
+      if (valEl) valEl.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
+      const miniInput = document.getElementById('input-yt-mini-crossfade');
+      if (miniInput) miniInput.value = state.ytCrossfadeSec;
+      const miniVal = document.getElementById('yt-mini-crossfade-val');
+      if (miniVal) miniVal.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
+    };
+  }
+
+  // Add all to DJ crate
+  const btnAddAllCrate = document.getElementById('btn-yt-add-all-crate');
+  if (btnAddAllCrate) {
+    btnAddAllCrate.onclick = () => {
+      const seen = new Set(state.crate.map((c) => c.id));
+      let added = 0;
+      for (const t of state.ytCategoryTracks) {
+        if (!seen.has(t.id)) {
+          seen.add(t.id);
+          state.crate.push({ ...t, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
+          added++;
+        }
+      }
+      showYtToast(`Added ${added} songs to DJ crate (${state.crate.length} total)`);
+      render();
+    };
+  }
+
+  // Individual card action buttons
+  document.querySelectorAll('[data-yt-play-btn]').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const idx = Number(btn.dataset.ytPlayBtn);
+      p.setQueue(state.ytCategoryTracks, {
+        startIndex: idx,
+        autoPlay: true,
+        bestPart: state.ytBestPartMode,
+        crossfadeSec: state.ytCrossfadeSec,
+      });
+    };
+  });
+
+  document.querySelectorAll('[data-yt-queue-btn]').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const idx = Number(btn.dataset.ytQueueBtn);
+      const track = state.ytCategoryTracks[idx];
+      if (track) {
+        p.addToQueue(track);
+        showYtToast(`Added "${track.title}" to queue`);
+        renderMiniPlayer();
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-yt-crate-btn]').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const idx = Number(btn.dataset.ytCrateBtn);
+      const track = state.ytCategoryTracks[idx];
+      if (track) {
+        if (!state.crate.some((c) => c.id === track.id)) {
+          state.crate.push({ ...track, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
+          btn.textContent = '✓';
+          btn.style.color = 'var(--amber)';
+          btn.style.borderColor = 'var(--amber)';
+          showYtToast(`Added "${track.title}" to DJ crate`);
+        }
+      }
+    };
+  });
+
+  // Card click plays
+  document.querySelectorAll('.yt-track-card').forEach((card) => {
+    card.onclick = (e) => {
+      if (e.target.closest('button')) return;
+      const idx = Number(card.dataset.ytTrackIdx);
+      p.setQueue(state.ytCategoryTracks, {
+        startIndex: idx,
+        autoPlay: true,
+        bestPart: state.ytBestPartMode,
+        crossfadeSec: state.ytCrossfadeSec,
+      });
+    };
+  });
+
+  // Mini-player controls
+  const miniPlay = document.getElementById('btn-yt-mini-play');
+  if (miniPlay) {
+    miniPlay.onclick = () => {
+      p.togglePlayPause();
+      renderMiniPlayer();
+    };
+  }
+  const miniPrev = document.getElementById('btn-yt-mini-prev');
+  if (miniPrev) miniPrev.onclick = () => p.prevTrack();
+  const miniNext = document.getElementById('btn-yt-mini-next');
+  if (miniNext) miniNext.onclick = () => p.nextTrack();
+  const miniShuffle = document.getElementById('btn-yt-mini-shuffle');
+  if (miniShuffle) {
+    miniShuffle.onclick = () => {
+      p.toggleShuffle();
+      renderMiniPlayer();
+    };
+  }
+  const miniRepeat = document.getElementById('btn-yt-mini-repeat');
+  if (miniRepeat) {
+    miniRepeat.onclick = () => {
+      p.toggleRepeat();
+      renderMiniPlayer();
+    };
+  }
+  const miniBestPart = document.getElementById('btn-yt-mini-best-part');
+  if (miniBestPart) {
+    miniBestPart.onclick = () => {
+      state.ytBestPartMode = !state.ytBestPartMode;
+      p.setBestPartMode(state.ytBestPartMode);
+      render();
+    };
+  }
+  const miniCrossfade = document.getElementById('input-yt-mini-crossfade');
+  if (miniCrossfade) {
+    miniCrossfade.oninput = (e) => {
+      state.ytCrossfadeSec = Number(e.target.value);
+      p.setCrossfadeSec(state.ytCrossfadeSec);
+      const valEl = document.getElementById('yt-mini-crossfade-val');
+      if (valEl) valEl.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
+      const catInput = document.getElementById('input-yt-crossfade');
+      if (catInput) catInput.value = state.ytCrossfadeSec;
+      const catVal = document.getElementById('yt-crossfade-val');
+      if (catVal) catVal.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
+    };
+  }
+  const miniScrub = document.getElementById('yt-mini-scrub-track');
+  if (miniScrub) {
+    miniScrub.onclick = (e) => {
+      const rect = miniScrub.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const ps = p.getPlaybackState();
+      const dur = ps.duration || ps.currentTrack?.durationSec || 0;
+      if (dur > 0) {
+        p.seekTo(pct * dur);
+      }
+    };
+  }
+  const miniQueueBtn = document.getElementById('btn-yt-mini-queue');
+  if (miniQueueBtn) {
+    miniQueueBtn.onclick = () => {
+      state.ytQueueDrawerOpen = !state.ytQueueDrawerOpen;
+      renderQueueDrawer();
+      attachQueueEvents();
+    };
+  }
+
+  // Queue drawer events
+  attachQueueEvents();
+}
+
+function attachQueueEvents() {
+  const p = getYouTubePlayer();
+  const drawerClose = document.getElementById('btn-yt-queue-close');
+  if (drawerClose) {
+    drawerClose.onclick = () => {
+      state.ytQueueDrawerOpen = false;
+      renderQueueDrawer();
+    };
+  }
+  const drawerClear = document.getElementById('btn-yt-queue-clear');
+  if (drawerClear) {
+    drawerClear.onclick = () => {
+      p.setQueue([]);
+      state.ytQueueDrawerOpen = false;
+      renderMiniPlayer();
+    };
+  }
+  document.querySelectorAll('[data-queue-up]').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = Number(btn.dataset.queueUp);
+      p.reorderQueue(idx, idx - 1);
+      renderQueueDrawer();
+      attachQueueEvents();
+    };
+  });
+  document.querySelectorAll('[data-queue-down]').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = Number(btn.dataset.queueDown);
+      p.reorderQueue(idx, idx + 1);
+      renderQueueDrawer();
+      attachQueueEvents();
+    };
+  });
+  document.querySelectorAll('[data-queue-del]').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = Number(btn.dataset.queueDel);
+      p.removeFromQueue(idx);
+      renderQueueDrawer();
+      attachQueueEvents();
+    };
+  });
+}
+
 function render() {
   if (state.screen === 'splash') return renderSplash();
-  if (state.screen === 'wizard') return renderWizard();
-  if (state.screen === 'review') return renderReview();
-  if (state.screen === 'playing') return renderPlaying();
-  if (state.screen === 'summary') return renderSummary();
+  if (state.appMode === 'yt') {
+    renderYouTubeMusicScreen();
+  } else if (state.screen === 'wizard') {
+    renderWizard();
+  } else if (state.screen === 'review') {
+    renderReview();
+  } else if (state.screen === 'playing') {
+    renderPlaying();
+  } else if (state.screen === 'summary') {
+    renderSummary();
+  }
+  attachGlobalYtListeners();
+  renderMiniPlayer();
 }
 
 // Global DJ Keyboard Shortcuts (matches naux.party + pro mixer keys)
