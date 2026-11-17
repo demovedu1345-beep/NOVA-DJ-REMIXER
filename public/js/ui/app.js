@@ -722,31 +722,8 @@ async function handleLocalFiles(files) {
 }
 
 async function advanceFromStep0() {
-  // If user didn't add manual tracks yet but selected Language/Vibe tiles, auto-populate strictly from decodable Full-DSP catalogue!
-  if (state.crate.length < 2 && state.selectedLanguages.length > 0) {
-    state.searchBusy = true;
-    state.searchError = false;
-    state.searchStatus = 'Building your Full-DSP crate from Audius & Openverse…';
-    render();
-
-    const chosen = LANGUAGES.filter((l) => state.selectedLanguages.includes(l.id));
-    for (const lang of chosen) {
-      try {
-        const r = await fetch(`/api/catalogue?q=${encodeURIComponent(lang.query)}&provider=all&limit=12`);
-        if (r.ok) {
-          const d = await r.json();
-          for (const t of (d.results || []).filter((x) => isDecodableTrack(x)).slice(0, 8)) addTrackToCrate(t);
-        }
-      } catch {}
-    }
-    state.searchBusy = false;
-  }
-
   if (state.crate.length < 1) {
-    state.searchError = true;
-    state.searchStatus = 'Pick at least one vibe, search Audius/Openverse, paste a CORS audio URL, or drop audio files first.';
-    render();
-    return;
+    populateVibeTracksToCrate(state.activeVibeCard || 'hindi', state.activeVibeCategory || 'hindi-dance');
   }
   state.wizardStep = 1;
   render();
@@ -786,7 +763,10 @@ function syncAutoPlan({ navigate = false } = {}) {
     playMode: state.playMode,
     moodEnergy: state.moodEnergy,
   });
-  if (navigate) state.screen = 'review';
+  if (navigate) {
+    approveAndPlay();
+    return;
+  }
   render();
 
   const hasAnyAi = state.health?.ai?.multiProviderConfigured || state.health?.opusConfigured || state.opusKey || state.geminiKey || state.openaiKey;
@@ -823,7 +803,12 @@ function syncAutoPlan({ navigate = false } = {}) {
 }
 
 function buildReviewSet() {
-  syncAutoPlan({ navigate: true });
+  if (!state.crate.length) {
+    populateVibeTracksToCrate(state.activeVibeCard || 'hindi', state.activeVibeCategory || 'hindi-dance');
+  }
+  state.sequencedSet = sequenceCrate(state.crate, { vibe: state.vibe, playMode: state.playMode });
+  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+  approveAndPlay();
 }
 
 async function runOfflineWavExport() {
@@ -851,7 +836,13 @@ async function runOfflineWavExport() {
 }
 
 async function approveAndPlay() {
-  if (!state.sequencedSet.length) return;
+  if (!state.sequencedSet.length) {
+    if (state.crate.length) {
+      state.sequencedSet = sequenceCrate(state.crate, { vibe: state.vibe, playMode: state.playMode });
+    } else {
+      populateVibeTracksToCrate(state.activeVibeCard || 'hindi', state.activeVibeCategory || 'hindi-dance');
+    }
+  }
   const orch = initOrchestrator();
   state.screen = 'playing';
   state.lastLiveId = 'A';
@@ -1538,6 +1529,28 @@ const VIBE_CATEGORIES_MAP = {
   ],
 };
 
+function populateVibeTracksToCrate(vibeId, catId) {
+  const vId = vibeId || state.activeVibeCard || 'hindi';
+  const cats = VIBE_CATEGORIES_MAP[vId] || VIBE_CATEGORIES_MAP['hindi'];
+  const cId = catId || state.activeVibeCategory || cats[0].id;
+  const cat = cats.find(c => c.id === cId) || cats[0];
+  const dbEntry = CURATED_CATEGORIES_DB[cat.dbKey] || CURATED_CATEGORIES_DB[cat.id];
+  const songs = (dbEntry?.songs || []).map((t) => ({
+    ...t,
+    source: 'youtube',
+    provider: 'YouTube',
+    mixReady: true,
+    dspReady: false,
+  }));
+  state.activeVibeCard = vId;
+  state.activeVibeCategory = cat.id;
+  state.selectedLanguages = [vId];
+  state.crate = songs;
+  state.sequencedSet = sequenceCrate(songs, { vibe: state.vibe, playMode: state.playMode });
+  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+  return songs;
+}
+
 function getActiveVibeTracks() {
   const vibeId = state.activeVibeCard || 'hindi';
   const cats = VIBE_CATEGORIES_MAP[vibeId] || VIBE_CATEGORIES_MAP['hindi'];
@@ -1556,44 +1569,34 @@ function renderVibeMusicExplorer() {
   const dbEntry = CURATED_CATEGORIES_DB[currentCat.dbKey] || CURATED_CATEGORIES_DB[currentCat.id];
   const tracks = dbEntry?.songs || [];
 
-  const p = getYouTubePlayer();
-  const ps = p.getPlaybackState();
-  const currentTrackId = ps.currentTrack?.id;
-
   return `
-    <div class="vibe-music-explorer-section" id="vibe-explorer" style="margin-top:28px;padding:26px;border-radius:24px;border:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.015);box-shadow:inset 0 1px 1px rgba(255,255,255,0.1), 0 12px 36px rgba(0,0,0,0.4)">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div class="vibe-music-explorer-section" id="vibe-explorer" style="margin-top:22px;padding:22px 26px;border-radius:22px;border:1.5px solid rgba(200,255,0,0.35);background:rgba(200,255,0,0.03);box-shadow:inset 0 1px 1px rgba(255,255,255,0.08), 0 12px 36px rgba(0,0,0,0.4)">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
         <div>
-          <div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase">
-            ⚡ ${esc(vibeMeta.label.toUpperCase())} · YOUTUBE PARTY CATEGORIES
+          <div style="font-family:var(--font-mono);font-size:11px;font-weight:800;letter-spacing:0.08em;color:#c8ff00;text-transform:uppercase">
+            ✓ DIRECTLY LOADED INTO YOUR SET (${tracks.length} SONGS)
           </div>
-          <h2 class="font-display" style="font-size: clamp(26px, 3.6vw, 42px);color:#fff;margin-top:6px;line-height:1">
+          <h2 class="font-display" style="font-size:clamp(24px, 3.2vw, 36px);color:#fff;margin-top:6px;line-height:1">
             ${esc(currentCat.label.toUpperCase())}
           </h2>
-          <p style="font-size:15px;color:rgba(245,245,240,0.65);margin-top:6px;max-width:38rem">
-            ${esc(currentCat.hint)} · <span style="color:#c8ff00;font-weight:800;font-family:var(--font-mono)">${tracks.length} SONGS (STRICTLY 100+)</span>
+          <p style="font-size:14px;color:rgba(245,245,240,0.7);margin-top:6px;max-width:38rem">
+            ${esc(currentCat.hint)} · <span style="color:#c8ff00;font-weight:700">Strictly 100+ Real YouTube Songs</span>
           </p>
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button id="btn-play-vibe-set" class="naux-btn-play-set squeeze" style="padding:11px 22px;font-size:14px">
-            ▶ PLAY THIS SET (${tracks.length})
-          </button>
-          <button id="btn-shuffle-vibe-set" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px">
-            🔀 SHUFFLE
-          </button>
           <button id="btn-vibe-best-part-toggle" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px;${state.ytBestPartMode ? 'border-color:#c8ff00;color:#c8ff00' : ''}">
             ⚡ BEST PART: ${state.ytBestPartMode ? 'ON (35s)' : 'OFF'}
           </button>
-          <button id="btn-vibe-add-all-crate" class="naux-btn-crate-add squeeze" style="padding:10px 18px;font-size:12px;border-color:var(--amber);color:var(--amber)">
-            + ADD ALL TO DJ CRATE
+          <button id="btn-play-vibe-set" class="naux-btn-play-set squeeze" style="padding:12px 24px;font-size:14px;background:#c8ff00;color:#000;border-radius:9999px">
+            ▶ START MIXING NOW (${tracks.length}) →
           </button>
         </div>
       </div>
 
       <!-- Level 2: Subcategory Chips under the active vibe card -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08)">
-        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.45);text-transform:uppercase;margin-bottom:10px">
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div style="font-family:var(--font-mono);font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(245,245,240,0.5);text-transform:uppercase;margin-bottom:10px">
           SELECT CATEGORY (${cats.length} CATEGORIES · STRICTLY 100+ SONGS EACH):
         </div>
         <div class="naux-filter-bar" style="margin-top:0">
@@ -1607,49 +1610,6 @@ function renderVibeMusicExplorer() {
             `;
           }).join('')}
         </div>
-      </div>
-
-      <!-- Level 3: 100+ Songs Ordered List matching naux.party/songs -->
-      <ol class="naux-song-list" style="margin-top:24px">
-        ${tracks.map((t, idx) => {
-          const isPlaying = (currentTrackId === t.id && ps.isPlaying);
-          const inCrate = state.crate.some(c => c.id === t.id);
-          const hookStart = t.hookStartSec ?? (t.entrySec ?? Math.round((t.durationSec || 180) * 0.25));
-          const hookDur = t.hookDurationSec ?? 35;
-          const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
-          return `
-            <li class="naux-song-row ${isPlaying ? 'is-active' : ''}" data-vibe-song-idx="${idx}">
-              <div class="naux-song-num">${String(idx + 1).padStart(2, '0')}</div>
-              <div class="naux-song-info">
-                <div class="naux-song-title">
-                  <span>${esc(t.title)}</span>
-                  ${isPlaying ? '<span style="font-size:10px;color:#c8ff00;font-family:var(--font-mono);margin-left:8px">● PLAYING</span>' : ''}
-                </div>
-                <div class="naux-song-meta">${esc(t.artist || 'Unknown Artist')} ${t.year ? `· ${t.year}` : ''}</div>
-              </div>
-              <div class="naux-song-tag">
-                ⚡ FROM THE BEST PART (${fmtTime(hookStart)}–${fmtTime(hookEnd)})
-              </div>
-              <div class="naux-song-actions">
-                <button class="naux-action-btn ${isPlaying ? 'active' : ''}" data-vibe-play-idx="${idx}" title="${isPlaying ? 'Pause' : 'Play'}">
-                  ${isPlaying ? '❚❚' : '▶'}
-                </button>
-                <button class="naux-action-btn" data-vibe-queue-idx="${idx}" title="Add to upcoming queue">
-                  +Q
-                </button>
-                <button class="naux-action-btn ${inCrate ? 'in-crate' : ''}" data-vibe-crate-idx="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}">
-                  ${inCrate ? '✓' : '+DJ'}
-                </button>
-              </div>
-            </li>
-          `;
-        }).join('')}
-      </ol>
-
-      <div style="margin-top:32px;display:flex;justify-content:center">
-        <button id="btn-play-vibe-set-bottom" class="naux-btn-play-set squeeze">
-          ▶ PLAY THIS AS A SET (${tracks.length} SONGS) →
-        </button>
       </div>
     </div>
   `;
@@ -2077,44 +2037,35 @@ function renderDeckCard(deckId, slotName, deckData, tel) {
   const dur = Math.max(1, deckData?.duration || track?.durationSec || 180);
   const pos = deckData?.position || 0;
   const isYt = Boolean(deckData?.engine === 'yt' || (track && isYtTrack(track)));
-  const hasStems = Boolean(!isYt && (track?.stems_available || track?.neuralStems || track?.analysis?.stems_available));
-  const camelot = track?.camelot || track?.key_camelot;
+  const cleanArtist = (track?.artist || '').replace(/\s*·\s*\d{4}\s*$/, '');
+  const entry = deckData?.playFull ? 0 : (track?.entrySec || Math.round(dur * 0.25));
+  const exit = deckData?.playFull ? dur : (deckData?.cutAt || track?.exitSec || Math.round(dur * 0.75));
 
   const statusBadge = isLive
-    ? `<span class="deck-live-badge"><span class="live-dot"></span>LIVE${deckData.playFull ? ' · FULL' : ''}</span>`
-    : `<span id="cue-deck-status" style="color:rgba(245,245,240,0.68)">○ ${track ? (deckData.status === 'ready' ? 'READY' : 'CUEING') : 'STANDBY'}</span>`;
-
-  const techBadge = track
-    ? isYt
-      ? `<span class="deck-dsp-pill">YT VIDEO · NO DSP</span>`
-      : `<span class="deck-dsp-pill">${track.isVideo ? 'VIDEO · DSP' : 'DSP'}${track.bpm ? ` · ${Math.round(track.bpm)} BPM` : ''}${camelot ? ` · ${esc(camelot)}` : ''}</span>`
-    : '';
-  const stemsBadge = track
-    ? isYt
-      ? `<span class="deck-stems-pill">VOL/CUE FADE ONLY</span>`
-      : `<span class="deck-stems-pill ${hasStems ? 'on' : ''}">${hasStems ? 'DEMUCS 4-STEM ✓' : 'STEMS OFF · EQ ISOLATOR'}</span>`
-    : '';
+    ? `<span class="deck-live-badge"><span class="live-dot"></span>LIVE${deckData?.playFull ? ' · FULL' : ''}</span>`
+    : `<span id="cue-deck-status" style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${track ? (deckData?.status === 'ready' ? 'READY' : 'CUEING') : 'STANDBY'}</span>`;
 
   return `
     <section class="deck" data-deck="${deckId}" data-slot="${slotName}">
       <header class="deck-header">
         <span class="deck-label">DECK ${deckId}</span>
         ${statusBadge}
-        ${techBadge}
-        ${stemsBadge}
       </header>
 
       <div class="deck-title-row">
         <div style="min-width:0;flex:1">
           <h2 class="deck-title ${isLong ? 'long' : ''}" id="${isLive ? 'live-deck-title' : 'cue-deck-title'}">${esc(titleText)}</h2>
-          ${track ? `<p class="deck-artist" id="${isLive ? 'live-deck-artist' : 'cue-deck-artist'}">${esc(track.artist)}</p>` : ''}
+          ${track ? `
+            <p class="deck-artist" id="${isLive ? 'live-deck-artist' : 'cue-deck-artist'}">
+              ${esc(cleanArtist)}
+              ${isLive ? `<span style="color:#c8ff00;margin-left:8px;font-family:var(--font-mono);font-size:0.75em;font-weight:700">· IN ${fmtTime(entry)} · OUT ${fmtTime(exit)}</span>` : ''}
+            </p>
+          ` : ''}
         </div>
-        ${track?.isVideo && track?.videoUrl ? `<div class="deck-video-slot"><video id="video-deck-${deckId}" src="${esc(track.videoUrl)}" muted playsinline preload="auto"></video></div>` : ''}
         ${isLive && state.pipVideoVisible && isYt && track ? '<div class="deck-pip-slot" data-pip-slot="true"></div>' : ''}
       </div>
 
-      ${track ? renderWaveformHtml(track, pos, dur, deckData.mixOutSec || deckData.cutAt, deckData.playFull, isLive) : ''}
-      ${track ? renderDeckTelemetryHtml(deckId, tel) : ''}
+      ${track ? renderWaveformHtml(track, pos, dur, deckData?.mixOutSec || deckData?.cutAt, deckData?.playFull, isLive) : ''}
     </section>
   `;
 }
@@ -2230,6 +2181,10 @@ function renderProDrawer() {
           </div>
         ` : ''}
 
+        <div style="margin-top:14px;padding-top:14px;border-top:2px solid rgba(245,245,240,0.12)">
+          ${renderLiveTransitionPanel(snap)}
+        </div>
+
         <div style="border-top:2px solid rgba(245,245,240,0.12);padding-top:14px;display:flex;gap:10px">
           <button id="btn-quick-save-set" class="ingest-btn squeeze" style="flex:1;height:52px;font-size:22px">SAVE SET TO DB</button>
         </div>
@@ -2337,7 +2292,7 @@ function renderPlaying() {
         <span class="wordmark">NOVA</span>
 
         <button class="vibe-pill squeeze" id="btn-open-vibe">
-          <span class="truncate">${esc(state.playMode.toUpperCase())} · ${esc(state.vibe.toUpperCase())}${bpmBadge}</span>
+          <span class="truncate">${esc((state.activeVibeCard || 'HINDI').toUpperCase())} · ${(state.activeVibeCategory?.replace(/^[a-z]+-/, '') || 'DANCE').toUpperCase()} · ${(state.vibe || 'PEAK').toUpperCase()} · ${(state.crowd === 'small' ? '4–6' : state.crowd === 'large' ? '20+' : '10–20')}</span>
           <span class="vibe-cta">CHANGE</span>
         </button>
 
@@ -2384,8 +2339,6 @@ function renderPlaying() {
           <button class="agent-pill accent squeeze" id="btn-play-next">＋ PLAY NEXT</button>
         </div>
       </div>
-
-      ${renderLiveTransitionPanel(snap)}
 
       <div class="bottom-controls">
         ${snap.paused ? `
@@ -2727,8 +2680,7 @@ function bindWizardEvents() {
     const autoRevBtn = document.getElementById('btn-auto-review-now');
     if (autoRevBtn) {
       autoRevBtn.onclick = () => {
-        if (!state.setPlan && state.crate.length >= 2) syncAutoPlan({ navigate: true });
-        else { state.screen = 'review'; render(); }
+        approveAndPlay();
       };
     }
 
@@ -2750,6 +2702,7 @@ function bindWizardEvents() {
         const cats = VIBE_CATEGORIES_MAP[id] || VIBE_CATEGORIES_MAP['hindi'];
         state.activeVibeCategory = cats[0].id;
         state.selectedLanguages = [id];
+        populateVibeTracksToCrate(id, cats[0].id);
         render();
         const explorer = document.getElementById('vibe-explorer');
         if (explorer) {
@@ -2762,58 +2715,19 @@ function bindWizardEvents() {
     document.querySelectorAll('[data-vibe-cat]').forEach((btn) => {
       btn.onclick = () => {
         state.activeVibeCategory = btn.dataset.vibeCat;
+        populateVibeTracksToCrate(state.activeVibeCard || 'hindi', btn.dataset.vibeCat);
         render();
       };
     });
 
-    // Play vibe set CTA
+    // Play vibe set CTA -> directly starts set
     const btnPlayVibeSet = document.getElementById('btn-play-vibe-set');
     if (btnPlayVibeSet) {
       btnPlayVibeSet.onclick = () => {
-        const tracks = getActiveVibeTracks();
-        if (!tracks.length) return;
-        const p = getYouTubePlayer();
-        p.setQueue(tracks, {
-          startIndex: 0,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-        showYtToast(`Playing ${tracks.length} tracks with ${state.ytCrossfadeSec}s crossfades`);
-      };
-    }
-    const btnPlayVibeSetBtm = document.getElementById('btn-play-vibe-set-bottom');
-    if (btnPlayVibeSetBtm) {
-      btnPlayVibeSetBtm.onclick = () => {
-        const tracks = getActiveVibeTracks();
-        if (!tracks.length) return;
-        const p = getYouTubePlayer();
-        p.setQueue(tracks, {
-          startIndex: 0,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-        showYtToast(`Playing ${tracks.length} tracks`);
-      };
-    }
-
-    // Shuffle vibe set
-    const btnShuffleVibeSet = document.getElementById('btn-shuffle-vibe-set');
-    if (btnShuffleVibeSet) {
-      btnShuffleVibeSet.onclick = () => {
-        const tracks = getActiveVibeTracks();
-        if (!tracks.length) return;
-        const p = getYouTubePlayer();
-        p.shuffle = true;
-        const startIdx = Math.floor(Math.random() * tracks.length);
-        p.setQueue(tracks, {
-          startIndex: startIdx,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-        showYtToast(`Shuffling ${tracks.length} tracks`);
+        if (!state.crate.length) {
+          populateVibeTracksToCrate(state.activeVibeCard || 'hindi', state.activeVibeCategory || 'hindi-dance');
+        }
+        approveAndPlay();
       };
     }
 
@@ -2827,97 +2741,6 @@ function bindWizardEvents() {
         render();
       };
     }
-
-    // Add all category tracks to DJ crate
-    const btnVibeAddAll = document.getElementById('btn-vibe-add-all-crate');
-    if (btnVibeAddAll) {
-      btnVibeAddAll.onclick = () => {
-        const tracks = getActiveVibeTracks();
-        const seen = new Set(state.crate.map(c => c.id));
-        let added = 0;
-        for (const t of tracks) {
-          if (!seen.has(t.id)) {
-            seen.add(t.id);
-            state.crate.push({ ...t, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
-            added++;
-          }
-        }
-        showYtToast(`Added ${added} tracks to DJ Crate (${state.crate.length} total)`);
-        render();
-      };
-    }
-
-    // Individual track row play button
-    document.querySelectorAll('[data-vibe-play-idx]').forEach((btn) => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.vibePlayIdx);
-        const tracks = getActiveVibeTracks();
-        const p = getYouTubePlayer();
-        const ps = p.getPlaybackState();
-        if (ps.queueIndex === idx && ps.currentTrack?.id === tracks[idx]?.id) {
-          p.togglePlayPause();
-        } else {
-          p.setQueue(tracks, {
-            startIndex: idx,
-            autoPlay: true,
-            bestPart: state.ytBestPartMode,
-            crossfadeSec: state.ytCrossfadeSec,
-          });
-        }
-      };
-    });
-
-    // Add individual track to queue
-    document.querySelectorAll('[data-vibe-queue-idx]').forEach((btn) => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.vibeQueueIdx);
-        const tracks = getActiveVibeTracks();
-        const track = tracks[idx];
-        if (track) {
-          const p = getYouTubePlayer();
-          p.addToQueue(track);
-          showYtToast(`Added "${track.title}" to upcoming queue`);
-          renderMiniPlayer();
-        }
-      };
-    });
-
-    // Add individual track to DJ crate
-    document.querySelectorAll('[data-vibe-crate-idx]').forEach((btn) => {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.dataset.vibeCrateIdx);
-        const tracks = getActiveVibeTracks();
-        const track = tracks[idx];
-        if (track) {
-          if (!state.crate.some(c => c.id === track.id)) {
-            state.crate.push({ ...track, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
-            btn.textContent = '✓';
-            btn.classList.add('in-crate');
-            showYtToast(`Added "${track.title}" to DJ crate`);
-            render();
-          }
-        }
-      };
-    });
-
-    // Click anywhere on song row to play
-    document.querySelectorAll('.naux-song-row[data-vibe-song-idx]').forEach((row) => {
-      row.onclick = (e) => {
-        if (e.target.closest('button')) return;
-        const idx = Number(row.dataset.vibeSongIdx);
-        const tracks = getActiveVibeTracks();
-        const p = getYouTubePlayer();
-        p.setQueue(tracks, {
-          startIndex: idx,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-      };
-    });
   } else if (state.wizardStep === 1) {
     document.querySelectorAll('[data-mode]').forEach((b) => {
       b.onclick = () => { state.playMode = b.dataset.mode; render(); };
@@ -4662,6 +4485,7 @@ window.addEventListener('pointermove', (e) => {
 }, { passive: true });
 
 // Boot
+populateVibeTracksToCrate('hindi', 'hindi-dance');
 fetchHealth();
 loadSavedSets();
 render();

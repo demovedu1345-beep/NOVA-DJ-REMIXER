@@ -148,7 +148,7 @@ export class NovaOrchestrator {
   }
 
   #isYtTrack(track) {
-    return Boolean(track && track.videoId && !this.#isDspTrack(track));
+    return Boolean(track && (track.videoId || track.source === 'youtube' || track.provider === 'YouTube' || !this.#isDspTrack(track)));
   }
 
   #isPlayableTrack(track) {
@@ -260,7 +260,7 @@ export class NovaOrchestrator {
       slot.engine = 'yt';
       try {
         await this.#ensureYtReady();
-        this.ytEngine.load(deckId, track, 'live', this.playMode);
+        await this.ytEngine.load(deckId, track, 'live', this.playMode);
         await this.ytEngine.waitForReady(deckId, 7500);
         slot.status = 'live';
         slot.ytVol = 1;
@@ -317,7 +317,7 @@ export class NovaOrchestrator {
       slot.engine = 'yt';
       try {
         await this.#ensureYtReady();
-        this.ytEngine.load(deckId, track, 'preload', this.playMode);
+        await this.ytEngine.load(deckId, track, 'preload', this.playMode);
         await this.ytEngine.waitForReady(deckId, 7500);
         slot.status = 'ready';
         slot.ytVol = 0;

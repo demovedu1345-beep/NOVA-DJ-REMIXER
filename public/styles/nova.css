@@ -1,13 +1,15 @@
 :root {
-  --ink: #060608;
+  --ink: #070707;
   --surface: #0e1015;
   --surface-glass: rgba(14, 16, 21, 0.72);
+  --lime: #c8ff00;
+  --lime-glow: rgba(200, 255, 0, 0.35);
   --accent: #ff4d00;
   --accent-glow: rgba(255, 77, 0, 0.28);
   --amber: #ffb800;
   --amber-glow: rgba(255, 184, 0, 0.24);
   --bone: #f5f5f0;
-  --font-display: 'Syne', 'Anton', 'Arial Narrow', Impact, sans-serif;
+  --font-display: 'Anton', 'Syne', 'Arial Narrow', Impact, sans-serif;
   --font-sans: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --mouse-x: 50%;
@@ -824,6 +826,8 @@ button {
    LIVE PERFORMANCE CONSOLE (Exact naux.party 100dvh stage)
    ========================================================= */
 .play-stage {
+  --accent: #c8ff00;
+  --accent-glow: rgba(200, 255, 0, 0.35);
   position: relative;
   min-height: 100dvh;
   display: flex;
@@ -831,6 +835,7 @@ button {
   overflow-x: clip;
   overflow-y: auto;
   padding: 2.2vh 4vw;
+  background: #070707;
 }
 
 .pulse-aura {
@@ -840,7 +845,7 @@ button {
   width: 90vw;
   height: 90vh;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 77, 0, 0.14), rgba(255, 184, 0, 0.04) 55%, transparent);
+  background: radial-gradient(closest-side, rgba(200, 255, 0, 0.10), rgba(200, 255, 0, 0.02) 55%, transparent);
   pointer-events: none;
   animation: pulseGlow var(--pulse-dur, 2s) ease-in-out infinite;
 }
@@ -865,26 +870,28 @@ button {
   max-width: 44vw;
   align-items: center;
   gap: 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.035);
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(14, 16, 21, 0.75);
   backdrop-filter: blur(14px);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  padding: 8px 20px;
-  font-family: var(--font-display);
-  font-size: clamp(16px, 1.3vw, 22px);
+  padding: 8px 22px;
+  font-family: var(--font-sans);
+  font-size: clamp(12px, 1.1vw, 14px);
+  font-weight: 600;
   text-transform: uppercase;
-  color: rgba(245, 245, 240, 0.85);
+  letter-spacing: 0.04em;
+  color: #ffffff;
 }
 @media (min-width: 900px) {
   .vibe-pill { display: inline-flex; }
 }
 .vibe-pill:hover {
-  border-color: var(--accent);
-  color: var(--bone);
-  box-shadow: 0 0 18px rgba(255, 77, 0, 0.22);
+  border-color: #c8ff00;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(200, 255, 0, 0.28);
 }
-.vibe-pill .vibe-cta { color: var(--accent); flex-shrink: 0; }
+.vibe-pill .vibe-cta { color: #c8ff00; font-weight: 800; flex-shrink: 0; }
 
 .play-topbar-right {
   margin-left: auto;
@@ -964,7 +971,7 @@ button {
   transition: transform 1.5s cubic-bezier(0.76, 0, 0.18, 1), opacity 1.5s cubic-bezier(0.76, 0, 0.18, 1), filter 1.5s;
   padding: 16px 20px;
   border-radius: 24px;
-  background: radial-gradient(circle at 50% 0%, rgba(255, 77, 0, 0.04), transparent 70%), var(--surface-glass);
+  background: radial-gradient(circle at 50% 0%, rgba(200, 255, 0, 0.04), transparent 70%), var(--surface-glass);
   border: 1px solid rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(14px);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.09), 0 12px 36px rgba(0, 0, 0, 0.45);
@@ -977,8 +984,8 @@ button {
   opacity: 1;
   filter: none;
   transform: translate(0, 0) scale(1);
-  border-color: rgba(255, 77, 0, 0.32);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(255, 77, 0, 0.12);
+  border-color: rgba(200, 255, 0, 0.4);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 32px rgba(200, 255, 0, 0.2);
 }
 .deck[data-slot="cue"] {
   opacity: 0.92;
@@ -1179,7 +1186,7 @@ button {
 .playhead-line.dragging {
   width: 5px;
   background: var(--accent);
-  box-shadow: 0 0 24px rgba(255, 77, 0, 0.95);
+  box-shadow: 0 0 24px var(--accent-glow);
 }
 
 .drag-hint-ring {
@@ -1214,7 +1221,7 @@ button {
   white-space: nowrap;
   overflow: hidden;
   pointer-events: none;
-  box-shadow: 0 0 24px rgba(255, 77, 0, 0.25);
+  box-shadow: 0 0 24px var(--accent-glow);
 }
 
 .drag-time-badge {
@@ -1252,7 +1259,7 @@ button {
   letter-spacing: -0.02em;
   color: transparent;
   -webkit-text-stroke: 3px var(--accent);
-  text-shadow: 0 0 60px rgba(255, 77, 0, 0.32);
+  text-shadow: 0 0 60px var(--accent-glow);
   transform: rotate(-6deg);
   animation: stampIn 0.26s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
@@ -1400,26 +1407,42 @@ button {
 
 .mega-btn {
   flex: 1;
-  height: clamp(74px, 13.5vh, 162px);
-  border-radius: 26px;
-  font-family: var(--font-display);
-  font-size: clamp(32px, 4.8vw, 84px);
+  height: clamp(84px, 14vh, 170px);
+  border-radius: 28px;
+  font-family: 'Anton', var(--font-display);
+  font-size: clamp(38px, 5.2vw, 88px);
+  font-weight: 900;
   line-height: 1;
   letter-spacing: 0.025em;
   text-transform: uppercase;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s, background-color 0.2s;
+}
+.mega-btn:active {
+  transform: scale(0.97);
 }
 .mega-btn.primary {
-  background: var(--accent);
-  color: var(--ink);
+  background: #c8ff00;
+  color: #000000;
+  border: none;
+  box-shadow: 0 8px 32px rgba(200, 255, 0, 0.25);
+}
+.mega-btn.primary:hover {
+  background: #d4ff1a;
+  box-shadow: 0 10px 40px rgba(200, 255, 0, 0.4);
 }
 .mega-btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
 .mega-btn.secondary {
-  border: 4px solid rgba(245, 245, 240, 0.82);
-  color: var(--bone);
+  background: transparent;
+  border: 4px solid #ffffff;
+  color: #ffffff;
+}
+.mega-btn.secondary:hover {
+  border-color: #c8ff00;
+  color: #c8ff00;
 }
 .mega-btn.secondary.active {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: #c8ff00;
+  color: #c8ff00;
 }
 .mega-btn.secondary:disabled {
   border-color: rgba(245, 245, 240, 0.22);

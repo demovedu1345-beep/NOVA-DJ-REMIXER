@@ -178,7 +178,8 @@ export class YouTubeDeckEngine {
       return track.videoId;
     }
     try {
-      const q = `${track.title} ${track.artist || ''} official audio`;
+      const cleanArtist = (track.artist || '').replace(/\s*·\s*\d{4}\s*$/, '').trim();
+      const q = `${track.title} ${cleanArtist} official audio`;
       const res = await fetch(`/api/youtube-search?q=${encodeURIComponent(q)}&max=1`);
       if (res.ok) {
         const data = await res.json();
