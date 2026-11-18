@@ -10,7 +10,9 @@
   --amber-glow: rgba(255, 184, 0, 0.24);
   --bone: #f5f5f0;
   --font-display: 'Anton', 'Syne', 'Arial Narrow', Impact, sans-serif;
+  --font-anton: 'Anton', 'Syne', 'Arial Narrow', Impact, sans-serif;
   --font-sans: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-inter: 'Inter Tight', 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --mouse-x: 50%;
   --mouse-y: 50%;

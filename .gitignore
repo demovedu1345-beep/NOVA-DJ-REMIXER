@@ -8,4 +8,5 @@ __pycache__/
 *.pyc
 .DS_Store
 .tmp_*
+extracted_naux/
 
