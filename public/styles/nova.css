@@ -2978,17 +2978,18 @@ button {
   flex-direction: column;
 }
 
-.naux-back-btn {
+.naux-back-btn, .naux-back-link {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
   background: transparent;
   border: none;
   cursor: pointer;
   transition: color 0.15s ease;
 }
-.naux-back-btn:hover {
+.naux-back-btn:hover, .naux-back-link:hover {
   color: #fff;
 }
 

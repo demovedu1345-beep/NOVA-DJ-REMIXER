@@ -129,7 +129,7 @@ const DEFAULT_CLIENT_KEYS = {
 
 const state = {
   screen: 'wizard', // wizard | review | playing | summary | yt
-  appMode: 'dj', // 'dj' (AI DJ Mixer) | 'yt' (Party Song Lists)
+  appMode: 'yt', // 'yt' (Party Song Lists matching naux.party/songs) | 'dj' (AI DJ Mixer)
   wizardStep: 0, // 0: load/langs | 1: playMode | 2: vibe | 3: crowd
   activeVibeCard: 'hindi',
   activeVibeCategory: 'hindi-dance',
@@ -2461,7 +2461,7 @@ function goHome() {
   ytHost.setAttribute('data-visible', 'false');
   state.appMode = 'yt';
   state.ytViewMode = 'directory';
-  state.screen = 'main';
+  state.screen = 'wizard';
   state.wizardStep = 0;
   state.drawerOpen = false;
   state.debugModalOpen = false;
@@ -3662,11 +3662,21 @@ function renderYouTubeMusicScreen() {
 
   if (state.ytViewMode === 'category') {
     // CATEGORY DETAIL VIEW (100+ songs list matching naux.party/songs/hindi-dance)
-    const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory);
+    const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory) || {
+      id: state.ytSelectedCategory,
+      label: 'Hindi Dance Songs',
+      hint: 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NOVA starts each one at its best part.',
+      tracks: []
+    };
 
     if (!state.ytCategoryTracks.length && !state.ytLoadingTracks && !state.ytError) {
       loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory);
     }
+
+    const tracks = state.ytCategoryTracks.length ? state.ytCategoryTracks : (currentCat.tracks || []);
+    const artistsPreview = Array.from(new Set(
+      tracks.slice(0, 10).map(t => (t.artist || '').split(/[,&]/)[0].trim()).filter(Boolean)
+    )).slice(0, 6).join(', ') + (tracks.length > 6 ? ' and more' : '');
 
     root.innerHTML = `
       <div class="naux-main-shell">
@@ -3674,29 +3684,24 @@ function renderYouTubeMusicScreen() {
           <header class="naux-top-header">
             <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
             <div class="naux-nav-actions">
-              <button id="btn-back-to-lists" class="naux-filter-chip">← ALL LISTS</button>
-              ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="naux-filter-chip active">CRATE (${state.crate.length})</button>` : ''}
-              <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.4);color:#c8ff00" title="Switch to AI DJ Booth">🎧 AI DJ BOOTH</button>
-              <button id="btn-open-brain-yt" class="naux-filter-chip">BRAIN</button>
+              <button id="btn-back-to-lists" class="naux-back-link">ALL LISTS</button>
+              <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
+              <button id="btn-open-brain-yt" class="naux-filter-chip">🧠 BRAIN</button>
             </div>
           </header>
 
           <main class="naux-detail-hero" style="flex:1">
-            <div style="margin-top:20px">
-              <button id="btn-back-to-lists-sub" class="naux-back-btn">← ALL LISTS</button>
-            </div>
-
-            <h1 class="naux-hero-title" style="margin-top:14px">${esc((currentCat.label || 'PARTY SET').toUpperCase())} 2026</h1>
+            <h1 class="naux-hero-title">${esc(currentCat.label)} 2026</h1>
             <p class="naux-hero-subtitle">
-              ${state.ytCategoryTracks.length || currentCat.tracks?.length || 100}+ hand-curated songs. Stream from the best part with dual-deck continuous playback, custom blend, and zero awkward silence.
+              ${esc(currentCat.hint || 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NOVA starts each one at its best part.')}
+            </p>
+            <p style="margin-top:12px;font-size:15px;color:rgba(255,255,255,0.45);font-family:var(--font-sans)">
+              ${tracks.length} songs${artistsPreview ? `, from ${esc(artistsPreview)}` : ''}. Updated daily.
             </p>
 
-            <div class="naux-detail-actions">
-              <button id="btn-play-category-set" class="naux-btn-play-set squeeze">
+            <div class="naux-detail-actions" style="margin-top:28px">
+              <button id="btn-play-category-set" class="naux-btn-play-set squeeze" style="font-size:20px;padding:16px 36px">
                 ▶ PLAY THIS AS A SET →
-              </button>
-              <button id="btn-shuffle-category-set" class="naux-btn-crate-add squeeze">
-                🔀 SHUFFLE SET
               </button>
               <button id="btn-yt-best-part-toggle" class="naux-btn-crate-add squeeze" style="${state.ytBestPartMode ? 'border-color:#c8ff00;color:#c8ff00' : ''}">
                 ⚡ BEST PART: ${state.ytBestPartMode ? 'ON (35s)' : 'OFF'}
@@ -3706,14 +3711,11 @@ function renderYouTubeMusicScreen() {
                 <input id="input-yt-crossfade" type="range" min="0" max="8" step="0.5" value="${state.ytCrossfadeSec}" style="width:70px;accent-color:#c8ff00;cursor:pointer" />
                 <span id="yt-crossfade-val" style="font-family:var(--font-mono);font-size:11px;color:#c8ff00;min-width:30px">${state.ytCrossfadeSec.toFixed(1)}s</span>
               </div>
-              <button id="btn-add-all-category-crate" class="naux-btn-crate-add squeeze" style="border-color:rgba(255,184,0,0.5);color:var(--amber)">
-                + ADD ALL TO DJ CRATE (${state.ytCategoryTracks.length})
-              </button>
             </div>
 
             ${state.ytLoadingTracks ? `
               <div style="padding:80px 20px;text-align:center;font-family:var(--font-mono);color:#c8ff00;font-size:14px;letter-spacing:0.04em">
-                ⚡ LOADING ${state.ytCategoryTracks.length || '100+'} TRACKS…
+                ⚡ LOADING ${tracks.length || '100+'} TRACKS…
               </div>
             ` : state.ytError ? `
               <div class="status-banner err" style="margin:24px 0">
@@ -3722,34 +3724,23 @@ function renderYouTubeMusicScreen() {
               </div>
             ` : `
               <ol class="naux-song-list">
-                ${state.ytCategoryTracks.map((t, idx) => {
+                ${tracks.map((t, idx) => {
                   const isPlaying = (currentTrackId === t.id && ps.isPlaying);
-                  const inCrate = state.crate.some(c => c.id === t.id);
-                  const hookStart = t.hookStartSec ?? (t.entrySec ?? Math.round((t.durationSec || 180) * 0.25));
-                  const hookDur = t.hookDurationSec ?? 35;
-                  const hookEnd = t.hookEndSec ?? (hookStart + hookDur);
+                  const cleanArtist = (t.artist || '').replace(/\s*·\s*\d{4}\s*$/, '');
                   return `
                     <li class="naux-song-row ${isPlaying ? 'is-active' : ''}" data-song-idx="${idx}">
-                      <div class="naux-song-num">${String(idx + 1).padStart(2, '0')}</div>
+                      <span class="naux-song-num">${idx + 1}</span>
                       <div class="naux-song-info">
                         <div class="naux-song-title">
                           <span>${esc(t.title)}</span>
                           ${isPlaying ? '<span style="font-size:10px;color:#c8ff00;font-family:var(--font-mono);margin-left:8px">● PLAYING</span>' : ''}
                         </div>
-                        <div class="naux-song-meta">${esc(t.artist || 'Unknown Artist')} ${t.year ? `· ${t.year}` : ''}</div>
+                        <div class="naux-song-meta">${esc(cleanArtist)} ${t.year ? `· ${t.year}` : ''}</div>
                       </div>
-                      <div class="naux-song-tag">
-                        ⚡ FROM THE BEST PART (${fmtTime(hookStart)}–${fmtTime(hookEnd)})
-                      </div>
+                      <span class="naux-song-tag">from the best part</span>
                       <div class="naux-song-actions">
                         <button class="naux-action-btn ${isPlaying ? 'active' : ''}" data-play-idx="${idx}" title="${isPlaying ? 'Pause' : 'Play'}">
                           ${isPlaying ? '❚❚' : '▶'}
-                        </button>
-                        <button class="naux-action-btn" data-queue-idx="${idx}" title="Add to upcoming queue">
-                          +Q
-                        </button>
-                        <button class="naux-action-btn ${inCrate ? 'in-crate' : ''}" data-crate-idx="${idx}" title="${inCrate ? 'In DJ crate' : 'Add to DJ crate'}">
-                          ${inCrate ? '✓' : '+DJ'}
                         </button>
                       </div>
                     </li>
@@ -3757,10 +3748,13 @@ function renderYouTubeMusicScreen() {
                 }).join('')}
               </ol>
 
-              <div style="margin-top:40px;display:flex;justify-content:center">
-                <button id="btn-play-category-set-bottom" class="naux-btn-play-set squeeze">
+              <div style="margin-top:36px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+                <button id="btn-play-category-set-bottom" class="naux-btn-play-set squeeze" style="font-size:20px;padding:16px 36px">
                   ▶ PLAY THIS AS A SET →
                 </button>
+                <p style="font-size:14px;color:rgba(255,255,255,0.45);max-width:38rem">
+                  Songs play through YouTube's official uploads. NOVA picks the order, starts each song at its hook and mixes one into the next.
+                </p>
               </div>
             `}
           </main>
@@ -3795,16 +3789,15 @@ function renderYouTubeMusicScreen() {
         <header class="naux-top-header">
           <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
           <div class="naux-nav-actions">
-            ${state.crate.length ? `<button id="btn-open-crate-from-yt" class="naux-filter-chip active">CRATE (${state.crate.length})</button>` : ''}
-            <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.4);color:#c8ff00" title="Switch to AI DJ Booth">🎧 AI DJ BOOTH</button>
-            <button id="btn-open-brain-yt" class="naux-filter-chip">BRAIN</button>
+            <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
+            <button id="btn-open-brain-yt" class="naux-filter-chip">🧠 BRAIN</button>
           </div>
         </header>
 
         <main style="flex:1">
           <h1 class="naux-hero-title">PARTY SONG LISTS</h1>
           <p class="naux-hero-subtitle">
-            Over 3,200 hand-curated tracks across 16 party categories. Every category strictly contains 100+ songs, streaming seamlessly from the best part with zero awkward silence.
+            The songs NOVA plays, by language and mood, updated every day. Every song is the official version, and NOVA starts each one at its best part. Pick a list and play it as a set.
           </p>
 
           <!-- Language Filter Bar -->
@@ -3820,17 +3813,17 @@ function renderYouTubeMusicScreen() {
           <ul class="naux-cards-grid yt-tracks-grid">
             ${visibleCategories.map(cat => `
               <li class="naux-cat-card" data-open-cat="${esc(cat.id)}">
-                <div>
-                  <div class="naux-cat-card-header">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
                     <h3 class="naux-cat-title">${esc(cat.label)}</h3>
                     <span class="naux-badge-100 yt-cat-chip">${cat.tracks?.length || 100}+ SONGS</span>
                   </div>
-                  <div class="naux-cat-count">${cat.tracks?.length || 0} songs · Hand-curated</div>
+                  <div class="naux-cat-count">${cat.tracks?.length || 0} songs · Official YouTube</div>
                   <p class="naux-cat-hint">${esc(cat.query || 'Party anthems & chart hits ready to mix')}</p>
                 </div>
                 <div class="naux-cat-card-footer">
-                  <span class="naux-cat-play-link">VIEW ${cat.tracks?.length || 100}+ TRACKS →</span>
-                  <button class="naux-action-btn" data-play-cat="${esc(cat.id)}" style="background:#c8ff00;color:#070707;border-color:#c8ff00" title="Play full category set">
+                  <span class="naux-cat-play-link">VIEW ${cat.tracks?.length || 100}+ SONGS →</span>
+                  <button class="naux-action-btn squeeze" data-play-cat="${esc(cat.id)}" style="background:#c8ff00;color:#000;border:none;padding:8px 20px;font-size:12px;font-weight:800;border-radius:9999px" title="Play full category set directly">
                     ▶ PLAY SET
                   </button>
                 </div>
@@ -4142,53 +4135,48 @@ function attachGlobalYtListeners() {
     };
   });
 
-  // Play Category Set from Directory card
+function playCuratedCategoryAsSet(tracks, catId) {
+  const cId = catId || state.ytSelectedCategory || 'hindi-dance';
+  const cat = findCatalogCategory(state.ytSelectedLang, cId);
+  const list = (tracks && tracks.length) ? tracks : (cat?.tracks || []);
+  if (!list.length) return;
+  const songs = list.map((t) => ({
+    ...t,
+    source: 'youtube',
+    provider: 'YouTube',
+    mixReady: true,
+    dspReady: false,
+  }));
+  state.crate = songs;
+  state.activeVibeCard = state.ytSelectedLang === 'all' ? 'hindi' : state.ytSelectedLang;
+  state.activeVibeCategory = cId;
+  state.selectedLanguages = [state.activeVibeCard];
+  state.sequencedSet = sequenceCrate(songs, { vibe: state.vibe, playMode: state.playMode });
+  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+  approveAndPlay();
+}
+
+  // Play Category Set from Directory card -> launches Live DJ Console immediately!
   document.querySelectorAll('[data-play-cat]').forEach((btn) => {
     btn.onclick = (e) => {
       e.stopPropagation();
       const catId = btn.dataset.playCat;
       const cat = findCatalogCategory(state.ytSelectedLang, catId);
-      if (cat?.tracks?.length) {
-        state.ytSelectedCategory = catId;
-        state.ytCategoryTracks = [...cat.tracks];
-        p.setQueue(state.ytCategoryTracks, {
-          startIndex: 0,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-        showYtToast(`Playing ${cat.label} (${state.ytCategoryTracks.length} songs)`);
-        state.ytViewMode = 'category';
-        render();
-      }
+      playCuratedCategoryAsSet(cat?.tracks, catId);
     };
   });
 
-  // Play category set CTA in detail view
+  // Play category set CTA in detail view -> launches Live DJ Console immediately!
   const btnPlaySet = document.getElementById('btn-play-category-set');
   if (btnPlaySet) {
     btnPlaySet.onclick = () => {
-      if (!state.ytCategoryTracks.length) return;
-      p.setQueue(state.ytCategoryTracks, {
-        startIndex: 0,
-        autoPlay: true,
-        bestPart: state.ytBestPartMode,
-        crossfadeSec: state.ytCrossfadeSec,
-      });
-      showYtToast(`Playing ${state.ytCategoryTracks.length} tracks with ${state.ytCrossfadeSec}s crossfades`);
+      playCuratedCategoryAsSet(state.ytCategoryTracks, state.ytSelectedCategory);
     };
   }
   const btnPlaySetBtm = document.getElementById('btn-play-category-set-bottom');
   if (btnPlaySetBtm) {
     btnPlaySetBtm.onclick = () => {
-      if (!state.ytCategoryTracks.length) return;
-      p.setQueue(state.ytCategoryTracks, {
-        startIndex: 0,
-        autoPlay: true,
-        bestPart: state.ytBestPartMode,
-        crossfadeSec: state.ytCrossfadeSec,
-      });
-      showYtToast(`Playing ${state.ytCategoryTracks.length} tracks`);
+      playCuratedCategoryAsSet(state.ytCategoryTracks, state.ytSelectedCategory);
     };
   }
 
@@ -4439,16 +4427,16 @@ function attachQueueEvents() {
 
 function render() {
   if (state.screen === 'splash') return renderSplash();
-  if (state.appMode === 'yt') {
+  if (state.screen === 'playing') {
+    renderPlaying();
+  } else if (state.screen === 'summary') {
+    renderSummary();
+  } else if (state.appMode === 'yt') {
     renderYouTubeMusicScreen();
   } else if (state.screen === 'wizard') {
     renderWizard();
   } else if (state.screen === 'review') {
     renderReview();
-  } else if (state.screen === 'playing') {
-    renderPlaying();
-  } else if (state.screen === 'summary') {
-    renderSummary();
   }
   attachGlobalYtListeners();
   renderMiniPlayer();
