@@ -1617,146 +1617,99 @@ function renderVibeMusicExplorer() {
 
 function renderWizard() {
   const step = state.wizardStep;
-  const dbBadge = state.health?.database?.connected
-    ? `<span class="row-tag">${esc(state.health.database.provider.toUpperCase())} DB LIVE</span>`
-    : '';
 
-  const right = `
-    ${step === 0 ? `<button id="btn-open-brain" class="nav-meta-btn">BRAIN</button>` : ''}
-    ${step === 0 ? `<button id="btn-open-sets" class="nav-meta-btn">MY SETS (${state.savedSets.length})</button>` : ''}
-    ${dbBadge}
-    <span class="step-counter">${step + 1} / 4</span>
-    ${step > 0 ? renderExitBtn(false) : ''}
-  `;
+  // Track counts from CURATED_CATEGORIES_DB
+  const hindiCount = CURATED_CATEGORIES_DB['hindi-dance']?.songs?.length || 100;
+  const punjabiCount = CURATED_CATEGORIES_DB['punjabi-party']?.songs?.length || 100;
+  const englishCount = CURATED_CATEGORIES_DB['english-pop']?.songs?.length || 100;
+  const southCount = CURATED_CATEGORIES_DB['tamil-telugu-kuthu']?.songs?.length || 100;
+
+  const WIZARD_LANGUAGES = [
+    { id: 'hindi', label: 'Hindi', count: hindiCount, hint: `${hindiCount} songs ready` },
+    { id: 'punjabi', label: 'Punjabi', count: punjabiCount, hint: `${punjabiCount} songs ready` },
+    { id: 'english', label: 'English', count: englishCount, hint: `${englishCount} songs ready` },
+    { id: 'south', label: 'Tamil / Telugu', count: southCount, hint: `${southCount} songs ready` },
+  ];
 
   let bodyHtml = '';
 
   if (step === 0) {
     bodyHtml = `
-      <section class="wizard-body">
-        <h1 class="hero-h1">WHAT ARE WE PLAYING?</h1>
-        <p class="hero-sub">Drop audio or local music video files (.mp3, .wav, .mp4, .webm) or 4-stem bundles, browse Audius &amp; Openverse Full-DSP genres, or load YouTube videos (Vol/Cue fade only).</p>
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+        <h1 class="naux-wizard-title">WHAT ARE WE PLAYING?</h1>
+        <p class="naux-wizard-sub">Pick every language the room wants.</p>
 
-        <div class="ingest-box">
-          <div class="ingest-row">
-            <input
-              id="input-source"
-              class="ingest-input"
-              value="${esc(state.searchInput)}"
-              placeholder="Search Audius Full-DSP, paste YouTube URL/playlist, or paste CORS audio URL…"
-              autocomplete="off"
-            />
-            <button id="btn-fetch-source" class="ingest-btn squeeze" ${state.searchBusy ? 'disabled' : ''}>
-              ${state.searchBusy ? 'LOADING…' : 'LOAD / SEARCH'}
-            </button>
-            <button id="btn-drop-files" class="ingest-btn ghost squeeze">
-              + DROP AUDIO / VIDEO
-            </button>
-            <input id="file-audio-input" type="file" accept="audio/*,video/mp4,video/webm,.mp3,.wav,.flac,.m4a,.ogg,.mp4,.webm,.m4v,.mov" multiple hidden />
-          </div>
-
-          <div class="source-pills">
-            <button class="pill-btn squeeze ${state.searchProvider === 'audius' ? 'active' : ''}" data-provider="audius">Audius Full DSP</button>
-            <button class="pill-btn squeeze ${state.searchProvider === 'openverse' ? 'active' : ''}" data-provider="openverse">Openverse CC</button>
-            <button class="pill-btn squeeze ${state.searchProvider === 'itunes' ? 'active' : ''}" data-provider="itunes">🍎 Apple Music</button>
-            <button class="pill-btn squeeze ${state.searchProvider === 'all' ? 'active' : ''}" data-provider="all">All Full-DSP</button>
-            <button class="pill-btn squeeze ${state.searchProvider === 'youtube' ? 'active' : ''}" data-provider="youtube">YouTube Video (Vol/Cue Only)</button>
-            <button id="btn-open-yt-catalog" class="pill-btn squeeze" style="border-color:var(--accent);color:var(--accent);font-weight:700">▶ BROWSE YOUTUBE CATALOG (25+ TRACKS / GENRE) →</button>
-            ${state.searchResults.length ? `<button id="btn-add-all-results" class="pill-btn squeeze" style="border-color:var(--amber);color:var(--amber)">+ ADD ALL ${state.searchResults.length} TO CRATE</button>` : ''}
-            ${state.crate.length ? `<button id="btn-clear-crate" class="pill-btn squeeze">CLEAR CRATE (${state.crate.length})</button>` : ''}
-          </div>
-
-          <div class="genre-bar">
-            ${GENRE_CATALOG.map((g) => `
-              <button class="genre-chip squeeze ${state.activeGenre === g.id ? 'active' : ''}" data-genre-id="${g.id}">${esc(g.label)}</button>
-            `).join('')}
-          </div>
-
-          <div id="wizard-status-banner" class="status-banner ${state.searchError ? 'err' : ''}">${esc(state.searchStatus)}</div>
-          ${(state.crate.length >= 2 && state.setPlan?.transitions?.length) ? `
-            <div style="margin-top:8px;padding:10px 14px;border-radius:12px;background:rgba(107,255,149,0.06);border:1px solid rgba(107,255,149,0.3);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
-              <div class="font-mono-num" style="font-size:12px;color:#6bff95">
-                ⚡ AUTO-PLANNED SET READY · ${state.sequencedSet.length} TRACKS · ${state.setPlan.transitions.length} TRANSITIONS · ${state.setPlan.validation?.valid ? 'VALIDATOR ✓' : 'SAFE FALLBACK'}
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button id="btn-auto-review-now" class="pill-btn squeeze" style="font-size:12px;border-color:var(--accent);color:var(--accent)">▶ REVIEW &amp; PLAY AUTO-SET</button>
-              </div>
-            </div>
-          ` : ''}
-          ${state.costEstimate ? `
-            <div class="font-mono-num" style="font-size:11px;color:rgba(255,184,0,0.78);margin-top:4px">
-              ESTIMATE: ~${state.costEstimate.estimatedSeconds}s · AI Cost ~$${state.costEstimate.estimatedUsd.toFixed(3)} · Active Planner: ${esc(String(state.costEstimate.providers?.PLANNER || 'auto').toUpperCase())}
-            </div>
-          ` : ''}
-
-          ${state.searchResults.length ? `
-            <div class="search-results-grid">
-              ${state.searchResults.map((t, idx) => {
-                const inCrate = state.crate.some((c) => c.id === t.id);
-                const isYt = isYtTrack(t);
-                return `
-                  <button class="result-card squeeze ${inCrate ? 'added' : ''}" data-result-idx="${idx}">
-                    <img class="result-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
-                    <div class="result-info">
-                      <div class="result-title">${esc(t.title)}</div>
-                      <div class="result-sub">${esc(t.artist)} · ${fmtTime(t.durationSec)}</div>
-                      <span class="result-badge ${isYt ? 'yt' : t.source === 'itunes' ? 'itunes' : 'dsp'}">${esc(isYt ? 'YT VIDEO · VOL/CUE ONLY' : t.source === 'itunes' ? '🍎 APPLE MUSIC · 30s PREVIEW' : (t.provider || 'FULL DSP · AUDIOBUFFER'))} ${inCrate ? '✓' : '+'}</span>
-                    </div>
-                  </button>
-                `;
-              }).join('')}
-            </div>
-            ${state.searchHasMore ? `
-              <div style="margin-top:12px;display:flex;justify-content:center">
-                <button id="btn-load-more-results" class="pill-btn squeeze" style="border-color:var(--accent);color:var(--accent)" ${state.searchBusy ? 'disabled' : ''}>
-                  ${state.searchBusy ? 'LOADING…' : `+ LOAD MORE TRACKS (PAGE ${state.searchPage + 1})`}
-                </button>
-              </div>
-            ` : ''}
-          ` : ''}
-        </div>
-
-        <h2 class="font-display" style="margin-top:34px;font-size:28px;color:rgba(245,245,240,0.55);letter-spacing:0.03em">OR QUICK-FILL BY VIBE</h2>
-        <div class="choice-grid-2" style="margin-top:14px">
-          ${LANGUAGES.map((l) => {
-            const sel = (state.activeVibeCard === l.id) || state.selectedLanguages.includes(l.id);
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:32px">
+          ${WIZARD_LANGUAGES.map((l) => {
+            const sel = state.selectedLanguages.includes(l.id);
             return `
-              <button class="big-card squeeze ${sel ? 'selected' : ''}" data-lang="${l.id}">
-                <span class="big-card-title">${esc(l.label)}</span>
-                <span class="big-card-hint">${esc(l.hint)}</span>
+              <button class="naux-choice-btn ${sel ? 'selected' : ''}" data-wizard-lang="${l.id}">
+                <span class="naux-choice-title">${esc(l.label)}</span>
+                <span class="naux-choice-hint">${l.hint}</span>
               </button>
             `;
           }).join('')}
         </div>
-        ${renderVibeMusicExplorer()}
+
+        <button id="btn-wiz-next" class="naux-next-fixed squeeze" ${state.selectedLanguages.length ? '' : 'disabled'}>
+          NEXT →
+        </button>
+
+        <p style="margin-top:48px;font-size:16px;color:rgba(255,255,255,0.4)">
+          Plays through YouTube · <a id="link-party-lists" style="color:rgba(255,255,255,0.7);text-decoration:underline;cursor:pointer">Song lists</a> · Privacy · Terms
+        </p>
       </section>
     `;
   } else if (step === 1) {
+    const selectedLangs = state.selectedLanguages.length ? state.selectedLanguages : ['hindi'];
     bodyHtml = `
-      <section class="wizard-body">
-        <button class="back-btn" id="btn-wiz-back">← BACK</button>
-        <h1 class="hero-h1">HOW SHOULD NOVA MIX?</h1>
-        <p class="hero-sub">Pick how deep NOVA blends each track in your ${state.crate.length}-${state.crate.length === 1 ? 'song' : 'song'} crate.</p>
-        <div class="choice-grid-3">
-          ${MIX_STYLES.map((m) => `
-            <button class="big-card tall squeeze ${state.playMode === m.id ? 'selected' : ''}" data-mode="${m.id}">
-              <span class="big-card-title">${esc(m.label)}</span>
-              <span class="big-card-hint">${esc(m.hint)}</span>
-            </button>
-          `).join('')}
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
+        <h1 class="naux-wizard-title">WHAT KIND?</h1>
+        <p class="naux-wizard-sub">Optional. Skip a language to take anything in it.</p>
+
+        <div style="display:flex;flex-direction:column;gap:32px;margin-top:28px">
+          ${selectedLangs.map((langId) => {
+            const langDef = WIZARD_LANGUAGES.find(l => l.id === langId) || { label: langId.toUpperCase() };
+            const subcats = VIBE_CATEGORIES_MAP[langId] || VIBE_CATEGORIES_MAP['hindi'];
+            return `
+              <div>
+                <h3 style="font-family:var(--font-display);font-size:26px;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.04em">
+                  ${esc(langDef.label)}
+                </h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px">
+                  ${subcats.map((sc) => {
+                    const sel = (state.activeVibeCategory === sc.id) || !state.activeVibeCategory;
+                    const count = CURATED_CATEGORIES_DB[sc.dbKey]?.songs?.length || 100;
+                    return `
+                      <button class="naux-choice-btn compact ${sel ? 'selected' : ''}" data-wizard-subcat="${sc.id}" data-parent-lang="${langId}">
+                        <span class="naux-choice-title" style="font-size:24px">${esc(sc.label)}</span>
+                        <span class="naux-choice-hint">${count} ready</span>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
+
+        <button id="btn-wiz-next" class="naux-next-fixed squeeze">
+          NEXT →
+        </button>
       </section>
     `;
   } else if (step === 2) {
     bodyHtml = `
-      <section class="wizard-body">
-        <button class="back-btn" id="btn-wiz-back">← BACK</button>
-        <h1 class="hero-h1">WHERE IN THE NIGHT ARE WE?</h1>
-        <div class="choice-grid-2">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
+        <h1 class="naux-wizard-title">WHERE IN THE NIGHT ARE WE?</h1>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:32px">
           ${NIGHT_VIBES.map((v) => `
-            <button class="big-card tall squeeze ${state.vibe === v.id ? 'selected' : ''}" data-vibe="${v.id}">
-              <span class="big-card-title">${esc(v.label)}</span>
-              <span class="big-card-hint">${esc(v.hint)}</span>
+            <button class="naux-choice-btn tall squeeze ${state.vibe === v.id ? 'selected' : ''}" data-vibe="${v.id}">
+              <span class="naux-choice-title">${esc(v.label)}</span>
+              <span class="naux-choice-hint">${esc(v.hint)}</span>
             </button>
           `).join('')}
         </div>
@@ -1764,14 +1717,15 @@ function renderWizard() {
     `;
   } else if (step === 3) {
     bodyHtml = `
-      <section class="wizard-body">
-        <button class="back-btn" id="btn-wiz-back">← BACK</button>
-        <h1 class="hero-h1">HOW MANY PEOPLE?</h1>
-        <div class="choice-grid-3">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
+        <h1 class="naux-wizard-title">HOW MANY PEOPLE?</h1>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px">
           ${CROWD_SIZES.map((c) => `
-            <button class="big-card tall squeeze ${state.crowd === c.id ? 'selected' : ''}" data-crowd="${c.id}">
-              <span class="big-card-title">${esc(c.label)}</span>
-              <span class="big-card-hint">${esc(c.hint)}</span>
+            <button class="naux-choice-btn tall squeeze ${state.crowd === c.id ? 'selected' : ''}" data-crowd="${c.id}">
+              <span class="naux-choice-title">${esc(c.label)}</span>
+              <span class="naux-choice-hint">${esc(c.hint)}</span>
             </button>
           `).join('')}
         </div>
@@ -1779,25 +1733,20 @@ function renderWizard() {
     `;
   }
 
-  const canNext = step === 0
-    ? (state.crate.length >= 1 || state.selectedLanguages.length >= 1) && !state.searchBusy
-    : true;
-
-  const floatingNext = `
-    <div class="floating-next-wrap">
-      ${state.crate.length ? `<button id="btn-open-crate" class="crate-floating-pill squeeze" title="Inspect &amp; edit crate"><span>${state.crate.length}</span> ${state.crate.length === 1 ? 'TRACK' : 'TRACKS'} READY ▾</button>` : '<div></div>'}
-      <button id="btn-wiz-next" class="floating-next-btn squeeze" ${canNext ? '' : 'disabled'}>${step === 3 ? 'FINALIZE SET →' : 'NEXT →'}</button>
-    </div>
-  `;
-
   root.innerHTML = `
-    <main class="stage-shell">
-      ${renderTopBar(right)}
+    <main class="naux-step-shell">
+      <div class="naux-wizard-header">
+        <button id="btn-naux-brand" class="naux-wizard-brand" aria-label="NAUX home">NAUX</button>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button id="btn-open-pro-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Pro DJ Booth &amp; File Ingest">🎚 PRO DJ / UPLOAD</button>
+          <button id="btn-open-brain-wiz" class="naux-filter-chip">🧠 BRAIN</button>
+          <span style="font-family:var(--font-display);font-size:22px;color:rgba(255,255,255,0.5)">${step + 1} / 4</span>
+          ${step > 0 ? `<button id="btn-wiz-exit" class="naux-back-btn" style="font-size:20px;margin-left:8px" title="Exit to Step 1">✕</button>` : ''}
+        </div>
+      </div>
       ${bodyHtml}
     </main>
-    ${floatingNext}
-    ${state.setsModalOpen ? renderSetsModal() : ''}
-    ${state.crateModalOpen ? renderCrateModal() : ''}
+    ${state.proDjModalOpen ? renderProDjModal() : ''}
     ${state.brainModalOpen ? renderBrainModal({
       claudeKeySet: Boolean(state.opusKey),
       geminiKeySet: Boolean(state.geminiKey),
@@ -1811,6 +1760,78 @@ function renderWizard() {
   `;
 
   bindWizardEvents();
+}
+
+function renderProDjModal() {
+  return `
+    <div class="modal-backdrop" id="pro-dj-backdrop">
+      <div class="modal-sheet" onclick="event.stopPropagation()" style="max-width:820px;border-color:rgba(200,255,0,0.4)">
+        <div style="padding:22px 26px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid rgba(255,255,255,0.12)">
+          <div>
+            <div class="font-display text-accent" style="font-size:32px;line-height:1">🎚 PRO DJ / FILE INGEST</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px">Drop local audio/video, search Audius &amp; Openverse CORS streams, or isolate 4-stems</div>
+          </div>
+          <button id="btn-close-pro-dj" class="exit-btn">✕</button>
+        </div>
+        <div style="padding:24px 26px">
+          <div class="ingest-box" style="margin-top:0">
+            <div class="ingest-row">
+              <input
+                id="input-source"
+                class="ingest-input"
+                value="${esc(state.searchInput)}"
+                placeholder="Search Audius Full-DSP, paste YouTube URL/playlist, or paste audio URL…"
+                autocomplete="off"
+              />
+              <button id="btn-fetch-source" class="ingest-btn squeeze" ${state.searchBusy ? 'disabled' : ''}>
+                ${state.searchBusy ? 'LOADING…' : 'LOAD / SEARCH'}
+              </button>
+              <button id="btn-drop-files" class="ingest-btn ghost squeeze">
+                + DROP AUDIO / VIDEO
+              </button>
+              <input id="file-audio-input" type="file" accept="audio/*,video/mp4,video/webm,.mp3,.wav,.flac,.m4a,.ogg,.mp4,.webm,.m4v,.mov" multiple hidden />
+            </div>
+
+            <div class="source-pills" style="margin-top:14px">
+              <button class="pill-btn squeeze ${state.searchProvider === 'audius' ? 'active' : ''}" data-provider="audius">Audius Full DSP</button>
+              <button class="pill-btn squeeze ${state.searchProvider === 'openverse' ? 'active' : ''}" data-provider="openverse">Openverse CC</button>
+              <button class="pill-btn squeeze ${state.searchProvider === 'itunes' ? 'active' : ''}" data-provider="itunes">🍎 Apple Music</button>
+              <button class="pill-btn squeeze ${state.searchProvider === 'all' ? 'active' : ''}" data-provider="all">All Full-DSP</button>
+              <button class="pill-btn squeeze ${state.searchProvider === 'youtube' ? 'active' : ''}" data-provider="youtube">YouTube Video</button>
+            </div>
+
+            <div id="wizard-status-banner" class="status-banner ${state.searchError ? 'err' : ''}">${esc(state.searchStatus)}</div>
+
+            ${state.searchResults.length ? `
+              <div class="search-results-grid" style="margin-top:16px">
+                ${state.searchResults.map((t, idx) => {
+                  const inCrate = state.crate.some((c) => c.id === t.id);
+                  const isYt = isYtTrack(t);
+                  return `
+                    <button class="result-card squeeze ${inCrate ? 'added' : ''}" data-result-idx="${idx}">
+                      <img class="result-thumb" src="${esc(t.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
+                      <div class="result-info">
+                        <div class="result-title">${esc(t.title)}</div>
+                        <div class="result-sub">${esc(t.artist)} · ${fmtTime(t.durationSec)}</div>
+                        <span class="result-badge ${isYt ? 'yt' : t.source === 'itunes' ? 'itunes' : 'dsp'}">${esc(isYt ? 'YT VIDEO' : t.source === 'itunes' ? '🍎 APPLE MUSIC' : (t.provider || 'FULL DSP'))} ${inCrate ? '✓' : '+'}</span>
+                      </div>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,0.6)">CRATE: ${state.crate.length} TRACKS</span>
+            <button id="btn-play-pro-crate" class="naux-btn-play-set squeeze" style="padding:10px 24px;font-size:15px" ${state.crate.length ? '' : 'disabled'}>
+              ▶ PLAY CRATE IN LIVE CONSOLE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderCrateModal() {
@@ -2289,7 +2310,7 @@ function renderPlaying() {
       <div class="pulse-aura" id="pulse-aura" style="--pulse-dur:${energyPulseDur}"></div>
 
       <div class="play-topbar">
-        <span class="wordmark">NOVA</span>
+        <span class="wordmark font-display" style="color:#c8ff00">NAUX</span>
 
         <button class="vibe-pill squeeze" id="btn-open-vibe">
           <span class="truncate">${esc((state.activeVibeCard || 'HINDI').toUpperCase())} · ${(state.activeVibeCategory?.replace(/^[a-z]+-/, '') || 'DANCE').toUpperCase()} · ${(state.vibe || 'PEAK').toUpperCase()} · ${(state.crowd === 'small' ? '4–6' : state.crowd === 'large' ? '20+' : '10–20')}</span>
@@ -2538,151 +2559,148 @@ function bindBrainModalEvents() {
 }
 
 function bindWizardEvents() {
-  const home = document.getElementById('btn-home');
-  if (home) home.onclick = goHome;
-  bindExitHandler(false);
-
-  const openBrain = document.getElementById('btn-open-brain');
-  if (openBrain) openBrain.onclick = () => { state.brainModalOpen = true; render(); };
   bindBrainModalEvents();
 
-  const openSets = document.getElementById('btn-open-sets');
-  if (openSets) openSets.onclick = () => { state.setsModalOpen = true; render(); };
-
-  if (state.setsModalOpen) {
-    document.getElementById('sets-backdrop').onclick = () => { state.setsModalOpen = false; render(); };
-    document.getElementById('btn-close-sets').onclick = () => { state.setsModalOpen = false; render(); };
-    document.querySelectorAll('[data-load-set]').forEach((b) => {
-      b.onclick = () => {
-        const s = state.savedSets[Number(b.dataset.loadSet)];
-        if (s?.tracks?.length) {
-          state.crate = s.tracks.map((t) => ({ ...t, heat: buildFallbackHeat(t) }));
-          state.playMode = s.vibe?.playMode || 'club';
-          state.vibe = s.vibe?.vibe || 'peak';
-          state.setsModalOpen = false;
-          buildReviewSet();
-        }
-      };
-    });
+  // Top header brand resets to step 0
+  const brand = document.getElementById('btn-naux-brand');
+  if (brand) {
+    brand.onclick = () => {
+      state.wizardStep = 0;
+      state.appMode = 'wizard';
+      render();
+    };
   }
 
-  const openCrate = document.getElementById('btn-open-crate');
-  if (openCrate) openCrate.onclick = () => { state.crateModalOpen = true; render(); };
-
-  if (state.crateModalOpen) {
-    document.getElementById('crate-backdrop').onclick = () => { state.crateModalOpen = false; render(); };
-    document.getElementById('btn-close-crate').onclick = () => { state.crateModalOpen = false; render(); };
-    document.querySelectorAll('[data-crate-rm]').forEach((b) => {
-      b.onclick = () => {
-        state.crate.splice(Number(b.dataset.crateRm), 1);
-        if (!state.crate.length) state.crateModalOpen = false;
-        render();
-      };
-    });
+  // Link to song lists
+  const btnSongLists = document.getElementById('link-party-lists');
+  if (btnSongLists) {
+    btnSongLists.onclick = () => {
+      state.appMode = 'yt';
+      state.ytViewMode = 'directory';
+      render();
+    };
   }
 
+  const btnOpenPro = document.getElementById('btn-open-pro-dj');
+  if (btnOpenPro) {
+    btnOpenPro.onclick = () => {
+      state.proDjModalOpen = true;
+      render();
+    };
+  }
+
+  const btnOpenBrainWiz = document.getElementById('btn-open-brain-wiz');
+  if (btnOpenBrainWiz) {
+    btnOpenBrainWiz.onclick = () => {
+      state.brainModalOpen = true;
+      render();
+    };
+  }
+
+  const btnWizExit = document.getElementById('btn-wiz-exit');
+  if (btnWizExit) {
+    btnWizExit.onclick = () => {
+      state.wizardStep = 0;
+      render();
+    };
+  }
+
+  // Back button
   const back = document.getElementById('btn-wiz-back');
-  if (back) back.onclick = () => { state.wizardStep = Math.max(0, state.wizardStep - 1); render(); };
+  if (back) {
+    back.onclick = () => {
+      state.wizardStep = Math.max(0, state.wizardStep - 1);
+      render();
+    };
+  }
 
+  // Next button
   const next = document.getElementById('btn-wiz-next');
   if (next) {
     next.onclick = () => {
-      if (state.wizardStep === 0) advanceFromStep0();
-      else if (state.wizardStep < 3) {
+      if (state.wizardStep < 3) {
         state.wizardStep += 1;
         render();
       } else {
-        buildReviewSet();
+        const targetLang = state.selectedLanguages[0] || 'hindi';
+        const catId = state.activeVibeCategory || 'hindi-dance';
+        populateVibeTracksToCrate(targetLang, catId);
+        approveAndPlay();
       }
     };
   }
 
-  if (state.wizardStep === 0) {
+  // Step 0: Language selection (No songs displayed below!)
+  document.querySelectorAll('[data-wizard-lang]').forEach((btn) => {
+    btn.onclick = () => {
+      const id = btn.dataset.wizardLang;
+      if (state.selectedLanguages.includes(id)) {
+        if (state.selectedLanguages.length > 1) {
+          state.selectedLanguages = state.selectedLanguages.filter(l => l !== id);
+        }
+      } else {
+        state.selectedLanguages.push(id);
+      }
+      state.activeVibeCard = state.selectedLanguages[0] || 'hindi';
+      render();
+    };
+  });
+
+  // Step 1: Subcategory selection
+  document.querySelectorAll('[data-wizard-subcat]').forEach((btn) => {
+    btn.onclick = () => {
+      state.activeVibeCategory = btn.dataset.wizardSubcat;
+      state.activeVibeCard = btn.dataset.parentLang || state.activeVibeCard;
+      render();
+    };
+  });
+
+  // Step 2: Time of Night / Vibe selection
+  document.querySelectorAll('[data-vibe]').forEach((b) => {
+    b.onclick = () => {
+      state.vibe = b.dataset.vibe;
+      state.wizardStep = 3;
+      render();
+    };
+  });
+
+  // Step 3: Crowd size selection -> Launches directly into the live set!
+  document.querySelectorAll('[data-crowd]').forEach((b) => {
+    b.onclick = () => {
+      state.crowd = b.dataset.crowd;
+      const targetLang = state.selectedLanguages[0] || 'hindi';
+      const catId = state.activeVibeCategory || 'hindi-dance';
+      populateVibeTracksToCrate(targetLang, catId);
+      approveAndPlay();
+    };
+  });
+
+  // Pro DJ Modal Handlers
+  if (state.proDjModalOpen) {
+    const backdrop = document.getElementById('pro-dj-backdrop');
+    if (backdrop) backdrop.onclick = () => { state.proDjModalOpen = false; render(); };
+    const closeBtn = document.getElementById('btn-close-pro-dj');
+    if (closeBtn) closeBtn.onclick = () => { state.proDjModalOpen = false; render(); };
+
     const inp = document.getElementById('input-source');
-    inp.oninput = (e) => { state.searchInput = e.target.value; };
-    inp.onkeydown = (e) => { if (e.key === 'Enter') handleSourceFetch(); };
-    document.getElementById('btn-fetch-source').onclick = () => handleSourceFetch();
+    if (inp) {
+      inp.oninput = (e) => { state.searchInput = e.target.value; };
+      inp.onkeydown = (e) => { if (e.key === 'Enter') handleSourceFetch(); };
+    }
+    const fetchBtn = document.getElementById('btn-fetch-source');
+    if (fetchBtn) fetchBtn.onclick = () => handleSourceFetch();
 
     const fileInput = document.getElementById('file-audio-input');
-    document.getElementById('btn-drop-files').onclick = () => fileInput.click();
-    fileInput.onchange = (e) => handleLocalFiles(e.target.files);
-
-    const stage = document.querySelector('.stage-shell');
-    if (stage) {
-      stage.ondragover = (e) => { e.preventDefault(); };
-      stage.ondrop = (e) => {
-        e.preventDefault();
-        if (e.dataTransfer?.files?.length) handleLocalFiles(e.dataTransfer.files);
-      };
-    }
+    const dropBtn = document.getElementById('btn-drop-files');
+    if (dropBtn && fileInput) dropBtn.onclick = () => fileInput.click();
+    if (fileInput) fileInput.onchange = (e) => handleLocalFiles(e.target.files);
 
     document.querySelectorAll('[data-provider]').forEach((b) => {
       b.onclick = () => {
         state.searchProvider = b.dataset.provider;
-        state.activeGenre = '';
         render();
       };
     });
-
-    document.querySelectorAll('[data-genre-id]').forEach((b) => {
-      b.onclick = () => {
-        const g = GENRE_CATALOG.find((x) => x.id === b.dataset.genreId);
-        if (!g) return;
-        state.activeGenre = g.id;
-        state.searchInput = g.q || '';
-        // iTunes genre chips force provider to 'itunes' so catalogue.js routes correctly
-        if (g.provider === 'itunes') {
-          state.searchProvider = 'itunes';
-          handleSourceFetch(g.q, { page: 1, append: false, genre: g.genre, mode: g.mode, provider: 'itunes' });
-        } else if (state.searchProvider === 'youtube') {
-          handleSourceFetch(g.q || g.label, { page: 1, append: false });
-        } else {
-          handleSourceFetch(g.q, { page: 1, append: false, genre: g.genre, mode: g.mode });
-        }
-      };
-    });
-
-    const loadMoreBtn = document.getElementById('btn-load-more-results');
-    if (loadMoreBtn) {
-      loadMoreBtn.onclick = () => {
-        const g = GENRE_CATALOG.find((x) => x.id === state.activeGenre);
-        handleSourceFetch(g ? g.q : state.searchInput, {
-          page: (state.searchPage || 1) + 1,
-          append: true,
-          genre: g?.genre || '',
-          mode: g?.mode || '',
-        });
-      };
-    }
-
-    const addAll = document.getElementById('btn-add-all-results');
-    if (addAll) {
-      addAll.onclick = () => {
-        let added = 0;
-        for (const t of state.searchResults) if (addTrackToCrate(t)) added++;
-        state.searchStatus = `Added ${added} tracks to crate (${state.crate.length} total).`;
-        refreshCostEstimate();
-        render();
-      };
-    }
-
-    const clearCrate = document.getElementById('btn-clear-crate');
-    if (clearCrate) {
-      clearCrate.onclick = () => {
-        state.crate = [];
-        state.sequencedSet = [];
-        state.setPlan = null;
-        state.searchStatus = 'Crate cleared.';
-        render();
-      };
-    }
-
-    const autoRevBtn = document.getElementById('btn-auto-review-now');
-    if (autoRevBtn) {
-      autoRevBtn.onclick = () => {
-        approveAndPlay();
-      };
-    }
 
     document.querySelectorAll('[data-result-idx]').forEach((b) => {
       b.onclick = () => {
@@ -2695,81 +2713,15 @@ function bindWizardEvents() {
       };
     });
 
-    document.querySelectorAll('[data-lang]').forEach((b) => {
-      b.onclick = () => {
-        const id = b.dataset.lang;
-        state.activeVibeCard = id;
-        const cats = VIBE_CATEGORIES_MAP[id] || VIBE_CATEGORIES_MAP['hindi'];
-        state.activeVibeCategory = cats[0].id;
-        state.selectedLanguages = [id];
-        populateVibeTracksToCrate(id, cats[0].id);
-        render();
-        const explorer = document.getElementById('vibe-explorer');
-        if (explorer) {
-          explorer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      };
-    });
-
-    // Subcategory chips inside Vibe explorer
-    document.querySelectorAll('[data-vibe-cat]').forEach((btn) => {
-      btn.onclick = () => {
-        state.activeVibeCategory = btn.dataset.vibeCat;
-        populateVibeTracksToCrate(state.activeVibeCard || 'hindi', btn.dataset.vibeCat);
-        render();
-      };
-    });
-
-    // Play vibe set CTA -> directly starts set
-    const btnPlayVibeSet = document.getElementById('btn-play-vibe-set');
-    if (btnPlayVibeSet) {
-      btnPlayVibeSet.onclick = () => {
-        if (!state.crate.length) {
-          populateVibeTracksToCrate(state.activeVibeCard || 'hindi', state.activeVibeCategory || 'hindi-dance');
-        }
+    const playProCrate = document.getElementById('btn-play-pro-crate');
+    if (playProCrate) {
+      playProCrate.onclick = () => {
+        state.proDjModalOpen = false;
+        state.sequencedSet = sequenceCrate(state.crate, { vibe: state.vibe, playMode: state.playMode });
+        state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
         approveAndPlay();
       };
     }
-
-    // Best part toggle inside Vibe explorer
-    const btnVibeBestPart = document.getElementById('btn-vibe-best-part-toggle');
-    if (btnVibeBestPart) {
-      btnVibeBestPart.onclick = () => {
-        state.ytBestPartMode = !state.ytBestPartMode;
-        const p = getYouTubePlayer();
-        p.setBestPartMode(state.ytBestPartMode);
-        render();
-      };
-    }
-  } else if (state.wizardStep === 1) {
-    document.querySelectorAll('[data-mode]').forEach((b) => {
-      b.onclick = () => { state.playMode = b.dataset.mode; render(); };
-    });
-  } else if (state.wizardStep === 2) {
-    document.querySelectorAll('[data-vibe]').forEach((b) => {
-      b.onclick = () => {
-        state.vibe = b.dataset.vibe;
-        render();
-        setTimeout(() => {
-          if (state.wizardStep === 2) {
-            state.wizardStep = 3;
-            render();
-          }
-        }, 220);
-      };
-    });
-  } else if (state.wizardStep === 3) {
-    document.querySelectorAll('[data-crowd]').forEach((b) => {
-      b.onclick = () => {
-        state.crowd = b.dataset.crowd;
-        render();
-        setTimeout(() => {
-          if (state.wizardStep === 3) {
-            buildReviewSet();
-          }
-        }, 220);
-      };
-    });
   }
 }
 
@@ -3682,7 +3634,7 @@ function renderYouTubeMusicScreen() {
       <div class="naux-main-shell">
         <div class="naux-container">
           <header class="naux-top-header">
-            <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
+            <button id="btn-naux-brand" class="naux-logo" title="NAUX Home">NAUX</button>
             <div class="naux-nav-actions">
               <button id="btn-back-to-lists" class="naux-back-link">ALL LISTS</button>
               <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
@@ -3701,16 +3653,8 @@ function renderYouTubeMusicScreen() {
 
             <div class="naux-detail-actions" style="margin-top:28px">
               <button id="btn-play-category-set" class="naux-btn-play-set squeeze" style="font-size:20px;padding:16px 36px">
-                ▶ PLAY THIS AS A SET →
+                PLAY THIS AS A SET →
               </button>
-              <button id="btn-yt-best-part-toggle" class="naux-btn-crate-add squeeze" style="${state.ytBestPartMode ? 'border-color:#c8ff00;color:#c8ff00' : ''}">
-                ⚡ BEST PART: ${state.ytBestPartMode ? 'ON (35s)' : 'OFF'}
-              </button>
-              <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);border-radius:9999px;padding:8px 16px">
-                <span style="font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,0.7)">BLEND:</span>
-                <input id="input-yt-crossfade" type="range" min="0" max="8" step="0.5" value="${state.ytCrossfadeSec}" style="width:70px;accent-color:#c8ff00;cursor:pointer" />
-                <span id="yt-crossfade-val" style="font-family:var(--font-mono);font-size:11px;color:#c8ff00;min-width:30px">${state.ytCrossfadeSec.toFixed(1)}s</span>
-              </div>
             </div>
 
             ${state.ytLoadingTracks ? `
@@ -3787,8 +3731,9 @@ function renderYouTubeMusicScreen() {
     <div class="naux-main-shell">
       <div class="naux-container">
         <header class="naux-top-header">
-          <button id="btn-naux-brand" class="naux-logo" title="NOVA Home">NOVA</button>
+          <button id="btn-naux-brand" class="naux-logo" title="NAUX Home">NAUX</button>
           <div class="naux-nav-actions">
+            <button id="btn-nav-create-set" class="naux-back-link">CREATE SET</button>
             <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
             <button id="btn-open-brain-yt" class="naux-filter-chip">🧠 BRAIN</button>
           </div>
@@ -3809,23 +3754,13 @@ function renderYouTubeMusicScreen() {
             `).join('')}
           </div>
 
-          <!-- 16 Categories Grid -->
+          <!-- Categories Grid: Clean minimalist cards matching naux.party/songs -->
           <ul class="naux-cards-grid yt-tracks-grid">
             ${visibleCategories.map(cat => `
-              <li class="naux-cat-card" data-open-cat="${esc(cat.id)}">
-                <div style="display:flex;flex-direction:column;gap:6px">
-                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-                    <h3 class="naux-cat-title">${esc(cat.label)}</h3>
-                    <span class="naux-badge-100 yt-cat-chip">${cat.tracks?.length || 100}+ SONGS</span>
-                  </div>
-                  <div class="naux-cat-count">${cat.tracks?.length || 0} songs · Official YouTube</div>
-                  <p class="naux-cat-hint">${esc(cat.query || 'Party anthems & chart hits ready to mix')}</p>
-                </div>
-                <div class="naux-cat-card-footer">
-                  <span class="naux-cat-play-link">VIEW ${cat.tracks?.length || 100}+ SONGS →</span>
-                  <button class="naux-action-btn squeeze" data-play-cat="${esc(cat.id)}" style="background:#c8ff00;color:#000;border:none;padding:8px 20px;font-size:12px;font-weight:800;border-radius:9999px" title="Play full category set directly">
-                    ▶ PLAY SET
-                  </button>
+              <li>
+                <div class="naux-cat-card" data-open-cat="${esc(cat.id)}">
+                  <span class="font-display text-2xl uppercase leading-tight naux-cat-title">${esc(cat.label)}</span>
+                  <span class="yt-cat-chip" style="margin-top:6px;font-size:15px;color:rgba(255,255,255,0.55);font-family:var(--font-sans)">${cat.tracks?.length || 100} songs</span>
                 </div>
               </li>
             `).join('')}
