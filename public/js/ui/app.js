@@ -247,12 +247,9 @@ function buildRenderSig(snap) {
   return [
     snap.liveId,
     liveSlot?.track?.id || '',
-    liveSlot?.status || '',
     Boolean(liveSlot?.playFull),
     cueSlot?.track?.id || '',
-    cueSlot?.status || '',
     Boolean(snap.crossfading),
-    Boolean(snap.paused),
   ].join('|');
 }
 
@@ -951,25 +948,38 @@ async function saveCurrentSetToDb(customName) {
   render();
 }
 
+let lastPipRect = { x: 0, y: 0, w: 0, h: 0, liveId: '' };
 function positionPipTile() {
   if (!state.pipVideoVisible || state.screen !== 'playing' || state.snap?.crossfading) {
-    ytHost.setAttribute('data-visible', 'false');
+    if (ytHost.getAttribute('data-visible') !== 'false') {
+      ytHost.setAttribute('data-visible', 'false');
+    }
     return;
   }
   const slot = document.querySelector('.deck[data-slot="live"] [data-pip-slot]');
   const liveSlot = state.snap?.decks?.[state.snap?.liveId];
   if (!slot || liveSlot?.engine !== 'yt') {
-    ytHost.setAttribute('data-visible', 'false');
+    if (ytHost.getAttribute('data-visible') !== 'false') {
+      ytHost.setAttribute('data-visible', 'false');
+    }
     return;
   }
   const rect = slot.getBoundingClientRect();
-  ytHost.style.setProperty('--tile-x', `${Math.round(rect.left)}px`);
-  ytHost.style.setProperty('--tile-y', `${Math.round(rect.top)}px`);
-  ytHost.style.setProperty('--tile-w', `${Math.round(rect.width)}px`);
-  ytHost.style.setProperty('--tile-h', `${Math.round(rect.height)}px`);
-  ytHost.style.setProperty('--tile-opacity', '1');
-  ytHost.setAttribute('data-visible', 'true');
-  ytHost.setAttribute('data-live', state.snap.liveId);
+  const x = Math.round(rect.left);
+  const y = Math.round(rect.top);
+  const w = Math.round(rect.width);
+  const h = Math.round(rect.height);
+  const lid = state.snap?.liveId || 'A';
+  if (lastPipRect.x !== x || lastPipRect.y !== y || lastPipRect.w !== w || lastPipRect.h !== h || lastPipRect.liveId !== lid) {
+    lastPipRect = { x, y, w, h, liveId: lid };
+    ytHost.style.setProperty('--tile-x', `${x}px`);
+    ytHost.style.setProperty('--tile-y', `${y}px`);
+    ytHost.style.setProperty('--tile-w', `${w}px`);
+    ytHost.style.setProperty('--tile-h', `${h}px`);
+    ytHost.style.setProperty('--tile-opacity', '1');
+    ytHost.setAttribute('data-visible', 'true');
+    ytHost.setAttribute('data-live', lid);
+  }
 }
 
 /* =========================================================
@@ -1144,7 +1154,7 @@ function updateDeckTelemetryDom(deckId, tel) {
   setCell('vol', `${Math.min(100, Math.round((tel.vol || 0) * 100))}%`, Math.round((tel.vol || 0) * 100), 'green');
 }
 
-function updateDeckWaveformDom(deckId, slot, posOverride, bassEnergy) {
+function updateDeckWaveformDom(deckId, slot, posOverride) {
   if (!slot?.track) return;
   const wf = document.querySelector(`.deck[data-deck="${deckId}"] .waveform-bars`);
   if (!wf) return;
@@ -1153,23 +1163,21 @@ function updateDeckWaveformDom(deckId, slot, posOverride, bassEnergy) {
   const entry = slot.playFull ? 0 : (slot.track.entrySec || 0);
   const exit = slot.playFull ? dur : (slot.mixOutSec || slot.cutAt || slot.track.exitSec || dur);
   const bars = wf.children;
-  const bassPulse = 1 + (bassEnergy || 0) * 0.14;
+  const playheadIdx = Math.floor((pos / dur) * bars.length);
+  const entryIdx = Math.floor((entry / dur) * bars.length);
+  const exitIdx = Math.floor((exit / dur) * bars.length);
   for (let i = 0; i < bars.length; i++) {
-    const barTime = ((i + 0.5) / bars.length) * dur;
-    const inside = barTime >= entry && barTime <= exit;
-    const played = barTime <= pos;
+    const inside = i >= entryIdx && i <= exitIdx;
+    const played = i <= playheadIdx;
     const cls = !inside ? 'wave-bar outside' : played ? 'wave-bar played' : 'wave-bar';
     if (bars[i].className !== cls) bars[i].className = cls;
-    if (played && inside) {
-      bars[i].style.transform = `scaleY(${bassPulse.toFixed(2)})`;
-    } else if (bars[i].style.transform) {
-      bars[i].style.transform = '';
-    }
   }
   const ph = document.querySelector(`.deck[data-deck="${deckId}"] .playhead-line`);
   if (ph) {
-    ph.style.left = `${Math.min(100, Math.max(0, (pos / dur) * 100))}%`;
-    ph.className = deckId === state.snap?.liveId && state.dragCueSec !== null ? 'playhead-line dragging' : 'playhead-line';
+    ph.style.left = `${Math.min(100, Math.max(0, (pos / dur) * 100)).toFixed(2)}%`;
+    const isDrag = deckId === state.snap?.liveId && state.dragCueSec !== null;
+    const dragCls = isDrag ? 'playhead-line dragging' : 'playhead-line';
+    if (ph.className !== dragCls) ph.className = dragCls;
   }
 }
 
@@ -1381,66 +1389,61 @@ function syncPlayingDom() {
     if (cueStatus.textContent !== label) cueStatus.textContent = label;
   }
 
-  // Update BOTH Deck A & Deck B beat-grid waveforms & live EQ/filter telemetry + local <video> sync
-  updateDeckWaveformDom(snap.liveId, liveSlot, pos, snap.spectrum?.bass || 0);
-  updateDeckWaveformDom(snap.cueId, cueSlot, cueSlot?.position || 0, 0);
-  updateDeckTelemetryDom('A', snap.deckTelemetry?.A);
-  updateDeckTelemetryDom('B', snap.deckTelemetry?.B);
+  // Update live waveform and local video sync
+  updateDeckWaveformDom(snap.liveId, liveSlot, pos);
   syncLocalVideoDecks(snap, pos);
 
-  const tpClock = document.getElementById('live-tp-clock');
-  if (tpClock) {
-    const cTxt = `CLOCK: ${String(snap.clockMode || 'audioworklet').toUpperCase()}${snap.dualDriftMs !== null && snap.dualDriftMs !== undefined ? ` · DRIFT ${snap.dualDriftMs.toFixed(1)}ms` : ''}`;
-    if (tpClock.textContent !== cTxt) tpClock.textContent = cTxt;
-  }
-  const tpLog = document.getElementById('live-transition-log');
-  if (tpLog) {
-    const logSig = `${snap.transitionLog?.length || 0}:${snap.crossfading ? 1 : 0}:${snap.liveTrack?.id || ''}:${snap.cueTrack?.id || ''}`;
-    if (tpLog.dataset.sig !== logSig) {
-      tpLog.dataset.sig = logSig;
-      tpLog.innerHTML = renderLiveTransitionLogHtml(snap);
-    }
-  }
+  // ONLY update pro drawer telemetry when drawer is actually open
+  if (state.drawerOpen) {
+    updateDeckTelemetryDom('A', snap.deckTelemetry?.A);
+    updateDeckTelemetryDom('B', snap.deckTelemetry?.B);
 
-  // ── Live FX Pills Strip (120ms fast path, zero fake UI) ──────────────────
-  const fxStrip = document.getElementById('live-active-fx-strip');
-  if (fxStrip) {
-    const fxSig = (snap.activeDspMoves || []).map((m) => `${m.id}:${Math.round((m.progress01 ?? 0) * 20)}`).join('|');
-    if (fxStrip.dataset.sig !== fxSig) {
-      fxStrip.dataset.sig = fxSig;
-      fxStrip.innerHTML = renderLiveFxStrip(snap);
+    const tpClock = document.getElementById('live-tp-clock');
+    if (tpClock) {
+      const cTxt = `CLOCK: ${String(snap.clockMode || 'audioworklet').toUpperCase()}${snap.dualDriftMs !== null && snap.dualDriftMs !== undefined ? ` · DRIFT ${snap.dualDriftMs.toFixed(1)}ms` : ''}`;
+      if (tpClock.textContent !== cTxt) tpClock.textContent = cTxt;
     }
-  }
-  // ── Auto-FX toggle button label ──────────────────────────────────────────
-  const autoFxBtn = document.getElementById('btn-toggle-auto-dj-fx');
-  if (autoFxBtn) {
-    const on = snap.autoDjFxEnabled !== false;
-    autoFxBtn.textContent = on ? '▶ AUTO-FX ON' : '⏸ AUTO-FX OFF';
-    autoFxBtn.className = on ? '' : 'off';
-  }
-  // ── DJ Action Feed (deduplicated by entry id:length signature) ───────────
-  const feedEl = document.getElementById('dj-action-feed');
-  if (feedEl) {
-    const feedSig = `${snap.djActionFeed?.length || 0}:${snap.djActionFeed?.[0]?.id || ''}`;
-    if (feedEl.dataset.sig !== feedSig) {
-      feedEl.dataset.sig = feedSig;
-      feedEl.innerHTML = renderDjActionFeed(snap);
-      // Update event counter
-      const feedWrap = document.getElementById('dj-action-feed-wrap');
-      if (feedWrap) {
-        const header = feedWrap.querySelector('.dj-feed-header .dj-feed-title:last-child');
-        if (header) header.textContent = snap.djActionFeed?.length ? `${snap.djActionFeed.length} EVENTS` : 'NO EVENTS YET';
+    const tpLog = document.getElementById('live-transition-log');
+    if (tpLog) {
+      const logSig = `${snap.transitionLog?.length || 0}:${snap.crossfading ? 1 : 0}:${snap.liveTrack?.id || ''}:${snap.cueTrack?.id || ''}`;
+      if (tpLog.dataset.sig !== logSig) {
+        tpLog.dataset.sig = logSig;
+        tpLog.innerHTML = renderLiveTransitionLogHtml(snap);
+      }
+    }
+
+    const fxStrip = document.getElementById('live-active-fx-strip');
+    if (fxStrip) {
+      const fxSig = (snap.activeDspMoves || []).map((m) => `${m.id}:${Math.round((m.progress01 ?? 0) * 20)}`).join('|');
+      if (fxStrip.dataset.sig !== fxSig) {
+        fxStrip.dataset.sig = fxSig;
+        fxStrip.innerHTML = renderLiveFxStrip(snap);
+      }
+    }
+    const autoFxBtn = document.getElementById('btn-toggle-auto-dj-fx');
+    if (autoFxBtn) {
+      const on = snap.autoDjFxEnabled !== false;
+      autoFxBtn.textContent = on ? '▶ AUTO-FX ON' : '⏸ AUTO-FX OFF';
+      autoFxBtn.className = on ? '' : 'off';
+    }
+    const feedEl = document.getElementById('dj-action-feed');
+    if (feedEl) {
+      const feedSig = `${snap.djActionFeed?.length || 0}:${snap.djActionFeed?.[0]?.id || ''}`;
+      if (feedEl.dataset.sig !== feedSig) {
+        feedEl.dataset.sig = feedSig;
+        feedEl.innerHTML = renderDjActionFeed(snap);
+        const feedWrap = document.getElementById('dj-action-feed-wrap');
+        if (feedWrap) {
+          const header = feedWrap.querySelector('.dj-feed-header .dj-feed-title:last-child');
+          if (header) header.textContent = snap.djActionFeed?.length ? `${snap.djActionFeed.length} EVENTS` : 'NO EVENTS YET';
+        }
       }
     }
   }
 
-  const aura = document.getElementById('pulse-aura');
-  if (aura) {
-    const scale = 1 + (snap.spectrum?.bass || 0) * 0.16;
-    aura.style.transform = `scale(${scale.toFixed(3)})`;
+  if (state.pipVideoVisible) {
+    positionPipTile();
   }
-
-  positionPipTile();
 }
 
 /* =========================================================
@@ -1582,9 +1585,19 @@ function renderTopBar(rightHtml) {
 }
 
 function renderExitBtn(confirmMode = false) {
+  if (state.exitConfirm) {
+    return `
+      <button id="btn-exit" class="exit-btn confirming squeeze" aria-label="Tap again to end the party">
+        END PARTY? <span style="font-size:0.7em;opacity:0.75">TAP AGAIN</span>
+      </button>
+    `;
+  }
   return `
-    <button id="btn-exit" class="exit-btn squeeze ${state.exitConfirm ? 'confirming' : ''}" aria-label="Exit">
-      ${state.exitConfirm ? 'END SET? <span style="font-size:0.7em;opacity:0.75">TAP AGAIN</span>' : '✕'}
+    <button id="btn-exit" class="exit-btn squeeze" aria-label="Exit to home">
+      <svg viewBox="0 0 24 24" style="width:42%;height:42%" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
     </button>
   `;
 }
@@ -2084,44 +2097,36 @@ function renderWaveformHtml(track, pos, dur, cutAt, playFull, isLive) {
   const heat = buildFallbackHeat(track);
   const entry = playFull ? 0 : (track.entrySec || 0);
   const exit = playFull ? dur : (cutAt || track.exitSec || dur);
-  const entryPct = `${Math.min(100, Math.max(0, (entry / dur) * 100))}%`;
-  const exitPct = `${Math.min(100, Math.max(0, (exit / dur) * 100))}%`;
-  const posPct = `${Math.min(100, Math.max(0, (pos / dur) * 100))}%`;
-  const narrow = ((exit - entry) / dur) * 100 < 28;
-  const downbeats = track.downbeat_times || track.analysis?.downbeat_times || [];
-  const beats = track.beat_times || track.beats || track.analysis?.beat_times || [];
-  const dbStep = Math.max(1, Math.ceil(downbeats.length / 40));
-  const dbTicks = downbeats.filter((_, i) => i % dbStep === 0).map((t) =>
-    `<div class="beat-tick downbeat" style="left:${Math.min(100, Math.max(0, (t / dur) * 100)).toFixed(2)}%"></div>`
-  ).join('');
-  const beatStep = Math.max(1, Math.ceil(beats.length / 96));
-  const beatTicks = beats.filter((_, i) => i % beatStep === 0).map((t) =>
-    `<div class="beat-tick" style="left:${Math.min(100, Math.max(0, (t / dur) * 100)).toFixed(2)}%"></div>`
-  ).join('');
+  const entryPct = `${Math.min(100, Math.max(0, (entry / dur) * 100)).toFixed(2)}%`;
+  const exitPct = `${Math.min(100, Math.max(0, (exit / dur) * 100)).toFixed(2)}%`;
+  const posPct = `${Math.min(100, Math.max(0, (pos / dur) * 100)).toFixed(2)}%`;
+  const narrow = ((exit - entry) / dur) * 100 < 30;
+
+  const bars = heat.map((val, i) => {
+    const barTime = ((i + 0.5) / heat.length) * dur;
+    const inside = barTime >= entry && barTime <= exit;
+    const played = barTime <= pos;
+    const cls = !inside ? 'wave-bar outside' : played ? 'wave-bar played' : 'wave-bar';
+    const h = Math.round(val * 100);
+    return `<div class="${cls}" style="height:${h}%"></div>`;
+  }).join('');
 
   return `
     <div class="waveform-wrap">
-      ${beatTicks}
-      ${dbTicks}
-      <div class="cue-marker" style="left:${entryPct}">
+      <div class="cue-marker pointer-events-none absolute bottom-0 top-0" style="left:${entryPct}">
         <div class="cue-marker-line"></div>
         ${!(isLive && state.showDragHint) ? `<div class="cue-marker-label ${narrow ? 'right' : 'left'}">IN ${fmtTime(entry)}</div>` : ''}
       </div>
+
       ${exit < dur - 2 ? `
-        <div class="cue-marker" style="left:${exitPct}">
+        <div class="cue-marker pointer-events-none absolute bottom-0 top-0" style="left:${exitPct}">
           <div class="cue-marker-line"></div>
           ${!(isLive && state.showDragHint) ? `<div class="cue-marker-label ${narrow ? 'left' : 'right'}">OUT ${fmtTime(exit)}</div>` : ''}
         </div>
       ` : ''}
 
       <div class="waveform-bars" ${isLive ? 'id="live-waveform"' : ''}>
-        ${heat.map((h, i) => {
-          const barTime = ((i + 0.5) / heat.length) * dur;
-          const inside = barTime >= entry && barTime <= exit;
-          const played = barTime <= pos;
-          const cls = !inside ? 'wave-bar outside' : played ? 'wave-bar played' : 'wave-bar';
-          return `<div class="${cls}" style="height:${Math.round(h * 100)}%"></div>`;
-        }).join('')}
+        ${bars}
       </div>
 
       <div class="playhead-line" style="left:${posPct}"></div>
@@ -2138,7 +2143,7 @@ function renderWaveformHtml(track, pos, dur, cutAt, playFull, isLive) {
 
       ${isLive && state.dragCueSec !== null ? `
         <div class="drag-time-badge" style="left:${Math.min(92, Math.max(8, (state.dragCueSec / dur) * 100))}%">
-          ${fmtTime(state.dragCueSec)}${state.dragCueSec >= exit - 3 ? ' · PLAY FULL' : ''}
+          ${fmtTime(state.dragCueSec)}${state.dragCueSec >= exit - 3 && exit < dur - 1 ? ' · PLAY FULL' : ''}
         </div>
       ` : ''}
     </div>
@@ -2157,31 +2162,30 @@ function renderDeckCard(deckId, slotName, deckData, tel) {
   const entry = deckData?.playFull ? 0 : (track?.entrySec || Math.round(dur * 0.25));
   const exit = deckData?.playFull ? dur : (deckData?.cutAt || track?.exitSec || Math.round(dur * 0.75));
 
-  const statusBadge = isLive
-    ? `<span class="deck-live-badge"><span class="live-dot"></span>LIVE${deckData?.playFull ? ' · FULL' : ''}</span>`
-    : `<span id="cue-deck-status" style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${track ? (deckData?.status === 'ready' ? 'READY' : 'CUEING') : 'STANDBY'}</span>`;
+  const statusBadge = isLive && deckData?.status === 'live'
+    ? `<span class="flex items-center gap-3 text-lime" style="color:#c8ff00;display:inline-flex;align-items:center;gap:10px"><span class="h-[0.55em] w-[0.55em] animate-pulse rounded-full bg-lime" style="width:10px;height:10px;border-radius:50%;background:#c8ff00;display:inline-block"></span>LIVE${deckData?.playFull ? ' · FULL' : ''}</span>`
+    : `<span id="cue-deck-status" style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${slotName === 'out' ? 'OUT' : isLive ? (track ? 'STARTING' : 'STANDBY') : track ? 'CUEING' : 'STANDBY'}</span>`;
 
   return `
-    <section class="deck" data-deck="${deckId}" data-slot="${slotName}">
-      <header class="deck-header">
-        <span class="deck-label">DECK ${deckId}</span>
+    <section class="deck absolute left-0 top-0 flex w-full flex-col md:w-[58%] gap-[clamp(6px,1.6vh,24px)]" data-deck="${deckId}" data-slot="${slotName}" aria-hidden="${!isLive}">
+      <header class="deck-header flex items-center gap-5 font-display text-[clamp(22px,min(2.4vw,4.4vh),40px)] leading-none tracking-wide">
+        <span class="deck-label text-white/50" style="color:rgba(255,255,255,0.5)">DECK ${deckId}</span>
         ${statusBadge}
       </header>
 
-      <div class="deck-title-row">
-        <div style="min-width:0;flex:1">
-          <h2 class="deck-title ${isLong ? 'long' : ''}" id="${isLive ? 'live-deck-title' : 'cue-deck-title'}">${esc(titleText)}</h2>
+      <div class="deck-title-row flex items-start gap-[2.5vw]">
+        <div class="min-w-0 flex-1">
+          <h2 class="deck-title font-display uppercase leading-[0.86] tracking-[-0.01em] ${isLive ? 'title-land' : ''} ${isLong ? 'long' : ''}" id="${isLive ? 'live-deck-title' : 'cue-deck-title'}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(titleText)}</h2>
           ${track ? `
-            <p class="deck-artist" id="${isLive ? 'live-deck-artist' : 'cue-deck-artist'}">
+            <p class="deck-artist mt-[clamp(6px,1.6vh,24px)] truncate font-sans text-[clamp(24px,min(2.6vw,4.6vh),48px)] font-semibold leading-tight text-white/75" id="${isLive ? 'live-deck-artist' : 'cue-deck-artist'}">
               ${esc(cleanArtist)}
-              ${isLive ? `<span style="color:#c8ff00;margin-left:8px;font-family:var(--font-mono);font-size:0.75em;font-weight:700">· IN ${fmtTime(entry)} · OUT ${fmtTime(exit)}</span>` : ''}
             </p>
           ` : ''}
         </div>
-        ${isLive && state.pipVideoVisible && isYt && track ? '<div class="deck-pip-slot" data-pip-slot="true"></div>' : ''}
+        ${isLive && state.pipVideoVisible && isYt && track ? '<div class="deck-pip-slot aspect-video w-[max(356px,19vw)] shrink-0 rounded-[20px]" data-pip-slot="true"></div>' : ''}
       </div>
 
-      ${track ? renderWaveformHtml(track, pos, dur, deckData?.mixOutSec || deckData?.cutAt, deckData?.playFull, isLive) : ''}
+      ${track && slotName !== 'cue' ? renderWaveformHtml(track, pos, dur, deckData?.mixOutSec || deckData?.cutAt, deckData?.playFull, isLive) : ''}
     </section>
   `;
 }
@@ -2396,13 +2400,13 @@ function renderPlaying() {
   const liveSlot = snap.decks[snap.liveId];
   const cueSlot = snap.decks[snap.cueId];
   const livePos = liveSlot?.position || 0;
-  const liveDur = liveSlot?.duration || liveSlot?.track?.durationSec || 180;
-  const energyPulseDur = `${(2.6 - 0.16 * (liveSlot?.track?.energy || 7)).toFixed(2)}s`;
-  const bpmBadge = liveSlot?.track?.bpm ? ` · ${Math.round(liveSlot.track.bpm)} BPM` : '';
+  const liveDur = Math.max(1, liveSlot?.duration || liveSlot?.track?.durationSec || 180);
+  const energy = liveSlot?.track?.energy || 6;
+  const pulseDur = `${(2.6 - 0.17 * energy).toFixed(2)}s`;
 
   root.innerHTML = `
     <main class="play-stage" id="play-stage" data-paused="${snap.paused ? 'true' : 'false'}">
-      <div class="pulse-aura" id="pulse-aura" style="--pulse-dur:${energyPulseDur}"></div>
+      <div class="pulse-glow" id="pulse-aura" style="--pulse:${pulseDur}"></div>
 
       <div class="play-topbar">
         <span class="wordmark font-display" style="color:#c8ff00">NAUX</span>
@@ -2414,18 +2418,20 @@ function renderPlaying() {
 
         <div class="play-topbar-right">
           <button class="clock-pill squeeze ${snap.paused ? 'paused' : ''}" id="btn-clock-pause" title="Pause / Resume (Space)">
-            <span>${snap.paused ? '▶' : '❚❚'}</span>
-            <span class="clock-time" id="play-clock-text">${fmtTime(livePos)} / ${fmtTime(liveDur)}</span>
+            <span class="clock-icon" style="display:inline-flex;width:0.8em;height:0.8em;align-items:center;justify-content:center" aria-hidden="true">
+              ${snap.paused ? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' : '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'}
+            </span>
+            <span class="clock-time ${snap.paused ? 'clock-blink' : ''}" id="play-clock-text">${fmtTime(livePos)} / ${fmtTime(liveDur)}</span>
           </button>
 
-          <button class="mixer-toggle-btn squeeze ${state.drawerOpen ? 'open' : ''}" id="btn-open-drawer">
+          <button class="mixer-toggle-btn squeeze ${state.drawerOpen ? 'open' : ''}" id="btn-open-drawer" title="Pro DJ Console &amp; Stems">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
               <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
               <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
               <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
             </svg>
-            MIXER
+            <span class="hidden md:inline">PRO DJ</span>
           </button>
 
           ${renderExitBtn(true)}
@@ -2440,7 +2446,7 @@ function renderPlaying() {
       ${snap.paused ? `
         <button id="btn-paused-resume" class="paused-overlay" aria-label="Tap to resume">
           <span class="paused-stamp">PAUSED</span>
-          <span class="font-display" style="margin-top:14px;font-size:clamp(22px,2vw,32px);color:rgba(245,245,240,0.62)">
+          <span class="font-display" style="margin-top:1.5vh;font-size:clamp(22px,2vw,34px);color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.04em">
             AT ${fmtTime(livePos)} · SPACE OR TAP TO RESUME
           </span>
         </button>
@@ -2449,16 +2455,21 @@ function renderPlaying() {
       <div class="agent-bar">
         <span class="agent-tag">AGENT</span>
         <span class="agent-msg" id="agent-msg">${esc(snap.agentMessage)}</span>
-        <div class="agent-actions">
-          <button class="agent-pill accent squeeze" id="btn-mix-now" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>⚡ MIX NOW</button>
-          <button class="agent-pill squeeze" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>✕ REMOVE NEXT</button>
-          <button class="agent-pill accent squeeze" id="btn-play-next">＋ PLAY NEXT</button>
+        <div class="agent-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <button class="agent-btn accent squeeze" id="btn-mix-now" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>⚡ MIX NOW</button>
+          <button class="agent-btn remove squeeze" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>✕ <span class="hidden md:inline">REMOVE NEXT</span></button>
+          <button class="agent-btn accent squeeze" id="btn-play-next">＋ <span class="hidden md:inline">PLAY NEXT</span></button>
         </div>
       </div>
 
       <div class="bottom-controls">
         ${snap.paused ? `
-          <button class="mega-btn primary squeeze" id="btn-mega-resume">▶ RESUME</button>
+          <button class="mega-btn primary squeeze" id="btn-mega-resume">
+            <span style="display:inline-flex;align-items:center;gap:0.35em">
+              <svg width="0.7em" height="0.7em" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              RESUME
+            </span>
+          </button>
         ` : `
           <button class="mega-btn primary squeeze" id="btn-mega-skip" ${!liveSlot?.track || snap.crossfading ? 'disabled' : ''}>SKIP</button>
           <button class="mega-btn secondary squeeze ${liveSlot?.playFull ? 'active' : ''}" id="btn-mega-full" ${!liveSlot?.track || liveSlot?.playFull ? 'disabled' : ''}>
@@ -4545,11 +4556,17 @@ window.addEventListener('drop', (e) => {
   }
 });
 
+let rAfScheduled = false;
 window.addEventListener('pointermove', (e) => {
-  const x = `${((e.clientX / Math.max(1, window.innerWidth)) * 100).toFixed(1)}%`;
-  const y = `${((e.clientY / Math.max(1, window.innerHeight)) * 100).toFixed(1)}%`;
-  document.documentElement.style.setProperty('--mouse-x', x);
-  document.documentElement.style.setProperty('--mouse-y', y);
+  if (rAfScheduled) return;
+  rAfScheduled = true;
+  requestAnimationFrame(() => {
+    rAfScheduled = false;
+    const x = `${((e.clientX / Math.max(1, window.innerWidth)) * 100).toFixed(1)}%`;
+    const y = `${((e.clientY / Math.max(1, window.innerHeight)) * 100).toFixed(1)}%`;
+    document.documentElement.style.setProperty('--mouse-x', x);
+    document.documentElement.style.setProperty('--mouse-y', y);
+  });
 }, { passive: true });
 
 // Boot
