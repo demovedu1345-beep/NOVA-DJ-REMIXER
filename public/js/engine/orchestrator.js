@@ -124,7 +124,7 @@ export class NovaOrchestrator {
 
     this.vibe = 'peak';
     this.playMode = 'club';
-    this.ytCrossfadeSec = 5.5;
+    this.ytCrossfadeSec = 2.0;
     this.recipes = [];
     this.appliedRecipes = [];
     this.transitionLog = [];
@@ -648,116 +648,130 @@ export class NovaOrchestrator {
       return this.#endLastTrack(outId);
     }
 
-    this.crossfading = true;
-    this.paused = false;
-
-    if (outSlot.engine !== 'dsp' || inSlot.engine !== 'dsp') {
-      const durSec = this.ytCrossfadeSec || 5.5;
-      const startAt = this.proMixer.ctx.currentTime + 0.08;
-      const endAt = startAt + durSec;
-      this.transitionPlan = {
-        style: 'YT_VOLUME_CROSSFADE',
-        bars: 4,
-        ytOnly: true,
-        harmonic: { relation: 'YT IFrame Volume Fade Only (no EQ/stems/beatmatch)' },
-      };
-      this.#setAgent(`YT VOLUME FADE -> ${inSlot.track.title.toUpperCase()} (NO DSP ON YT IFRAME)`);
-      this.#emit();
-      if (inSlot.engine === 'yt') {
-        await this.ytEngine.playPreloaded(inId);
-        this.ytEngine.setVolume(inId, 0);
-      } else {
-        await this.proMixer.playDeck(inId, { offsetSec: inSlot.track.entrySec || 0, rate: 1, gain: 0.001, when: startAt });
-      }
-      if (outSlot.engine === 'dsp') {
-        this.proMixer.scheduleDeckStopAt(outId, endAt + 0.06);
-      }
-      this.pendingTransition = {
-        outId,
-        inId,
-        endAt: endAt + 0.08,
-        ytFade: { outId, inId, outEngine: outSlot.engine, inEngine: inSlot.engine, startAt, endAt },
-        driftSamples: [],
-        logDraft: {
-          fromTitle: outSlot.track.title,
-          toTitle: inSlot.track.title,
-          type: 'yt_volume_crossfade',
-          bars: 4,
-          eqMoves: ['none (YT iframe)'],
-          fxMoves: ['volume_curve'],
-          reason: 'Official YouTube IFrame deck: discrete cue & equal-power volume fade only (Web Audio DSP unavailable).',
-          fallbackUsed: false,
-          ytOnly: true,
-        },
-      };
+    if (inSlot.status === 'loading') {
+      this.#setAgent(`WAITING FOR ${inSlot.track.title.toUpperCase()} TO FINISH CUEING…`);
       this.#emit();
       return;
     }
 
-    const matchedRecipe = !styleOverride
-      ? this.recipes.find((r) => r.from === outSlot.track?.id && r.to === inSlot.track?.id)
-      : null;
+    this.crossfading = true;
+    this.paused = false;
 
-    let waitEndAt;
-    let logDraft = null;
-    if (matchedRecipe && TRANSITION_TYPES.includes(matchedRecipe.type)) {
-      this.transitionPlan = {
-        ...matchedRecipe,
-        style: matchedRecipe.type.toUpperCase(),
-        bars: matchedRecipe.length_bars,
-        harmonic: { relation: matchedRecipe.why || 'validated recipe' },
-      };
-      this.appliedRecipes.push(matchedRecipe);
-      this.#setAgent(
-        `MIXING (${matchedRecipe.type.replace(/_/g, ' ').toUpperCase()}) · ${matchedRecipe.length_bars} BARS · VALIDATED ✓`
-      );
+    try {
+      if (outSlot.engine !== 'dsp' || inSlot.engine !== 'dsp') {
+        const durSec = this.ytCrossfadeSec || 2.0;
+        this.transitionPlan = {
+          style: 'YT_VOLUME_CROSSFADE',
+          bars: 4,
+          ytOnly: true,
+          harmonic: { relation: 'YT IFrame Volume Fade Only (no EQ/stems/beatmatch)' },
+        };
+        this.#setAgent(`YT VOLUME FADE -> ${inSlot.track.title.toUpperCase()}`);
+        this.#emit();
+        if (inSlot.engine === 'yt') {
+          await this.ytEngine.playPreloaded(inId);
+          this.ytEngine.setVolume(inId, 0);
+        } else {
+          await this.proMixer.playDeck(inId, { offsetSec: inSlot.track.entrySec || 0, rate: 1, gain: 0.001 });
+        }
+        const startAt = this.proMixer.ctx.currentTime + 0.05;
+        const endAt = startAt + durSec;
+        if (outSlot.engine === 'dsp') {
+          this.proMixer.scheduleDeckStopAt(outId, endAt + 0.06);
+        }
+        this.pendingTransition = {
+          outId,
+          inId,
+          endAt: endAt + 0.08,
+          ytFade: { outId, inId, outEngine: outSlot.engine, inEngine: inSlot.engine, startAt, endAt },
+          driftSamples: [],
+          logDraft: {
+            fromTitle: outSlot.track.title,
+            toTitle: inSlot.track.title,
+            type: 'yt_volume_crossfade',
+            bars: 4,
+            eqMoves: ['none (YT iframe)'],
+            fxMoves: ['volume_curve'],
+            reason: 'Official YouTube IFrame deck: discrete cue & equal-power volume fade only.',
+            fallbackUsed: false,
+            ytOnly: true,
+          },
+        };
+        this.#emit();
+        return;
+      }
+
+      const matchedRecipe = !styleOverride
+        ? this.recipes.find((r) => r.from === outSlot.track?.id && r.to === inSlot.track?.id)
+        : null;
+
+      let waitEndAt;
+      let logDraft = null;
+      if (matchedRecipe && TRANSITION_TYPES.includes(matchedRecipe.type)) {
+        this.transitionPlan = {
+          ...matchedRecipe,
+          style: matchedRecipe.type.toUpperCase(),
+          bars: matchedRecipe.length_bars,
+          harmonic: { relation: matchedRecipe.why || 'validated recipe' },
+        };
+        this.appliedRecipes.push(matchedRecipe);
+        this.#setAgent(
+          `MIXING (${matchedRecipe.type.replace(/_/g, ' ').toUpperCase()}) · ${matchedRecipe.length_bars} BARS · VALIDATED ✓`
+        );
+        this.#emit();
+        const res = await this.proMixer.executeRecipe(outId, inId, matchedRecipe);
+        waitEndAt = res ? res.endAt : (this.proMixer.ctx.currentTime + 8);
+        logDraft = {
+          fromTitle: outSlot.track.title,
+          toTitle: inSlot.track.title,
+          type: matchedRecipe.type,
+          bars: matchedRecipe.length_bars,
+          eqMoves: (matchedRecipe.eq_automation || []).map((e) => `${e.deck} ${e.band}`),
+          fxMoves: (matchedRecipe.fx || []).map((f) => f.type),
+          reason: matchedRecipe.why || 'AI recipe',
+          fallbackUsed: Boolean(
+            matchedRecipe.fallbackUsed ||
+            matchedRecipe.validation?.fallbackApplied ||
+            (matchedRecipe.validation && !matchedRecipe.validation.valid) ||
+            /fallback/i.test(matchedRecipe.why || '')
+          ),
+        };
+      } else {
+        const plan = this.proMixer.planTransition(outId, inId, {
+          vibe: this.vibe,
+          playMode: this.playMode,
+          overrideStyle: styleOverride,
+        });
+        this.transitionPlan = plan;
+        this.#setAgent(
+          `MIXING (${plan.style.replace(/_/g, ' ')}) · ${plan.bars} BARS · ${plan.harmonic.relation.toUpperCase()}`
+        );
+        this.#emit();
+        const res = await this.proMixer.executeTransition(outId, inId, plan);
+        waitEndAt = res ? res.endAt : (this.proMixer.ctx.currentTime + (plan.durationSec || 8));
+        logDraft = {
+          fromTitle: outSlot.track.title,
+          toTitle: inSlot.track.title,
+          type: plan.style,
+          bars: plan.bars,
+          eqMoves: ['A low->cut', 'B low->in'],
+          fxMoves: [plan.style.toLowerCase()],
+          reason: `${plan.harmonic?.relation || 'phrase align'} (${reason})`,
+          fallbackUsed: false,
+        };
+      }
+
+      // Schedule exact stop of outgoing deck directly on AudioContext.currentTime (zero setTimeout)
+      this.proMixer.scheduleDeckStopAt(outId, waitEndAt + 0.04);
+      this.pendingTransition = { outId, inId, endAt: waitEndAt + 0.06, logDraft, driftSamples: [] };
       this.#emit();
-      const res = await this.proMixer.executeRecipe(outId, inId, matchedRecipe);
-      waitEndAt = res.endAt;
-      logDraft = {
-        fromTitle: outSlot.track.title,
-        toTitle: inSlot.track.title,
-        type: matchedRecipe.type,
-        bars: matchedRecipe.length_bars,
-        eqMoves: (matchedRecipe.eq_automation || []).map((e) => `${e.deck} ${e.band}`),
-        fxMoves: (matchedRecipe.fx || []).map((f) => f.type),
-        reason: matchedRecipe.why || 'AI recipe',
-        fallbackUsed: Boolean(
-          matchedRecipe.fallbackUsed ||
-          matchedRecipe.validation?.fallbackApplied ||
-          (matchedRecipe.validation && !matchedRecipe.validation.valid) ||
-          /fallback/i.test(matchedRecipe.why || '')
-        ),
-      };
-    } else {
-      const plan = this.proMixer.planTransition(outId, inId, {
-        vibe: this.vibe,
-        playMode: this.playMode,
-        overrideStyle: styleOverride,
-      });
-      this.transitionPlan = plan;
-      this.#setAgent(
-        `MIXING (${plan.style.replace(/_/g, ' ')}) · ${plan.bars} BARS · ${plan.harmonic.relation.toUpperCase()}`
-      );
+    } catch (err) {
+      console.error('[Orchestrator] Transition failed, rolling back crossfade lock:', err);
+      this.crossfading = false;
+      this.pendingTransition = null;
+      this.#setAgent(`TRANSITION ABORTED: ${err.message || 'Error'}`);
       this.#emit();
-      const res = await this.proMixer.executeTransition(outId, inId, plan);
-      waitEndAt = res.endAt;
-      logDraft = {
-        fromTitle: outSlot.track.title,
-        toTitle: inSlot.track.title,
-        type: plan.style,
-        bars: plan.bars,
-        eqMoves: ['A low->cut', 'B low->in'],
-        fxMoves: [plan.style.toLowerCase()],
-        reason: `${plan.harmonic?.relation || 'phrase align'} (${reason})`,
-        fallbackUsed: false,
-      };
     }
-
-    // Schedule exact stop of outgoing deck directly on AudioContext.currentTime (zero setTimeout)
-    this.proMixer.scheduleDeckStopAt(outId, waitEndAt + 0.04);
-    this.pendingTransition = { outId, inId, endAt: waitEndAt + 0.06, logDraft, driftSamples: [] };
-    this.#emit();
   }
 
   #endLastTrack(liveId) {
@@ -864,6 +878,13 @@ export class NovaOrchestrator {
 
   skip() {
     if (!this.running || this.finished || this.crossfading) return;
+    const cueId = this.liveDeckId === 'A' ? 'B' : 'A';
+    const cueSlot = this.decks[cueId];
+    if (cueSlot?.status === 'loading') {
+      this.#setAgent('NEXT TRACK IS STILL CUEING… PLEASE WAIT');
+      this.#emit();
+      return;
+    }
     return this.triggerTransition('skip');
   }
 

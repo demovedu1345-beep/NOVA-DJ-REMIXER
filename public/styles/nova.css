@@ -92,15 +92,24 @@ button {
 
 /* Tactile Emil Kowalski Squeeze with Spring Curve */
 .squeeze {
-  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: scale 0.24s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               color 0.2s, opacity 0.2s;
-  will-change: transform;
+  will-change: scale;
 }
 .squeeze:active:not(:disabled) {
-  transform: scale(0.96, 0.94);
+  scale: 0.96 0.94;
+}
+.mega-btn:active:not(:disabled) {
+  scale: 0.97;
+}
+.vibe-pill:active,
+.clock-pill:active,
+.agent-btn:active:not(:disabled),
+.exit-btn:active {
+  scale: 0.96;
 }
 
 /* =========================================================
@@ -956,12 +965,13 @@ main[data-paused="true"] .pulse-glow {
   flex-direction: column;
   gap: clamp(6px, 1.6vh, 24px);
   transform-origin: 0 0;
-  will-change: transform, opacity;
-  transition: transform 1.5s cubic-bezier(0.76, 0, 0.18, 1), opacity 1.5s cubic-bezier(0.76, 0, 0.18, 1), filter 1.5s;
+  will-change: transform, opacity, filter;
+  transition: transform 1.5s cubic-bezier(0.76, 0, 0.18, 1), opacity 1.5s cubic-bezier(0.76, 0, 0.18, 1), filter 1.5s cubic-bezier(0.76, 0, 0.18, 1);
   background: transparent;
   border: 0;
   box-shadow: none;
   backdrop-filter: none;
+  pointer-events: none;
 }
 @media (min-width: 768px) {
   .deck { width: 58%; }
@@ -971,6 +981,7 @@ main[data-paused="true"] .pulse-glow {
   opacity: 1;
   filter: none;
   transform: translate(0, 0) scale(1);
+  pointer-events: auto;
   border: 0;
   box-shadow: none;
 }
@@ -989,9 +1000,11 @@ main[data-paused="true"] .pulse-glow {
   pointer-events: none;
 }
 .deck[data-slot="enter"] {
-  opacity: 0;
-  transition: none;
-  transform: translate(150%, 0) scale(0.56);
+  opacity: 0 !important;
+  filter: grayscale(1) !important;
+  transition: none !important;
+  transform: translate(150%, 0) scale(0.56) !important;
+  pointer-events: none !important;
 }
 
 @media (max-width: 767px) {
@@ -1003,25 +1016,33 @@ main[data-paused="true"] .pulse-glow {
     container-type: normal;
   }
   .deck {
-    position: relative;
+    position: absolute;
     width: 100%;
-    transform: none !important;
-    filter: none !important;
+  }
+  .deck[data-slot="live"] {
+    opacity: 1;
+    filter: none;
+    transform: translate(0, 0) scale(1);
+    pointer-events: auto;
   }
   .deck[data-slot="cue"] {
     opacity: 0.3;
+    filter: grayscale(1);
     transform: translateY(calc(100cqh - 62%)) scale(0.62);
+    pointer-events: auto;
   }
   .deck[data-slot="out"] {
     opacity: 0;
     filter: blur(6px);
     transition-duration: 1.5s, 0.35s, 0.35s;
     transform: translateY(-12vh) scale(0.94);
+    pointer-events: none;
   }
   .deck[data-slot="enter"] {
-    opacity: 0;
-    transition: none;
-    transform: translateY(100cqh) scale(0.62);
+    opacity: 0 !important;
+    transition: none !important;
+    transform: translateY(100cqh) scale(0.62) !important;
+    pointer-events: none !important;
   }
   .drag-hint-bubble {
     font-size: 11px;
@@ -1087,6 +1108,7 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   line-height: 0.86;
   letter-spacing: -0.01em;
   overflow-wrap: anywhere;
+  word-break: normal;
   font-size: clamp(64px, min(9.5vw, 17vh), 210px);
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1097,8 +1119,23 @@ main[data-paused="true"] .deck[data-slot="cue"] {
 .deck-title.long {
   font-size: clamp(52px, min(6.6vw, 12vh), 150px);
 }
+.deck:has(.deck-pip-slot) .deck-title,
+.deck-title-row:has(.deck-pip-slot) .deck-title {
+  font-size: clamp(60px, min(7.6vw, 14vh), 180px);
+}
+.deck:has(.deck-pip-slot) .deck-title.long,
+.deck-title-row:has(.deck-pip-slot) .deck-title.long {
+  font-size: clamp(48px, min(5.4vw, 10.5vh), 130px);
+}
+@keyframes title-land {
+  0% { letter-spacing: 0.18em; opacity: 0.2; }
+  100% { letter-spacing: -0.01em; opacity: 1; }
+}
+.title-land {
+  animation: 1.5s cubic-bezier(0.16, 1, 0.3, 1) both title-land !important;
+}
 .deck[data-slot="live"] .deck-title {
-  animation: titleLand 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: title-land 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .deck-artist {
@@ -1199,12 +1236,16 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 3px solid var(--accent);
+  border: 3px solid #c8ff00;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  animation: dragHintRing 1.3s ease-out infinite;
+  animation: 1.3s ease-out infinite dragHintRing;
 }
 
+@keyframes drag-hint-in {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: none; }
+}
 .drag-hint-bubble {
   position: absolute;
   top: 0;
@@ -1214,7 +1255,7 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   max-width: 100%;
   padding: 0 16px;
   border-radius: 9999px;
-  border: 2px solid var(--accent);
+  border: 2px solid #c8ff00;
   background: var(--ink);
   display: inline-flex;
   align-items: center;
@@ -1224,7 +1265,31 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 0 24px var(--accent-glow);
+  box-shadow: 0 0 24px rgba(200, 255, 0, 0.25);
+  animation: 0.3s ease-out both drag-hint-in;
+}
+
+@keyframes drag-hint-arrows {
+  0%, 100% { transform: translate(-3px); }
+  50% { transform: translate(3px); }
+}
+.drag-hint-arrows {
+  display: inline-block;
+  color: #c8ff00;
+  font-family: var(--font-display);
+  animation: 0.9s ease-in-out infinite drag-hint-arrows;
+}
+
+.drag-hint-pointer {
+  position: absolute;
+  top: 36px;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 8px solid #c8ff00;
+  pointer-events: none;
 }
 
 .drag-time-badge {
@@ -1490,13 +1555,13 @@ main[data-paused="true"] .deck[data-slot="cue"] {
    ========================================================= */
 .naux-players {
   position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 320px;
-  height: 180px;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
   opacity: 0;
   pointer-events: none;
-  z-index: -1;
+  z-index: -10;
   overflow: hidden;
 }
 .naux-players iframe {
@@ -1508,17 +1573,17 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   transition: opacity 1.5s cubic-bezier(0.76, 0, 0.18, 1);
 }
 .naux-players[data-visible="true"] {
-  left: var(--tile-x, auto);
-  top: var(--tile-y, auto);
+  left: var(--tile-x, -9999px);
+  top: var(--tile-y, -9999px);
   bottom: auto;
   width: var(--tile-w, 320px);
   height: var(--tile-h, 180px);
   opacity: var(--tile-opacity, 0);
-  z-index: 16;
+  z-index: 12;
   background: #000;
-  border: 2px solid rgba(255, 77, 0, 0.45);
+  border: 1.5px solid rgba(200, 255, 0, 0.45);
   border-radius: 20px;
-  box-shadow: 0 0 60px rgba(255, 77, 0, 0.18);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
   transition: opacity 0.4s;
 }
 .naux-players[data-live="A"] #nova-yt-deck-B,
@@ -1650,9 +1715,23 @@ main[data-paused="true"] .deck[data-slot="cue"] {
   100% { opacity: 0; transform: translateX(110vw) skew(-14deg); }
 }
 @keyframes dragHintRing {
-  0% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 77, 0, 0.7); }
-  70% { opacity: 0.85; box-shadow: 0 0 0 16px rgba(255, 77, 0, 0); }
-  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 77, 0, 0); }
+  0% { opacity: 1; box-shadow: 0 0 0 0 rgba(200, 255, 0, 0.8); }
+  70% { opacity: 0.9; box-shadow: 0 0 0 16px rgba(200, 255, 0, 0); }
+  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200, 255, 0, 0); }
+}
+@keyframes ticker-in {
+  0% { opacity: 0; transform: translateY(60%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.ticker-in {
+  animation: 0.45s cubic-bezier(0.16, 1, 0.3, 1) both ticker-in;
+}
+@keyframes ticker-scroll {
+  0% { transform: translate(0); }
+  100% { transform: translateX(calc(-1 * var(--loop, 50%))); }
+}
+.ticker-scroll {
+  animation: ticker-scroll var(--dur, 8s) linear 1.5s infinite;
 }
 @keyframes clockBlink {
   50% { opacity: 0.18; }
@@ -3350,12 +3429,13 @@ main[data-paused="true"] .deck[data-slot="cue"] {
     right: max(2.5rem, calc((100vw - 72rem) / 2 + 2.5rem));
     bottom: 32px;
     height: 96px;
+    min-width: 240px;
     padding: 0 56px;
     font-size: 48px;
   }
 }
 .naux-next-fixed:active {
-  transform: scale(0.97);
+  scale: 0.97;
 }
 .naux-next-fixed:disabled {
   background: #3a4500;

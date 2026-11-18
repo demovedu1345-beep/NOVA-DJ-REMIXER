@@ -253,6 +253,71 @@ function buildRenderSig(snap) {
   ].join('|');
 }
 
+/* =========================================================
+   DYNAMIC AUTO-FIT TITLE FONT SCALER & VISUAL FX
+   ========================================================= */
+let stageResizeObserver = null;
+
+function triggerSweepEffect() {
+  const stage = document.getElementById('play-stage');
+  if (!stage) return;
+  const oldSw = stage.querySelector('.transition-sweep, .sweep');
+  if (oldSw) oldSw.remove();
+
+  const sw = document.createElement('div');
+  sw.className = 'sweep transition-sweep pointer-events-none absolute inset-y-0 left-0 z-20 w-[9vw] bg-lime mix-blend-difference';
+  stage.appendChild(sw);
+  setTimeout(() => sw.remove(), 1550);
+}
+
+function applyTitleLand(deckEl) {
+  if (!deckEl) return;
+  const titleEl = deckEl.querySelector('.deck-title');
+  if (!titleEl) return;
+  titleEl.classList.remove('title-land');
+  void titleEl.offsetWidth; // Force reflow
+  titleEl.classList.add('title-land');
+}
+
+function fitDeckTitle(deckEl) {
+  if (!deckEl) return;
+  const titleEl = deckEl.querySelector('.deck-title');
+  const stageEl = deckEl.parentElement || document.querySelector('.decks-stage');
+  if (!titleEl || !stageEl) return;
+
+  titleEl.style.fontSize = '';
+  if (!window.matchMedia('(min-width: 768px)').matches) return;
+
+  let fontSize = parseFloat(window.getComputedStyle(titleEl).fontSize);
+  if (!fontSize || isNaN(fontSize)) return;
+
+  const minFloor = Math.min(fontSize, 36);
+  for (let s = 0; s < 30 && deckEl.offsetHeight > stageEl.clientHeight && fontSize > minFloor; s++) {
+    fontSize = Math.max(minFloor, 0.93 * fontSize);
+    titleEl.style.fontSize = `${fontSize}px`;
+  }
+}
+
+function fitAllDeckTitles() {
+  const decks = document.querySelectorAll('.decks-stage .deck');
+  decks.forEach((deck) => fitDeckTitle(deck));
+}
+
+function initDeckTitleAutoScaler() {
+  const stage = document.querySelector('.decks-stage');
+  if (!stage) return;
+  if (stageResizeObserver) {
+    stageResizeObserver.disconnect();
+    stageResizeObserver = null;
+  }
+  fitAllDeckTitles();
+  stageResizeObserver = new ResizeObserver(() => fitAllDeckTitles());
+  stageResizeObserver.observe(stage);
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => fitAllDeckTitles()).catch(() => {});
+  }
+}
+
 function handleOrchestratorUpdate(snap) {
   const prevLive = state.lastLiveId;
   state.snap = snap;
@@ -267,34 +332,107 @@ function handleOrchestratorUpdate(snap) {
       return;
     }
 
+    // Trigger sweep lighting effect when crossfading begins
+    if (snap.crossfading && !state.lastCrossfading) {
+      triggerSweepEffect();
+    }
+    state.lastCrossfading = snap.crossfading;
+
     if (snap.liveId !== prevLive) {
       const oldLiveEl = document.querySelector(`.deck[data-deck="${prevLive}"]`);
       const newLiveEl = document.querySelector(`.deck[data-deck="${snap.liveId}"]`);
       state.lastLiveId = snap.liveId;
       state.lastPaused = snap.paused;
       state.lastRenderSig = buildRenderSig(snap);
-      state.sweepKey += 1;
       state.stems = { vocals: true, drums: true, bass: true, other: true };
       state.loopActive = false;
       triggerCueHint();
+
       if (oldLiveEl && newLiveEl) {
         state.animatingSwap = true;
+
+        // 1. Outgoing deck slides left (keeps original track title while sliding)
         oldLiveEl.setAttribute('data-slot', 'out');
-        newLiveEl.setAttribute('data-slot', 'live');
-        const stage = document.getElementById('play-stage');
-        if (stage) {
-          const sw = document.createElement('div');
-          sw.className = 'transition-sweep';
-          stage.appendChild(sw);
-          setTimeout(() => sw.remove(), 1550);
+        oldLiveEl.setAttribute('aria-hidden', 'true');
+        const oldStatus = oldLiveEl.querySelector('.deck-status-slot');
+        if (oldStatus) {
+          oldStatus.innerHTML = '<span style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ OUT</span>';
         }
-        setTimeout(() => {
-          state.animatingSwap = false;
-          if (state.screen === 'playing') {
-            state.lastRenderSig = buildRenderSig(state.snap);
-            render();
+
+        // 2. Incoming deck slides center to live
+        newLiveEl.setAttribute('data-slot', 'live');
+        newLiveEl.setAttribute('aria-hidden', 'false');
+        applyTitleLand(newLiveEl);
+
+        const newStatus = newLiveEl.querySelector('.deck-status-slot');
+        if (newStatus) {
+          newStatus.innerHTML = '<span class="flex items-center gap-3 text-lime" style="color:#c8ff00;display:inline-flex;align-items:center;gap:10px"><span class="h-[0.55em] w-[0.55em] animate-pulse rounded-full bg-lime" style="width:10px;height:10px;border-radius:50%;background:#c8ff00;display:inline-block"></span>LIVE</span>';
+        }
+
+        // Ensure live deck has waveform visible and initialized
+        const newWfSlot = newLiveEl.querySelector('.deck-waveform-slot');
+        const liveTrack = snap.decks[snap.liveId]?.track;
+        if (newWfSlot && liveTrack) {
+          const liveSlot = snap.decks[snap.liveId];
+          const dur = Math.max(1, liveSlot?.duration || liveTrack.durationSec || 180);
+          newWfSlot.innerHTML = renderWaveformHtml(liveTrack, liveSlot?.position || 0, dur, liveSlot?.cutAt, liveSlot?.playFull, true);
+          newWfSlot.style.display = '';
+          bindLiveWaveformScrub();
+        }
+
+        triggerSweepEffect();
+        fitAllDeckTitles();
+        positionPipTile();
+
+        // 3. When slide finishes (1500ms): outgoing deck teleports to enter (150%) and glides into cue (118%)
+        if (state.swapAnimTimer) clearTimeout(state.swapAnimTimer);
+        state.swapAnimTimer = setTimeout(() => {
+          if (state.screen !== 'playing') {
+            state.animatingSwap = false;
+            return;
           }
-        }, 1520);
+
+          const currentSnap = state.snap || snap;
+          const cueDeckId = prevLive;
+          const cueSlot = currentSnap.decks[cueDeckId];
+          const cueTrack = cueSlot?.track;
+
+          // A. Update outgoing deck content with the NEW upcoming cue song
+          const cueTitleEl = oldLiveEl.querySelector('.deck-title');
+          const cueArtistEl = oldLiveEl.querySelector('.deck-artist');
+          const cueStatusSlot = oldLiveEl.querySelector('.deck-status-slot');
+          const cueWfSlot = oldLiveEl.querySelector('.deck-waveform-slot');
+
+          const newTitle = cueTrack ? cueTrack.title : 'END OF SET';
+          if (cueTitleEl) {
+            cueTitleEl.textContent = newTitle;
+            cueTitleEl.classList.toggle('long', newTitle.length > 16);
+            cueTitleEl.classList.remove('title-land');
+          }
+          if (cueArtistEl) {
+            cueArtistEl.textContent = cueTrack ? (cueTrack.artist || '').replace(/\s*·\s*\d{4}\s*$/, '') : '';
+            cueArtistEl.style.display = cueTrack ? '' : 'none';
+          }
+          if (cueStatusSlot) {
+            cueStatusSlot.innerHTML = `<span style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${cueTrack ? (cueSlot.status === 'ready' ? 'READY' : 'CUEING') : 'STANDBY'}</span>`;
+          }
+          if (cueWfSlot) {
+            cueWfSlot.style.display = 'none';
+          }
+
+          // B. Instantly teleport off-screen right with transition: none
+          oldLiveEl.setAttribute('data-slot', 'enter');
+          void oldLiveEl.offsetHeight; // Force browser reflow
+
+          // C. 50ms later, slide smoothly in from 150% to 118% (cue)
+          setTimeout(() => {
+            oldLiveEl.setAttribute('data-slot', 'cue');
+            state.animatingSwap = false;
+            state.lastRenderSig = buildRenderSig(state.snap);
+            fitAllDeckTitles();
+            syncPlayingDom();
+          }, 50);
+        }, 1500);
       } else {
         render();
       }
@@ -308,13 +446,16 @@ function handleOrchestratorUpdate(snap) {
       }
       updateDeckTelemetryDom('A', snap.deckTelemetry?.A);
       updateDeckTelemetryDom('B', snap.deckTelemetry?.B);
+      updateDeckWaveformDom(snap.liveId, snap.decks[snap.liveId], snap.decks[snap.liveId]?.position);
+      syncPlayingDom();
       return;
     }
 
-    const sig = buildRenderSig(snap);
-    if (sig !== state.lastRenderSig || snap.paused !== state.lastPaused) {
+    // Only full-render if stage is missing or pause state changed
+    const stageEl = document.getElementById('play-stage');
+    if (!stageEl || snap.paused !== state.lastPaused) {
       state.lastPaused = snap.paused;
-      state.lastRenderSig = sig;
+      state.lastRenderSig = buildRenderSig(snap);
       render();
       return;
     }
@@ -950,7 +1091,7 @@ async function saveCurrentSetToDb(customName) {
 
 let lastPipRect = { x: 0, y: 0, w: 0, h: 0, liveId: '' };
 function positionPipTile() {
-  if (!state.pipVideoVisible || state.screen !== 'playing' || state.snap?.crossfading) {
+  if (!state.pipVideoVisible || state.screen !== 'playing' || state.playNextModalOpen || state.vibeModalOpen || state.debugModalOpen || state.drawerOpen) {
     if (ytHost.getAttribute('data-visible') !== 'false') {
       ytHost.setAttribute('data-visible', 'false');
     }
@@ -1174,10 +1315,18 @@ function updateDeckWaveformDom(deckId, slot, posOverride) {
   }
   const ph = document.querySelector(`.deck[data-deck="${deckId}"] .playhead-line`);
   if (ph) {
-    ph.style.left = `${Math.min(100, Math.max(0, (pos / dur) * 100)).toFixed(2)}%`;
+    const pct = `${Math.min(100, Math.max(0, (pos / dur) * 100)).toFixed(2)}%`;
+    ph.style.left = pct;
     const isDrag = deckId === state.snap?.liveId && state.dragCueSec !== null;
     const dragCls = isDrag ? 'playhead-line dragging' : 'playhead-line';
     if (ph.className !== dragCls) ph.className = dragCls;
+
+    if (deckId === state.snap?.liveId) {
+      const hintRing = document.getElementById('drag-hint-ring');
+      if (hintRing) hintRing.style.left = pct;
+      const hintPtr = document.getElementById('drag-hint-pointer');
+      if (hintPtr) hintPtr.style.left = pct;
+    }
   }
 }
 
@@ -1374,24 +1523,53 @@ function syncPlayingDom() {
     agentMsg.textContent = snap.agentMessage;
   }
 
-  const cueTitle = document.getElementById('cue-deck-title');
-  if (cueTitle && cueSlot?.track && cueTitle.textContent !== cueSlot.track.title) {
-    cueTitle.textContent = cueSlot.track.title;
-    const cueArt = document.getElementById('cue-deck-artist');
-    if (cueArt) cueArt.textContent = cueSlot.track.artist || '';
+  // Update aura energy pulse dynamically
+  const aura = document.getElementById('pulse-aura');
+  if (aura && liveSlot?.track) {
+    const energy = liveSlot.track.energy || 6;
+    const pulseDur = `${(2.6 - 0.17 * energy).toFixed(2)}s`;
+    if (aura.style.getPropertyValue('--pulse') !== pulseDur) {
+      aura.style.setProperty('--pulse', pulseDur);
+    }
   }
 
-  const cueStatus = document.getElementById('cue-deck-status');
-  if (cueStatus) {
-    const label = cueSlot?.track
-      ? (cueSlot.status === 'ready' ? '○ READY' : '○ CUEING')
-      : '○ STANDBY';
-    if (cueStatus.textContent !== label) cueStatus.textContent = label;
+  // Update scoped cue deck title, artist, and status
+  const cueDeckEl = document.querySelector(`.deck[data-deck="${snap.cueId}"]`);
+  if (cueDeckEl && cueDeckEl.getAttribute('data-slot') === 'cue') {
+    const cueTitle = cueDeckEl.querySelector('.deck-title');
+    const cueArt = cueDeckEl.querySelector('.deck-artist');
+    const cueStatus = cueDeckEl.querySelector('.deck-status-slot');
+
+    const expectedTitle = cueSlot?.track ? cueSlot.track.title : 'END OF SET';
+    if (cueTitle && cueTitle.textContent !== expectedTitle) {
+      cueTitle.textContent = expectedTitle;
+      cueTitle.classList.toggle('long', expectedTitle.length > 16);
+      fitDeckTitle(cueDeckEl);
+    }
+    if (cueArt) {
+      cueArt.textContent = cueSlot?.track ? (cueSlot.track.artist || '').replace(/\s*·\s*\d{4}\s*$/, '') : '';
+      cueArt.style.display = cueSlot?.track ? '' : 'none';
+    }
+    if (cueStatus) {
+      const label = cueSlot?.track
+        ? (cueSlot.status === 'ready' ? '○ READY' : '○ CUEING')
+        : '○ STANDBY';
+      cueStatus.innerHTML = `<span style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">${label}</span>`;
+    }
   }
 
   // Update live waveform and local video sync
   updateDeckWaveformDom(snap.liveId, liveSlot, pos);
   syncLocalVideoDecks(snap, pos);
+
+  // Update Skip button state and label
+  const btnSkip = document.getElementById('btn-mega-skip');
+  if (btnSkip) {
+    const isCueLoading = cueSlot?.status === 'loading';
+    const isXfading = Boolean(snap.crossfading);
+    btnSkip.disabled = !liveSlot?.track || isXfading || isCueLoading;
+    btnSkip.textContent = isCueLoading ? 'CUEING…' : 'SKIP';
+  }
 
   // ONLY update pro drawer telemetry when drawer is actually open
   if (state.drawerOpen) {
@@ -1821,6 +1999,10 @@ function renderWizard() {
             </button>
           `).join('')}
         </div>
+
+        <button id="btn-wiz-next" class="naux-next-fixed squeeze">
+          NEXT →
+        </button>
       </section>
     `;
   } else if (step === 3) {
@@ -2164,28 +2346,28 @@ function renderDeckCard(deckId, slotName, deckData, tel) {
 
   const statusBadge = isLive && deckData?.status === 'live'
     ? `<span class="flex items-center gap-3 text-lime" style="color:#c8ff00;display:inline-flex;align-items:center;gap:10px"><span class="h-[0.55em] w-[0.55em] animate-pulse rounded-full bg-lime" style="width:10px;height:10px;border-radius:50%;background:#c8ff00;display:inline-block"></span>LIVE${deckData?.playFull ? ' · FULL' : ''}</span>`
-    : `<span id="cue-deck-status" style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${slotName === 'out' ? 'OUT' : isLive ? (track ? 'STARTING' : 'STANDBY') : track ? 'CUEING' : 'STANDBY'}</span>`;
+    : `<span style="color:rgba(255,255,255,0.7);font-family:var(--font-display);font-size:clamp(16px,1.6vw,22px)">○ ${slotName === 'out' ? 'OUT' : isLive ? (track ? 'STARTING' : 'STANDBY') : track ? 'CUEING' : 'STANDBY'}</span>`;
 
   return `
     <section class="deck absolute left-0 top-0 flex w-full flex-col md:w-[58%] gap-[clamp(6px,1.6vh,24px)]" data-deck="${deckId}" data-slot="${slotName}" aria-hidden="${!isLive}">
       <header class="deck-header flex items-center gap-5 font-display text-[clamp(22px,min(2.4vw,4.4vh),40px)] leading-none tracking-wide">
         <span class="deck-label text-white/50" style="color:rgba(255,255,255,0.5)">DECK ${deckId}</span>
-        ${statusBadge}
+        <div class="deck-status-slot">${statusBadge}</div>
       </header>
 
       <div class="deck-title-row flex items-start gap-[2.5vw]">
         <div class="min-w-0 flex-1">
-          <h2 class="deck-title font-display uppercase leading-[0.86] tracking-[-0.01em] ${isLive ? 'title-land' : ''} ${isLong ? 'long' : ''}" id="${isLive ? 'live-deck-title' : 'cue-deck-title'}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(titleText)}</h2>
-          ${track ? `
-            <p class="deck-artist mt-[clamp(6px,1.6vh,24px)] truncate font-sans text-[clamp(24px,min(2.6vw,4.6vh),48px)] font-semibold leading-tight text-white/75" id="${isLive ? 'live-deck-artist' : 'cue-deck-artist'}">
-              ${esc(cleanArtist)}
-            </p>
-          ` : ''}
+          <h2 class="deck-title font-display uppercase leading-[0.86] tracking-[-0.01em] ${isLive ? 'title-land' : ''} ${isLong ? 'long' : ''}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(titleText)}</h2>
+          <p class="deck-artist mt-[clamp(6px,1.6vh,24px)] truncate font-sans text-[clamp(24px,min(2.6vw,4.6vh),48px)] font-semibold leading-tight text-white/75" style="${track ? '' : 'display:none'}">
+            ${esc(cleanArtist)}
+          </p>
         </div>
         ${isLive && state.pipVideoVisible && isYt && track ? '<div class="deck-pip-slot aspect-video w-[max(356px,19vw)] shrink-0 rounded-[20px]" data-pip-slot="true"></div>' : ''}
       </div>
 
-      ${track && slotName !== 'cue' ? renderWaveformHtml(track, pos, dur, deckData?.mixOutSec || deckData?.cutAt, deckData?.playFull, isLive) : ''}
+      <div class="deck-waveform-slot" style="${isLive && track ? '' : 'display:none'}">
+        ${track ? renderWaveformHtml(track, pos, dur, deckData?.mixOutSec || deckData?.cutAt, deckData?.playFull, isLive) : ''}
+      </div>
     </section>
   `;
 }
@@ -2499,6 +2681,7 @@ function renderPlaying() {
   bindPlayingEvents();
   positionPipTile();
   syncLocalVideoDecks(snap, livePos);
+  initDeckTitleAutoScaler();
 }
 
 function renderSummary() {
@@ -3243,6 +3426,41 @@ function bindReviewEvents() {
   document.getElementById('btn-approve-play').onclick = approveAndPlay;
 }
 
+function bindLiveWaveformScrub() {
+  const wf = document.getElementById('live-waveform') || document.querySelector('.deck[data-slot="live"] .waveform-bars');
+  if (!wf) return;
+  const calcSec = (clientX) => {
+    const rect = wf.getBoundingClientRect();
+    const dur = state.snap?.decks?.[state.snap?.liveId]?.duration || state.snap?.liveTrack?.durationSec || 180;
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    return Math.round(pct * dur);
+  };
+  wf.onpointerdown = (ev) => {
+    try { wf.setPointerCapture(ev.pointerId); } catch {}
+    state.showDragHint = false;
+    const bubble = document.getElementById('drag-hint-group');
+    if (bubble) bubble.remove();
+    state.dragCueSec = calcSec(ev.clientX);
+    syncPlayingDom();
+  };
+  wf.onpointermove = (ev) => {
+    if (state.dragCueSec === null) return;
+    state.dragCueSec = calcSec(ev.clientX);
+    syncPlayingDom();
+  };
+  const commitSeek = async () => {
+    if (state.dragCueSec === null) return;
+    const target = state.dragCueSec;
+    state.dragCueSec = null;
+    const track = await orchestrator.seekLive(target);
+    const isPlayFull = Boolean(state.snap?.decks?.[state.snap?.liveId]?.playFull);
+    saveCueAdjustment(track, target, isPlayFull);
+    syncPlayingDom();
+  };
+  wf.onpointerup = commitSeek;
+  wf.onpointercancel = () => { state.dragCueSec = null; syncPlayingDom(); };
+}
+
 function bindPlayingEvents() {
   bindExitHandler(true);
 
@@ -3318,37 +3536,7 @@ function bindPlayingEvents() {
   }
 
   // Interactive 88-Bar Waveform Scrub + Cue Learning
-  const wf = document.getElementById('live-waveform');
-  if (wf) {
-    const calcSec = (clientX) => {
-      const rect = wf.getBoundingClientRect();
-      const dur = state.snap?.decks?.[state.snap?.liveId]?.duration || state.snap?.liveTrack?.durationSec || 180;
-      const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-      return Math.round(pct * dur);
-    };
-    wf.onpointerdown = (ev) => {
-      try { wf.setPointerCapture(ev.pointerId); } catch {}
-      state.showDragHint = false;
-      state.dragCueSec = calcSec(ev.clientX);
-      syncPlayingDom();
-    };
-    wf.onpointermove = (ev) => {
-      if (state.dragCueSec === null) return;
-      state.dragCueSec = calcSec(ev.clientX);
-      syncPlayingDom();
-    };
-    const commitSeek = async () => {
-      if (state.dragCueSec === null) return;
-      const target = state.dragCueSec;
-      state.dragCueSec = null;
-      const track = await orchestrator.seekLive(target);
-      const isPlayFull = Boolean(state.snap?.decks?.[state.snap?.liveId]?.playFull);
-      saveCueAdjustment(track, target, isPlayFull);
-      render();
-    };
-    wf.onpointerup = commitSeek;
-    wf.onpointercancel = () => { state.dragCueSec = null; render(); };
-  }
+  bindLiveWaveformScrub();
 
   // Drawer Events
   if (state.drawerOpen) {
