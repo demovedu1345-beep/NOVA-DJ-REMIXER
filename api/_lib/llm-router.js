@@ -27,7 +27,7 @@ export function getAiHealth(req = null) {
     };
   })();
 
-  const gemModel = process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest';
+  const gemModel = process.env.GEMINI_PLANNER_MODEL || 'gemini-2.5-flash';
   const oaiModel = process.env.OPENAI_PLANNER_MODEL || 'gpt-4o-mini';
   const claudeModel = process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022';
 
@@ -115,13 +115,13 @@ async function callGeminiSingle({ apiKey, model, systemPrompt, userPrompt, audio
 }
 
 async function callGemini(opts) {
-  const primary = String(opts.model || process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest').replace(/^models\//, '');
+  const primary = String(opts.model || process.env.GEMINI_PLANNER_MODEL || 'gemini-2.5-flash').replace(/^models\//, '');
   const fallbacks = [...new Set([
-    'gemini-flash-lite-latest',
-    'gemini-3.1-flash-lite',
-    'gemini-3-flash-preview',
     primary,
-  ])].filter((m) => !/2\.5-flash$|flash-latest$|pro-latest$/.test(m));
+    'gemini-2.5-flash',
+    'gemini-flash-lite-latest',
+    'gemini-3-flash-preview',
+  ])];
   const perMs = process.env.VERCEL ? 11500 : 15000;
   let lastErr;
   for (const m of fallbacks) {
@@ -264,8 +264,8 @@ export async function invokeAiRole({
       if (provider === 'gemini') {
         const defaultGemModel =
           role === 'PLANNER'
-            ? (process.env.GEMINI_PLANNER_MODEL || 'gemini-flash-lite-latest')
-            : (process.env.GEMINI_LISTENER_MODEL || 'gemini-flash-lite-latest');
+            ? (process.env.GEMINI_PLANNER_MODEL || 'gemini-2.5-flash')
+            : (process.env.GEMINI_LISTENER_MODEL || 'gemini-2.5-flash');
         out = await callGemini({
           apiKey: keys.gemini,
           model: defaultGemModel,
