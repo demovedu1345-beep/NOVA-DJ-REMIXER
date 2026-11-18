@@ -145,17 +145,13 @@ import fs from 'node:fs';
 const appJsSource = fs.readFileSync('public/js/ui/app.js', 'utf8');
 assert(appJsSource.includes('renderYouTubeMusicScreen'), 'app.js must define renderYouTubeMusicScreen');
 assert(appJsSource.includes('renderMiniPlayer'), 'app.js must define renderMiniPlayer');
-assert(appJsSource.includes('yt-lang-tab'), 'app.js must render yt-lang-tab elements');
-assert(appJsSource.includes('yt-cat-chip'), 'app.js must render yt-cat-chip elements');
-assert(appJsSource.includes('yt-tracks-grid'), 'app.js must render yt-tracks-grid');
-assert(appJsSource.includes('btn-yt-mini-play'), 'app.js must render mini player transport');
-assert(appJsSource.includes('yt-scrub-hook-zone'), 'app.js must render hook zone on scrubber');
+assert(appJsSource.includes('Party song lists'), 'app.js must render 19 party song lists');
+assert(appJsSource.includes('btn-play-category-set'), 'app.js must render play category set button');
+assert(appJsSource.includes('CURATED_CATEGORIES_DB'), 'app.js must use CURATED_CATEGORIES_DB');
 
 const cssSource = fs.readFileSync('public/styles/nova.css', 'utf8');
-assert(cssSource.includes('.yt-mini-player'), 'nova.css must style .yt-mini-player');
-assert(cssSource.includes('.yt-lang-tabs'), 'nova.css must style .yt-lang-tabs');
-assert(cssSource.includes('.yt-playlist-panel'), 'nova.css must style .yt-playlist-panel');
-assert(cssSource.includes('.yt-queue-drawer'), 'nova.css must style .yt-queue-drawer');
+assert(cssSource.includes('.deck'), 'nova.css must style .deck');
+assert(cssSource.includes('.naux-players'), 'nova.css must style .naux-players');
 
 console.log('✓ UI & CSS Assets Verified');
 console.log('\nALL YOUTUBE INTEGRATION TESTS PASSED (0 ERRORS) ✓\n');

@@ -1,6 +1,10 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/songs", "destination": "/index.html" },
+    { "source": "/songs/:path*", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -22,3 +26,4 @@
     }
   }
 }
+

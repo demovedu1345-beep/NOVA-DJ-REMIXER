@@ -129,21 +129,23 @@ const DEFAULT_CLIENT_KEYS = {
 
 const initialSearch = (typeof window !== 'undefined' ? window.location.search : '').toLowerCase();
 const initialPath = (typeof window !== 'undefined' ? window.location.pathname : '').toLowerCase();
-const shouldOpenSongsDirectly = initialSearch.includes('songs') || initialPath.includes('/songs');
+const isSongsRoute = initialPath === '/songs' || initialPath.startsWith('/songs/') || initialSearch.includes('songs');
+const songCatMatch = initialPath.match(/^\/songs\/([a-z0-9-]+)/);
+const initialCatSlug = songCatMatch ? songCatMatch[1] : (initialSearch.includes('set=') ? new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('set') : null);
 
 const state = {
-  screen: shouldOpenSongsDirectly ? 'wizard' : 'splash', // splash | wizard | review | playing | summary | yt
-  appMode: shouldOpenSongsDirectly ? 'yt' : 'dj',
-  wizardStep: 0, // 0: load/langs | 1: playMode | 2: vibe | 3: crowd
+  screen: isSongsRoute ? 'wizard' : 'splash', // splash | wizard | review | playing | summary
+  appMode: isSongsRoute ? 'yt' : 'dj',
+  wizardStep: 0, // 0: languages | 1: subtypes | 2: vibe | 3: crowd
   activeVibeCard: 'hindi',
-  activeVibeCategory: 'hindi-dance',
+  activeVibeCategory: initialCatSlug || 'hindi-dance',
   sessionId: getSessionId(),
   health: null,
 
   // Dedicated YouTube Music Catalog & Player State (matches naux.party/songs)
-  ytViewMode: 'directory', // 'directory' (16 category cards) | 'category' (100+ song detail list)
+  ytViewMode: initialCatSlug ? 'category' : 'directory', // 'directory' (19 category cards) | 'category' (100+ song detail list)
   ytSelectedLang: 'all',
-  ytSelectedCategory: 'hindi-dance',
+  ytSelectedCategory: initialCatSlug || 'hindi-dance',
   ytCategoryTracks: [],
   ytLoadingTracks: false,
   ytError: null,
@@ -1647,24 +1649,14 @@ function renderSplash() {
 
   root.innerHTML = `
     <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white relative flex flex-col justify-between">
-      <!-- Discreet Top Utility Bar for PRO DJ & BRAIN -->
-      <header class="absolute top-6 right-6 flex items-center gap-3 z-30">
-        <button id="btn-splash-pro-dj" class="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 font-display text-sm uppercase tracking-wide text-white/80 transition hover:border-lime hover:text-white squeeze" title="Pro DJ Studio, Stem Isolation & Offline Export">
-          🎚 PRO DJ / UPLOAD
-        </button>
-        <button id="btn-splash-brain" class="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 font-display text-sm uppercase tracking-wide text-white/80 transition hover:border-lime hover:text-white squeeze" title="AI Brain Diagnostics & API Keys">
-          🧠 BRAIN
-        </button>
-      </header>
-
-      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center cursor-pointer select-none">
         <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime select-none">NAUX</h1>
         <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">The aux, handled.</p>
         <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime transition-opacity duration-300" id="splash-tagline-el">
           ${esc(tagline)}
         </p>
         <div class="mt-10">
-          <button id="btn-splash-start" class="rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze">
+          <button id="btn-splash-start" class="rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze cursor-pointer">
             START A SET →
           </button>
         </div>
@@ -1905,16 +1897,20 @@ function renderWizard() {
   const step = state.wizardStep;
 
   // Track counts from CURATED_CATEGORIES_DB
-  const hindiCount = CURATED_CATEGORIES_DB['hindi-dance']?.songs?.length || 100;
-  const punjabiCount = CURATED_CATEGORIES_DB['punjabi-party']?.songs?.length || 100;
-  const englishCount = CURATED_CATEGORIES_DB['english-pop']?.songs?.length || 100;
-  const southCount = CURATED_CATEGORIES_DB['tamil-telugu-kuthu']?.songs?.length || 100;
+  const hindiCount = CURATED_CATEGORIES_DB['hindi-dance']?.songs?.length || 358;
+  const punjabiCount = CURATED_CATEGORIES_DB['punjabi-party']?.songs?.length || 454;
+  const englishCount = CURATED_CATEGORIES_DB['english-pop']?.songs?.length || 107;
+  const southCount = CURATED_CATEGORIES_DB['tamil-telugu-kuthu']?.songs?.length || 14;
+  const garbaCount = CURATED_CATEGORIES_DB['gujarati-garba']?.songs?.length || 46;
+  const haryanviCount = CURATED_CATEGORIES_DB['haryanvi-bhojpuri-party']?.songs?.length || 11;
 
   const WIZARD_LANGUAGES = [
     { id: 'hindi', label: 'Hindi', count: hindiCount, hint: `${hindiCount} songs ready` },
     { id: 'punjabi', label: 'Punjabi', count: punjabiCount, hint: `${punjabiCount} songs ready` },
     { id: 'english', label: 'English', count: englishCount, hint: `${englishCount} songs ready` },
     { id: 'south', label: 'Tamil / Telugu', count: southCount, hint: `${southCount} songs ready` },
+    { id: 'gujarati', label: 'Garba / Gujarati', count: garbaCount, hint: `${garbaCount} songs ready` },
+    { id: 'haryanvi-bhojpuri', label: 'Haryanvi / Bhojpuri', count: haryanviCount, hint: `${haryanviCount} songs ready` },
   ];
 
   let bodyHtml = '';
@@ -1922,55 +1918,59 @@ function renderWizard() {
   if (step === 0) {
     bodyHtml = `
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
-        <h1 class="naux-wizard-title">WHAT ARE WE PLAYING?</h1>
-        <p class="naux-wizard-sub">Pick every language the room wants.</p>
+        <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What are we playing?</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <p class="text-xl text-white/60 md:text-2xl">Pick every language the room wants.</p>
+        </div>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:32px">
+        <div class="grid gap-4 sm:grid-cols-2 mt-7 md:mt-10">
           ${WIZARD_LANGUAGES.map((l) => {
-            const sel = state.selectedLanguages.includes(l.id);
+            const sel = (state.selectedLanguages || []).includes(l.id);
             return `
-              <button class="naux-choice-btn ${sel ? 'selected' : ''}" data-wizard-lang="${l.id}">
-                <span class="naux-choice-title">${esc(l.label)}</span>
-                <span class="naux-choice-hint">${l.hint}</span>
+              <button class="flex flex-col justify-between rounded-3xl border-4 p-5 text-left md:p-6 transition active:scale-[0.98] min-h-28 md:min-h-36 cursor-pointer ${sel ? 'border-lime bg-lime text-ink' : 'border-white/20 hover:border-white/60'}" data-wizard-lang="${l.id}" aria-pressed="${sel}">
+                <span class="font-display uppercase leading-none text-4xl md:text-5xl">${esc(l.label)}</span>
+                <span class="mt-3 text-lg md:text-xl ${sel ? 'text-ink/70' : 'text-white/55'}">${l.hint}</span>
               </button>
             `;
           }).join('')}
         </div>
 
-        <button id="btn-wiz-next" class="naux-next-fixed squeeze" ${state.selectedLanguages.length ? '' : 'disabled'}>
+        <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] disabled:bg-[#3a4500] disabled:text-ink/70 md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer" ${(state.selectedLanguages || []).length ? '' : 'disabled'}>
           NEXT →
         </button>
 
-        <p style="margin-top:48px;font-size:16px;color:rgba(255,255,255,0.4)">
-          Plays through YouTube · <a id="link-party-lists" style="color:rgba(255,255,255,0.7);text-decoration:underline;cursor:pointer">Song lists</a> · Privacy · Terms
+        <p class="mt-12 text-lg text-white/40">
+          Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a>
         </p>
       </section>
     `;
   } else if (step === 1) {
-    const selectedLangs = state.selectedLanguages.length ? state.selectedLanguages : ['hindi'];
+    const selectedLangs = (state.selectedLanguages || []).length ? state.selectedLanguages : ['hindi'];
     bodyHtml = `
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
-        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
-        <h1 class="naux-wizard-title">WHAT KIND?</h1>
-        <p class="naux-wizard-sub">Optional. Skip a language to take anything in it.</p>
+        <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
+        <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What kind?</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <p class="text-xl text-white/60 md:text-2xl">Optional. Skip a language to take anything in it.</p>
+        </div>
 
-        <div style="display:flex;flex-direction:column;gap:32px;margin-top:28px">
+        <div class="flex flex-col gap-8 mt-7 md:mt-10">
           ${selectedLangs.map((langId) => {
             const langDef = WIZARD_LANGUAGES.find(l => l.id === langId) || { label: langId.toUpperCase() };
             const subcats = VIBE_CATEGORIES_MAP[langId] || VIBE_CATEGORIES_MAP['hindi'];
             return `
               <div>
-                <h3 style="font-family:var(--font-display);font-size:26px;text-transform:uppercase;color:rgba(255,255,255,0.6);letter-spacing:0.04em">
+                <h3 class="mb-3 font-display text-3xl uppercase tracking-wide text-white/60">
                   ${esc(langDef.label)}
                 </h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px">
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   ${subcats.map((sc) => {
-                    const sel = (state.activeVibeCategory === sc.id) || !state.activeVibeCategory;
-                    const count = CURATED_CATEGORIES_DB[sc.dbKey]?.songs?.length || 100;
+                    const sel = (state.activeVibeCategory === sc.id);
+                    const count = CURATED_CATEGORIES_DB[sc.dbKey]?.songs?.length || CURATED_CATEGORIES_DB[sc.id]?.songs?.length || 100;
                     return `
-                      <button class="naux-choice-btn compact ${sel ? 'selected' : ''}" data-wizard-subcat="${sc.id}" data-parent-lang="${langId}">
-                        <span class="naux-choice-title" style="font-size:24px">${esc(sc.label)}</span>
-                        <span class="naux-choice-hint">${count} ready</span>
+                      <button class="flex flex-col justify-between rounded-3xl border-4 p-5 text-left md:p-6 transition active:scale-[0.98] min-h-24 md:min-h-28 cursor-pointer ${sel ? 'border-lime bg-lime text-ink' : 'border-white/20 hover:border-white/60'}" data-wizard-subcat="${sc.id}" data-parent-lang="${langId}">
+                        <span class="font-display uppercase leading-none text-3xl md:text-4xl">${esc(sc.label)}</span>
+                        <span class="mt-3 text-lg ${sel ? 'text-ink/70' : 'text-white/55'}">${count} ready</span>
                       </button>
                     `;
                   }).join('')}
@@ -1980,7 +1980,7 @@ function renderWizard() {
           }).join('')}
         </div>
 
-        <button id="btn-wiz-next" class="naux-next-fixed squeeze">
+        <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer">
           NEXT →
         </button>
       </section>
@@ -1988,19 +1988,22 @@ function renderWizard() {
   } else if (step === 2) {
     bodyHtml = `
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
-        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
-        <h1 class="naux-wizard-title">WHERE IN THE NIGHT ARE WE?</h1>
+        <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
+        <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">Where in the night are we?</h1>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:32px">
-          ${NIGHT_VIBES.map((v) => `
-            <button class="naux-choice-btn tall squeeze ${state.vibe === v.id ? 'selected' : ''}" data-vibe="${v.id}">
-              <span class="naux-choice-title">${esc(v.label)}</span>
-              <span class="naux-choice-hint">${esc(v.hint)}</span>
-            </button>
-          `).join('')}
+        <div class="grid gap-4 md:grid-cols-2 mt-7 md:mt-10">
+          ${NIGHT_VIBES.map((v) => {
+            const sel = state.vibe === v.id;
+            return `
+              <button class="flex flex-col justify-between rounded-3xl border-4 p-5 text-left md:p-6 transition active:scale-[0.98] min-h-24 md:min-h-[clamp(160px,28vh,300px)] cursor-pointer ${sel ? 'border-lime bg-lime text-ink' : 'border-white/20 hover:border-white/60'}" data-vibe="${v.id}">
+                <span class="font-display uppercase leading-none text-4xl md:text-[clamp(44px,5vw,80px)]">${esc(v.label)}</span>
+                <span class="mt-3 text-lg md:text-xl ${sel ? 'text-ink/70' : 'text-white/55'}">${esc(v.hint)}</span>
+              </button>
+            `;
+          }).join('')}
         </div>
 
-        <button id="btn-wiz-next" class="naux-next-fixed squeeze">
+        <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer">
           NEXT →
         </button>
       </section>
@@ -2008,30 +2011,31 @@ function renderWizard() {
   } else if (step === 3) {
     bodyHtml = `
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
-        <button id="btn-wiz-back" class="naux-back-btn" style="margin-bottom:20px;align-self:flex-start">← BACK</button>
-        <h1 class="naux-wizard-title">HOW MANY PEOPLE?</h1>
+        <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
+        <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">How many people?</h1>
 
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px">
-          ${CROWD_SIZES.map((c) => `
-            <button class="naux-choice-btn tall squeeze ${state.crowd === c.id ? 'selected' : ''}" data-crowd="${c.id}">
-              <span class="naux-choice-title">${esc(c.label)}</span>
-              <span class="naux-choice-hint">${esc(c.hint)}</span>
-            </button>
-          `).join('')}
+        <div class="grid gap-4 md:grid-cols-3 mt-7 md:mt-10">
+          ${CROWD_SIZES.map((c) => {
+            const sel = state.crowd === c.id;
+            return `
+              <button class="flex flex-col justify-between rounded-3xl border-4 p-5 text-left md:p-6 transition active:scale-[0.98] min-h-24 md:min-h-[clamp(160px,28vh,300px)] cursor-pointer ${sel ? 'border-lime bg-lime text-ink' : 'border-white/20 hover:border-white/60'}" data-crowd="${c.id}">
+                <span class="font-display uppercase leading-none text-4xl md:text-[clamp(44px,5vw,80px)]">${esc(c.label)}</span>
+                <span class="mt-3 text-lg md:text-xl ${sel ? 'text-ink/70' : 'text-white/55'}">${esc(c.hint)}</span>
+              </button>
+            `;
+          }).join('')}
         </div>
       </section>
     `;
   }
 
   root.innerHTML = `
-    <main class="naux-step-shell">
-      <div class="naux-wizard-header">
-        <button id="btn-naux-brand" class="naux-wizard-brand" aria-label="NAUX home">NAUX</button>
-        <div style="display:flex;align-items:center;gap:14px">
-          <button id="btn-open-pro-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Pro DJ Booth &amp; File Ingest">🎚 PRO DJ / UPLOAD</button>
-          <button id="btn-open-brain-wiz" class="naux-filter-chip">🧠 BRAIN</button>
-          <span style="font-family:var(--font-display);font-size:22px;color:rgba(255,255,255,0.5)">${step + 1} / 4</span>
-          ${step > 0 ? `<button id="btn-wiz-exit" class="naux-back-btn" style="font-size:20px;margin-left:8px" title="Exit to Step 1">✕</button>` : ''}
+    <main class="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 pb-32 pt-10 md:px-10 md:pb-44 font-sans text-white">
+      <div class="flex items-center justify-between font-display text-3xl tracking-wide">
+        <button id="btn-naux-brand" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
+        <div class="flex items-center gap-5">
+          <span class="text-white/50">${step + 1} / 4</span>
+          ${step > 0 ? `<button id="btn-wiz-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/25 text-white/75 hover:border-white hover:text-white font-display text-3xl leading-none tracking-wide transition-all duration-200 active:scale-95 cursor-pointer" aria-label="Exit">✕</button>` : ''}
         </div>
       </div>
       ${bodyHtml}
@@ -2179,85 +2183,63 @@ function renderReview() {
     return acc + playLen;
   }, 0);
 
-  const dspCount = state.sequencedSet.filter((t) => isDecodableTrack(t)).length;
-
-  const right = `
-    <button id="btn-open-debug" class="nav-meta-btn" style="color:var(--amber)">✦ RECIPES &amp; GRID</button>
-    <button id="btn-review-back" class="nav-meta-btn">← CHANGE SETUP</button>
-    ${renderExitBtn(false)}
-  `;
-
-  const recipes = state.setPlan?.transitions || [];
-
   const mins = Math.max(1, Math.round(totalSec / 60));
-  const songCount = state.sequencedSet.length;
 
   root.innerHTML = `
-    <main class="stage-shell">
-      ${renderTopBar(right)}
-      <h1 class="hero-h1" style="margin-top:4vh">TONIGHT'S SET</h1>
-      <p class="hero-sub">
-        ${songCount} ${songCount === 1 ? 'song' : 'songs'} · about ${mins} ${mins === 1 ? 'minute' : 'minutes'} ·
-        <span class="text-accent">${esc(state.playMode.toUpperCase())}</span>
-        · <span class="text-amber">${dspCount} FULL DSP</span>
-        ${state.setPlan?.validation?.valid ? ' · <span style="color:#6bff95">VALIDATOR ✓</span>' : ''}
-      </p>
-
-      <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-        <button id="btn-review-debug" class="pill-btn squeeze" style="border-color:var(--amber);color:var(--amber)">✦ INSPECT BEAT GRID &amp; RECIPES (${recipes.length})</button>
-        ${(dspCount >= 2 && recipes.length) ? `<button id="btn-review-audit-all" class="pill-btn squeeze" style="border-color:var(--accent);color:var(--accent)" ${state.batchAuditBusy ? 'disabled' : ''}>${state.batchAuditBusy ? 'AUDITING ALL…' : `🎧 AUDIT ALL (${recipes.length})`}</button>` : ''}
-        ${dspCount ? `<button id="btn-review-export" class="pill-btn squeeze" ${state.exportBusy ? 'disabled' : ''}>${state.exportBusy ? 'EXPORTING…' : '⬇ EXPORT MIX (.WAV)'}</button>` : ''}
-        ${state.exportMsg ? `<span style="font-size:13px;color:var(--amber)">${esc(state.exportMsg)}</span>` : ''}
+    <main class="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 pb-32 pt-10 md:px-10 md:pb-44 font-sans text-white">
+      <div class="flex items-center justify-between font-display text-3xl tracking-wide">
+        <button id="btn-home" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
+        <div class="flex items-center gap-5">
+          <button id="btn-review-back" class="text-white/60 hover:text-white cursor-pointer font-display text-2xl tracking-wide">
+            ← <span class="hidden sm:inline">CHANGE ANSWERS</span><span class="sm:hidden">BACK</span>
+          </button>
+          <button id="btn-review-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/25 text-white/75 hover:border-white hover:text-white font-display text-3xl leading-none tracking-wide transition-all duration-200 active:scale-95 cursor-pointer" aria-label="Exit">✕</button>
+        </div>
       </div>
 
-      <ol class="review-list" id="review-list">
+      <h1 class="mt-[4vh] font-display text-[44px] uppercase md:mt-[5vh] md:text-[clamp(48px,5.5vw,84px)] leading-[0.9]">Tonight's set</h1>
+      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <p class="text-xl text-white/60 md:text-xl">
+          ${state.sequencedSet.length} songs · about ${mins} minutes with the cuts
+        </p>
+      </div>
+
+      <p class="mt-3 text-base text-white/45 md:text-lg">
+        Plays through YouTube: with YouTube Premium there are no ads. Best on a laptop plugged into a speaker.
+      </p>
+
+      <ol class="mt-8 flex flex-col" id="review-list">
         ${state.sequencedSet.map((t, idx) => {
-          const isYt = isYtTrack(t);
-          const hasNeural = Boolean(!isYt && (t.neuralStems || t.stems_available || t.analysis?.stems_available));
-          const lowConf = Boolean(!isYt && (t.safe_transitions_only || t.analysis?.low_confidence));
           const eVal = Math.max(1, Math.min(10, Math.round(Number(t.energy) || 7)));
-          const bars = Array.from({ length: 10 }, (_, b) => {
-            const cls = b < eVal ? (b >= 7 ? 'energy-bar peak' : 'energy-bar on') : 'energy-bar';
-            return `<div class="${cls}" style="height:${8 + b * 3}px"></div>`;
-          }).join('');
+          const bars = Array.from({ length: 10 }, (_, b) => `
+            <div class="w-2 rounded-sm ${b < eVal ? 'bg-lime' : 'bg-white/15'}" style="height:${8 + 3 * b}px"></div>
+          `).join('');
           const cueLabel = t.playFull
             ? 'FULL'
             : `${fmtTime(t.entrySec || 0)}–${fmtTime(t.exitSec || t.durationSec || 180)}`;
-          const nextT = state.sequencedSet[idx + 1];
-          const rec = nextT ? recipes.find((r) => r.from === t.id && r.to === nextT.id) : null;
-          const techTag = isYt
-            ? 'YT VIDEO · NO DSP (VOL FADE ONLY)'
-            : hasNeural ? 'NEURAL 4-STEM ✓' : t.isVideo ? 'LOCAL VIDEO · FULL DSP ✓' : 'DSP · STEMS OFF (EQ)';
 
           return `
-            <li class="review-row" data-song-idx="${idx}">
-              <button class="drag-handle" data-drag-idx="${idx}" title="Drag to reorder" aria-label="Reorder ${esc(t.title)}">⋮⋮</button>
-              <span class="row-idx">${idx + 1}</span>
-              <div class="row-main">
-                <div class="row-title">${esc(t.title)}</div>
-                <div class="row-meta">
-                  <span>${esc(t.artist)}</span>
-                  <span class="row-tag">${techTag}</span>
-                  ${lowConf ? '<span class="font-mono-num" style="font-size:11px;color:#ff7b7b">⚠ SAFE-ONLY</span>' : ''}
-                  ${t.bpm ? `<span class="font-mono-num" style="font-size:12px">${Math.round(t.bpm)} BPM</span>` : ''}
-                  ${t.camelot ? `<span class="font-mono-num" style="font-size:12px;color:var(--amber)">${esc(t.camelot)}</span>` : ''}
-                  ${rec ? `<span class="font-mono-num" style="font-size:11px;color:rgba(245,245,240,0.6)">↳ ${esc(rec.type.replace(/_/g, ' ').toUpperCase())} (${Math.round((rec.compatibility?.score || 0.7) * 100)}%)</span>` : ''}
-                </div>
+            <li class="flex items-center gap-3 border-b-2 py-3 transition-colors md:gap-5 md:py-3 border-white/10" data-song-idx="${idx}">
+              <button class="flex h-12 w-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-xl text-2xl text-white/35 hover:text-white active:cursor-grabbing md:w-9" data-drag-idx="${idx}" title="Drag to reorder" aria-label="Move ${esc(t.title)}">⋮⋮</button>
+              <span class="w-7 shrink-0 font-display text-2xl text-white/35 md:w-10 md:text-2xl tabular-nums">${idx + 1}</span>
+              <div class="min-w-0 flex-1">
+                <div class="font-display text-[28px] uppercase leading-[1.05] max-md:line-clamp-2 md:truncate md:text-3xl md:leading-tight">${esc(t.title)}</div>
+                <div class="truncate text-base text-white/55 md:text-lg">${esc(t.artist)}</div>
               </div>
-              <div class="energy-meter" aria-label="Energy ${eVal} of 10">${bars}</div>
-              <span class="cue-range">${cueLabel}</span>
-              <button class="remove-row-btn squeeze" data-remove-idx="${idx}" aria-label="Remove ${esc(t.title)}">✕</button>
+              <div class="hidden shrink-0 items-end gap-1 md:flex" aria-label="Energy ${eVal} of 10">${bars}</div>
+              <span class="hidden w-40 shrink-0 text-right font-display text-xl text-white/60 tabular-nums sm:block">${cueLabel}</span>
+              <button class="h-12 w-12 shrink-0 rounded-2xl border-2 border-white/25 font-display text-2xl md:h-14 md:w-14 md:text-2xl text-white/70 hover:border-white hover:text-white remove-row-btn cursor-pointer" data-remove-idx="${idx}" aria-label="Remove ${esc(t.title)}">✕</button>
             </li>
           `;
         }).join('')}
       </ol>
-    </main>
 
-    <div class="sticky-approve-wrap">
-      <button id="btn-approve-play" class="approve-btn squeeze" ${state.sequencedSet.length ? '' : 'disabled'}>
-        APPROVE &amp; PLAY
-      </button>
-    </div>
+      <div class="pointer-events-none fixed inset-x-0 bottom-0 bg-gradient-to-t from-ink via-ink to-transparent px-6 pb-6 pt-12 md:px-10">
+        <button id="btn-approve-play" class="pointer-events-auto mx-auto block h-20 w-full max-w-6xl rounded-[24px] bg-lime font-display text-4xl md:h-[clamp(84px,11vh,110px)] md:rounded-[26px] md:text-[clamp(40px,4.2vw,68px)] tracking-wide text-ink transition active:scale-[0.98] cursor-pointer">
+          APPROVE &amp; PLAY
+        </button>
+      </div>
+    </main>
     ${state.debugModalOpen ? renderDebugModal({
       plan: state.setPlan,
       tracks: state.sequencedSet,
@@ -2497,33 +2479,67 @@ function renderProDrawer() {
 
 function renderPlayNextModal() {
   const liveId = state.snap?.liveTrack?.id;
-  const matches = state.playNextQuery.trim()
-    ? state.crate.filter((t) => t.id !== liveId && `${t.title} ${t.artist}`.toLowerCase().includes(state.playNextQuery.trim().toLowerCase()))
-    : state.crate.filter((t) => t.id !== liveId);
+  const allTracks = Object.values(CURATED_CATEGORIES_DB).flatMap(c => c.songs || []);
+  const query = (state.playNextQuery || '').trim().toLowerCase();
+  const matches = query
+    ? allTracks.filter(t => t.id !== liveId && `${t.title} ${t.artist}`.toLowerCase().includes(query))
+    : state.crate.filter(t => t.id !== liveId);
 
   return `
-    <div class="modal-backdrop" id="playnext-backdrop">
-      <div class="modal-sheet" onclick="event.stopPropagation()">
-        <div style="padding:22px 26px 10px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="font-display" style="font-size:32px;text-transform:uppercase">PLAY NEXT</span>
-            <button id="btn-close-playnext" class="exit-btn">✕</button>
+    <div class="fixed inset-0 z-40 flex items-end justify-center bg-ink/70 backdrop-blur-sm md:items-center" id="playnext-backdrop">
+      <div class="flex max-h-[88dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] border-2 border-white/15 bg-ink md:rounded-[28px]" onclick="event.stopPropagation()">
+        <div class="px-6 pt-5 md:px-8">
+          <div class="flex items-center justify-between">
+            <p class="font-display text-3xl uppercase tracking-wide md:text-4xl">Play next</p>
+            <button id="btn-close-playnext" aria-label="Close" class="h-11 w-11 rounded-full border-2 border-white/25 text-xl text-white/70 hover:border-white hover:text-white cursor-pointer">✕</button>
           </div>
-          <div style="display:flex;gap:10px;margin-top:14px">
-            <input id="input-playnext" class="ingest-input" style="flex:1;height:54px" value="${esc(state.playNextQuery)}" placeholder="Filter crate or search Audius / Openverse…" autofocus />
-            <button id="btn-playnext-search" class="ingest-btn squeeze" style="height:54px;font-size:20px;padding:0 18px">SEARCH DSP</button>
-          </div>
+          <input
+            id="input-playnext"
+            class="mt-4 w-full rounded-2xl border-2 border-white/20 bg-transparent px-5 py-3 text-lg text-white placeholder:text-white/35 focus:border-lime focus:outline-none"
+            value="${esc(state.playNextQuery)}"
+            placeholder="Search a song or artist"
+            aria-label="Search songs"
+            autofocus
+          />
         </div>
-        <div id="playnext-list" class="nova-scroll" style="padding:10px 26px 24px;overflow-y:auto;flex:1">
-          ${matches.slice(0, 30).map((t) => `
-            <button class="review-row squeeze" style="width:100%;text-align:left;justify-content:space-between" data-pick-next="${esc(t.id)}">
-              <div class="row-main">
-                <div class="row-title" style="font-size:24px">${esc(t.title)}</div>
-                <div class="row-meta">${esc(t.artist)}</div>
-              </div>
-              <span class="font-display text-accent" style="font-size:20px;flex-shrink:0">PLAY NEXT →</span>
-            </button>
-          `).join('') || '<p style="color:rgba(245,245,240,0.5);padding:18px 0">No matching tracks in crate. Press Enter to search Audius / Openverse!</p>'}
+        <div class="naux-scroll mt-3 min-h-0 flex-1 overflow-y-auto px-6 pb-5 md:px-8" id="playnext-list">
+          ${query ? (matches.length ? `
+            <ul class="flex flex-col gap-2">
+              ${matches.slice(0, 30).map((t) => `
+                <li class="flex items-center justify-between gap-3 border-b border-white/10 py-3">
+                  <div class="min-w-0 flex-1">
+                    <div class="font-display text-xl uppercase leading-tight md:text-2xl">${esc(t.title)}</div>
+                    <div class="truncate text-white/55 text-sm md:text-base">${esc(t.artist)}</div>
+                  </div>
+                  <button class="rounded-full border-2 border-lime px-4 py-1.5 font-display text-base tracking-wide text-lime transition hover:bg-lime hover:text-ink squeeze shrink-0 cursor-pointer" data-pick-next="${esc(t.id)}">
+                    ＋ PLAY NEXT
+                  </button>
+                </li>
+              `).join('')}
+            </ul>
+          ` : `
+            <div class="py-8 text-center">
+              <p class="text-white/55 text-lg">We don't have that one yet.</p>
+              <button class="mt-4 rounded-full border-2 border-lime px-6 py-2.5 font-display text-xl tracking-wide text-lime transition hover:bg-lime hover:text-ink cursor-pointer" id="btn-request-song">
+                ＋ REQUEST “${esc(state.playNextQuery.slice(0, 35))}”
+              </button>
+            </div>
+          `) : `
+            <p class="mb-2 font-display text-lg uppercase tracking-wide text-white/45">Played tonight</p>
+            <ul class="flex flex-col gap-2">
+              ${state.crate.filter(t => t.id !== liveId).slice(0, 15).map((t) => `
+                <li class="flex items-center justify-between gap-3 border-b border-white/10 py-3">
+                  <div class="min-w-0 flex-1">
+                    <div class="font-display text-xl uppercase leading-tight md:text-2xl">${esc(t.title)}</div>
+                    <div class="truncate text-white/55 text-sm md:text-base">${esc(t.artist)}</div>
+                  </div>
+                  <button class="rounded-full border-2 border-white/30 px-4 py-1.5 font-display text-base tracking-wide text-white/80 transition hover:border-lime hover:text-lime squeeze shrink-0 cursor-pointer" data-pick-next="${esc(t.id)}">
+                    play it again
+                  </button>
+                </li>
+              `).join('')}
+            </ul>
+          `}
         </div>
       </div>
     </div>
@@ -2531,37 +2547,77 @@ function renderPlayNextModal() {
 }
 
 function renderVibeModal() {
+  const timeOptions = [
+    { id: 'warmup', label: 'Warming up' },
+    { id: 'peak', label: 'Peak' },
+    { id: 'winddown', label: 'Winding down' },
+    { id: 'bangers', label: 'Only bangers' },
+  ];
+  const crowdOptions = [
+    { id: 'small', label: '4–6' },
+    { id: 'medium', label: '10–20' },
+    { id: 'large', label: '20+' },
+  ];
+  const langOptions = [
+    { id: 'hindi', label: 'Hindi' },
+    { id: 'punjabi', label: 'Punjabi' },
+    { id: 'english', label: 'English' },
+    { id: 'south', label: 'Tamil / Telugu' },
+    { id: 'gujarati', label: 'Garba / Gujarati' },
+    { id: 'haryanvi-bhojpuri', label: 'Haryanvi / Bhojpuri' },
+  ];
+
   return `
-    <div class="modal-backdrop" id="vibe-backdrop">
-      <div class="modal-sheet" onclick="event.stopPropagation()">
-        <div style="padding:22px 26px;overflow-y:auto" class="nova-scroll">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span class="font-display" style="font-size:32px;text-transform:uppercase">CHANGE THE VIBE</span>
-            <button id="btn-close-vibe" class="exit-btn">✕</button>
+    <div class="fixed inset-0 z-40 flex items-end justify-center bg-ink/70 backdrop-blur-sm md:items-center" id="vibe-backdrop">
+      <div class="flex max-h-[88dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] border-2 border-white/15 bg-ink md:rounded-[28px]" onclick="event.stopPropagation()">
+        <div class="naux-scroll min-h-0 flex-1 overflow-y-auto px-6 pb-2 pt-5 md:px-8">
+          <div class="flex items-center justify-between">
+            <p class="font-display text-3xl uppercase tracking-wide md:text-4xl">Change the vibe</p>
+            <button id="btn-close-vibe" aria-label="Close" class="h-11 w-11 rounded-full border-2 border-white/25 text-xl text-white/70 hover:border-white hover:text-white cursor-pointer">✕</button>
           </div>
-          <p style="margin-top:6px;color:rgba(245,245,240,0.55)">Live track keeps playing. Upcoming queue re-orders automatically.</p>
+          <p class="mt-1 text-base text-white/50">The song playing carries on. Everything after it is re-picked.</p>
 
-          <p class="font-display" style="margin-top:18px;font-size:20px;color:rgba(245,245,240,0.5)">MIX STYLE</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
-            ${MIX_STYLES.map((m) => `
-              <button class="pill-btn squeeze ${state.playMode === m.id ? 'active' : ''}" data-retune-mode="${m.id}">${esc(m.label)}</button>
-            `).join('')}
-          </div>
-
-          <p class="font-display" style="margin-top:18px;font-size:20px;color:rgba(245,245,240,0.5)">NIGHT ENERGY</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
-            ${NIGHT_VIBES.map((v) => `
-              <button class="pill-btn squeeze ${state.vibe === v.id ? 'active' : ''}" data-retune-vibe="${v.id}">${esc(v.label)}</button>
-            `).join('')}
+          <div class="mt-4">
+            <p class="mb-2 font-display text-lg uppercase tracking-wide text-white/45">Where in the night</p>
+            <div class="flex flex-wrap gap-2.5">
+              ${timeOptions.map(t => `
+                <button class="rounded-2xl border-2 px-4 py-1.5 font-display text-xl uppercase tracking-wide transition ${state.vibe === t.id ? 'border-lime bg-lime text-ink' : 'border-white/25 text-white/80 hover:border-white/60'} cursor-pointer" data-retune-vibe="${t.id}">
+                  ${t.label}
+                </button>
+              `).join('')}
+            </div>
           </div>
 
-          <div class="fx-slider-row" style="margin-top:18px">
-            <label><span>LIVE ENERGY ARC SLIDER (CHILL ↔ BANGERS)</span><span id="vibe-energy-val">${state.moodEnergy}%</span></label>
-            <input id="vibe-energy-slider" type="range" min="15" max="100" value="${state.moodEnergy}" />
+          <div class="mt-4">
+            <p class="mb-2 font-display text-lg uppercase tracking-wide text-white/45">How many people</p>
+            <div class="flex flex-wrap gap-2.5">
+              ${crowdOptions.map(c => `
+                <button class="rounded-2xl border-2 px-4 py-1.5 font-display text-xl uppercase tracking-wide transition ${state.crowd === c.id ? 'border-lime bg-lime text-ink' : 'border-white/25 text-white/80 hover:border-white/60'} cursor-pointer" data-retune-crowd="${c.id}">
+                  ${c.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <p class="mb-2 font-display text-lg uppercase tracking-wide text-white/45">Languages</p>
+            <div class="flex flex-wrap gap-2.5">
+              ${langOptions.map(l => {
+                const sel = (state.selectedLanguages || []).includes(l.id);
+                return `
+                  <button class="rounded-2xl border-2 px-4 py-1.5 font-display text-xl uppercase tracking-wide transition ${sel ? 'border-lime bg-lime text-ink' : 'border-white/25 text-white/80 hover:border-white/60'} cursor-pointer" data-retune-lang="${l.id}">
+                    ${l.label}
+                  </button>
+                `;
+              }).join('')}
+            </div>
           </div>
         </div>
-        <div style="padding:16px 26px;border-top:2px solid rgba(245,245,240,0.1)">
-          <button id="btn-apply-vibe" class="ingest-btn squeeze" style="width:100%">APPLY &amp; RE-SEQUENCE →</button>
+
+        <div class="border-t-2 border-white/10 px-6 pb-5 pt-4 md:px-8">
+          <button id="btn-apply-vibe" class="h-16 w-full rounded-[20px] bg-lime font-display text-3xl tracking-wide text-ink transition active:scale-[0.98] cursor-pointer">
+            APPLY
+          </button>
         </div>
       </div>
     </div>
@@ -2606,16 +2662,6 @@ function renderPlaying() {
             <span class="clock-time ${snap.paused ? 'clock-blink' : ''}" id="play-clock-text">${fmtTime(livePos)} / ${fmtTime(liveDur)}</span>
           </button>
 
-          <button class="mixer-toggle-btn squeeze ${state.drawerOpen ? 'open' : ''}" id="btn-open-drawer" title="Pro DJ Console &amp; Stems">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
-              <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
-              <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
-              <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
-            </svg>
-            <span class="hidden md:inline">PRO DJ</span>
-          </button>
-
           ${renderExitBtn(true)}
         </div>
       </div>
@@ -2638,9 +2684,8 @@ function renderPlaying() {
         <span class="agent-tag">AGENT</span>
         <span class="agent-msg" id="agent-msg">${esc(snap.agentMessage)}</span>
         <div class="agent-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <button class="agent-btn accent squeeze" id="btn-mix-now" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>⚡ MIX NOW</button>
-          <button class="agent-btn remove squeeze" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>✕ <span class="hidden md:inline">REMOVE NEXT</span></button>
-          <button class="agent-btn accent squeeze" id="btn-play-next">＋ <span class="hidden md:inline">PLAY NEXT</span></button>
+          <button class="agent-btn remove squeeze cursor-pointer" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>✕ <span class="hidden md:inline">REMOVE NEXT</span></button>
+          <button class="agent-btn accent squeeze cursor-pointer" id="btn-play-next">＋ <span class="hidden md:inline">PLAY NEXT</span></button>
         </div>
       </div>
 
@@ -2969,7 +3014,8 @@ function bindWizardEvents() {
         const targetLang = state.selectedLanguages[0] || 'hindi';
         const catId = state.activeVibeCategory || 'hindi-dance';
         populateVibeTracksToCrate(targetLang, catId);
-        approveAndPlay();
+        state.screen = 'review';
+        render();
       }
     };
   }
@@ -3008,14 +3054,15 @@ function bindWizardEvents() {
     };
   });
 
-  // Step 3: Crowd size selection -> Launches directly into the live set!
+  // Step 3: Crowd size selection -> Advances to Tonight's set (Review Screen)
   document.querySelectorAll('[data-crowd]').forEach((b) => {
     b.onclick = () => {
       state.crowd = b.dataset.crowd;
       const targetLang = state.selectedLanguages[0] || 'hindi';
       const catId = state.activeVibeCategory || 'hindi-dance';
       populateVibeTracksToCrate(targetLang, catId);
-      approveAndPlay();
+      state.screen = 'review';
+      render();
     };
   });
 
@@ -3329,12 +3376,16 @@ function bindDebugModalEvents() {
 }
 
 function bindReviewEvents() {
-  document.getElementById('btn-home').onclick = goHome;
-  document.getElementById('btn-review-back').onclick = () => {
+  const revHome = document.getElementById('btn-home');
+  if (revHome) revHome.onclick = goHome;
+  const revBack = document.getElementById('btn-review-back');
+  if (revBack) revBack.onclick = () => {
     state.screen = 'wizard';
-    state.wizardStep = 1;
+    state.wizardStep = 3;
     render();
   };
+  const revExit = document.getElementById('btn-review-exit');
+  if (revExit) revExit.onclick = goHome;
   bindExitHandler(false);
   const openDbg = document.getElementById('btn-open-debug');
   if (openDbg) openDbg.onclick = () => { state.debugModalOpen = true; render(); };
@@ -3484,7 +3535,7 @@ function bindPlayingEvents() {
     render();
   };
 
-  document.getElementById('btn-mix-now').onclick = () => orchestrator.mixNow();
+  const btnMixNow = document.getElementById('btn-mix-now'); if (btnMixNow) btnMixNow.onclick = () => orchestrator.mixNow();
   document.getElementById('btn-remove-next').onclick = () => {
     orchestrator.dropNextFromQueue();
     render();
@@ -3497,7 +3548,7 @@ function bindPlayingEvents() {
     state.vibeModalOpen = true;
     render();
   };
-  document.getElementById('btn-open-drawer').onclick = () => {
+  const btnDrawer = document.getElementById('btn-open-drawer'); if (btnDrawer) btnDrawer.onclick = () => {
     state.drawerOpen = !state.drawerOpen;
     render();
   };
@@ -3911,186 +3962,109 @@ async function loadYtCategoryTracks(langId, categoryId, forceRefresh = false) {
 }
 
 function renderYouTubeMusicScreen() {
-  const p = getYouTubePlayer();
-  const ps = p.getPlaybackState();
-  const currentTrackId = ps.currentTrack?.id;
-
   if (state.ytViewMode === 'category') {
     // CATEGORY DETAIL VIEW (100+ songs list matching naux.party/songs/hindi-dance)
-    const currentCat = findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory) || {
-      id: state.ytSelectedCategory,
+    const currentCat = CURATED_CATEGORIES_DB[state.ytSelectedCategory] || findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory) || {
+      slug: state.ytSelectedCategory,
       label: 'Hindi Dance Songs',
-      hint: 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NOVA starts each one at its best part.',
-      tracks: []
+      hint: 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.',
+      songs: []
     };
 
     if (!state.ytCategoryTracks.length && !state.ytLoadingTracks && !state.ytError) {
       loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory);
     }
 
-    const tracks = state.ytCategoryTracks.length ? state.ytCategoryTracks : (currentCat.tracks || []);
+    const tracks = state.ytCategoryTracks.length ? state.ytCategoryTracks : (currentCat.songs || currentCat.tracks || []);
     const artistsPreview = Array.from(new Set(
       tracks.slice(0, 10).map(t => (t.artist || '').split(/[,&]/)[0].trim()).filter(Boolean)
     )).slice(0, 6).join(', ') + (tracks.length > 6 ? ' and more' : '');
 
     root.innerHTML = `
-      <div class="naux-main-shell">
-        <div class="naux-container">
-          <header class="naux-top-header">
-            <button id="btn-naux-brand" class="naux-logo" title="NAUX Home">NAUX</button>
-            <div class="naux-nav-actions">
-              <button id="btn-back-to-lists" class="naux-back-link">ALL LISTS</button>
-              <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
-              <button id="btn-open-brain-yt" class="naux-filter-chip">🧠 BRAIN</button>
+      <div class="min-h-dvh bg-ink font-sans text-white">
+        <main class="mx-auto flex min-h-dvh max-w-4xl flex-col px-6 py-10 md:px-10">
+          <div class="flex items-center justify-between font-display text-3xl tracking-wide">
+            <a href="/" class="text-lime cursor-pointer" id="btn-naux-brand">NAUX</a>
+            <a href="/songs" class="text-2xl text-white/60 hover:text-white cursor-pointer" id="btn-back-to-lists">ALL LISTS</a>
+          </div>
+
+          <h1 class="mt-[4vh] font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(48px,5.5vw,84px)]">${esc(currentCat.label)} 2026</h1>
+          <p class="mt-4 max-w-2xl text-lg text-white/65 md:text-xl">
+            ${esc(currentCat.hint || 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.')}
+          </p>
+          <p class="mt-3 text-base text-white/45">
+            ${tracks.length} songs${artistsPreview ? `, from ${esc(artistsPreview)}` : ''}. Updated daily.
+          </p>
+
+          <button id="btn-play-category-set" class="mt-8 self-start rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink squeeze cursor-pointer">
+            PLAY THIS AS A SET →
+          </button>
+
+          ${state.ytLoadingTracks ? `
+            <div style="padding:80px 20px;text-align:center;font-family:var(--font-mono);color:#c8ff00;font-size:14px;letter-spacing:0.04em">
+              ⚡ LOADING ${tracks.length || '100+'} TRACKS…
             </div>
-          </header>
-
-          <main class="naux-detail-hero" style="flex:1">
-            <h1 class="naux-hero-title">${esc(currentCat.label)} 2026</h1>
-            <p class="naux-hero-subtitle">
-              ${esc(currentCat.hint || 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NOVA starts each one at its best part.')}
-            </p>
-            <p style="margin-top:12px;font-size:15px;color:rgba(255,255,255,0.45);font-family:var(--font-sans)">
-              ${tracks.length} songs${artistsPreview ? `, from ${esc(artistsPreview)}` : ''}. Updated daily.
-            </p>
-
-            <div class="naux-detail-actions" style="margin-top:28px">
-              <button id="btn-play-category-set" class="naux-btn-play-set squeeze" style="font-size:20px;padding:16px 36px">
-                PLAY THIS AS A SET →
-              </button>
+          ` : state.ytError ? `
+            <div class="status-banner err" style="margin:24px 0">
+              ${esc(state.ytError)}
+              <button id="btn-yt-retry-fetch" class="pill-btn squeeze" style="margin-left:14px">RETRY ⟳</button>
             </div>
+          ` : `
+            <ol class="mt-8 flex flex-col">
+              ${tracks.map((t, idx) => {
+                const cleanArtist = (t.artist || '').replace(/\s*·\s*\d{4}\s*$/, '');
+                return `
+                  <li class="flex items-baseline gap-3 border-b border-white/10 py-3 cursor-pointer hover:bg-white/[0.04] transition px-2 rounded-lg" data-song-idx="${idx}">
+                    <span class="w-8 shrink-0 font-display text-xl text-white/35 tabular-nums">${idx + 1}</span>
+                    <div class="min-w-0 flex-1">
+                      <div class="font-display text-xl uppercase leading-tight md:text-2xl">${esc(t.title)}</div>
+                      <div class="text-white/55">${esc(cleanArtist)} ${t.year ? `· ${t.year}` : ''}</div>
+                    </div>
+                    <span class="shrink-0 text-right text-sm text-white/45">from the best part</span>
+                  </li>
+                `;
+              }).join('')}
+            </ol>
 
-            ${state.ytLoadingTracks ? `
-              <div style="padding:80px 20px;text-align:center;font-family:var(--font-mono);color:#c8ff00;font-size:14px;letter-spacing:0.04em">
-                ⚡ LOADING ${tracks.length || '100+'} TRACKS…
-              </div>
-            ` : state.ytError ? `
-              <div class="status-banner err" style="margin:24px 0">
-                ${esc(state.ytError)}
-                <button id="btn-yt-retry-fetch" class="pill-btn squeeze" style="margin-left:14px">RETRY ⟳</button>
-              </div>
-            ` : `
-              <ol class="naux-song-list">
-                ${tracks.map((t, idx) => {
-                  const isPlaying = (currentTrackId === t.id && ps.isPlaying);
-                  const cleanArtist = (t.artist || '').replace(/\s*·\s*\d{4}\s*$/, '');
-                  return `
-                    <li class="naux-song-row ${isPlaying ? 'is-active' : ''}" data-song-idx="${idx}">
-                      <span class="naux-song-num">${idx + 1}</span>
-                      <div class="naux-song-info">
-                        <div class="naux-song-title">
-                          <span>${esc(t.title)}</span>
-                          ${isPlaying ? '<span style="font-size:10px;color:#c8ff00;font-family:var(--font-mono);margin-left:8px">● PLAYING</span>' : ''}
-                        </div>
-                        <div class="naux-song-meta">${esc(cleanArtist)} ${t.year ? `· ${t.year}` : ''}</div>
-                      </div>
-                      <span class="naux-song-tag">from the best part</span>
-                      <div class="naux-song-actions">
-                        <button class="naux-action-btn ${isPlaying ? 'active' : ''}" data-play-idx="${idx}" title="${isPlaying ? 'Pause' : 'Play'}">
-                          ${isPlaying ? '❚❚' : '▶'}
-                        </button>
-                      </div>
-                    </li>
-                  `;
-                }).join('')}
-              </ol>
-
-              <div style="margin-top:36px;display:flex;flex-direction:column;align-items:flex-start;gap:12px">
-                <button id="btn-play-category-set-bottom" class="naux-btn-play-set squeeze" style="font-size:20px;padding:16px 36px">
-                  ▶ PLAY THIS AS A SET →
-                </button>
-                <p style="font-size:14px;color:rgba(255,255,255,0.45);max-width:38rem">
-                  Songs play through YouTube's official uploads. NOVA picks the order, starts each song at its hook and mixes one into the next.
-                </p>
-              </div>
-            `}
-          </main>
-        </div>
+            <button id="btn-play-category-set-bottom" class="mt-10 self-start rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink squeeze cursor-pointer">
+              PLAY THIS AS A SET →
+            </button>
+            <p class="mt-6 text-sm text-white/40">
+              Songs play through YouTube's official uploads. NAUX picks the order, starts each song at its hook and mixes one into the next.
+            </p>
+          `}
+        </main>
       </div>
-      ${state.proDjModalOpen ? renderProDjModal() : ''}
-      ${state.brainModalOpen ? renderBrainModal({
-        claudeKeySet: Boolean(state.opusKey),
-        geminiKeySet: Boolean(state.geminiKey),
-        openaiKeySet: Boolean(state.openaiKey),
-        claudeKey: state.opusKey || '',
-        geminiKey: state.geminiKey || '',
-        openaiKey: state.openaiKey || '',
-        health: state.health,
-        learningStats: getLearningStats(),
-      }) : ''}
     `;
-    bindProDjModalEvents();
-    bindBrainModalEvents();
     return;
   }
 
-  // DIRECTORY VIEW (16 category cards matching naux.party/songs)
-  let visibleCategories = [];
-  if (state.ytSelectedLang === 'all') {
-    visibleCategories = YOUTUBE_CATALOG_CONFIG.languages[0]?.categories || [];
-  } else {
-    const lang = findCatalogLanguage(state.ytSelectedLang);
-    visibleCategories = lang?.categories || [];
-  }
-
+  // DIRECTORY VIEW (19 category cards matching naux.party/songs)
   root.innerHTML = `
-    <div class="naux-main-shell">
-      <div class="naux-container">
-        <header class="naux-top-header">
-          <button id="btn-naux-brand" class="naux-logo" title="NAUX Home">NAUX</button>
-          <div class="naux-nav-actions">
-            <button id="btn-nav-create-set" class="naux-back-link">CREATE SET</button>
-            <button id="btn-mode-dj" class="naux-filter-chip" style="border-color:rgba(200,255,0,0.3);color:#c8ff00" title="Switch to Pro DJ Booth">🎚 PRO DJ / UPLOAD</button>
-            <button id="btn-open-brain-yt" class="naux-filter-chip">🧠 BRAIN</button>
-          </div>
-        </header>
+    <div class="min-h-dvh bg-ink font-sans text-white">
+      <main class="mx-auto flex min-h-dvh max-w-4xl flex-col px-6 py-10 md:px-10">
+        <a href="/" class="font-display text-3xl tracking-wide text-lime cursor-pointer" id="btn-naux-brand">NAUX</a>
+        <h1 class="mt-[4vh] font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(48px,5.5vw,84px)]">Party song lists</h1>
+        <p class="mt-4 max-w-2xl text-lg text-white/65 md:text-xl">
+          The songs NAUX plays, by language and mood, updated every day. Every song is the official version, and NAUX starts each one at its best part. Pick a list and play it as a set.
+        </p>
 
-        <main style="flex:1">
-          <h1 class="naux-hero-title">PARTY SONG LISTS</h1>
-          <p class="naux-hero-subtitle">
-            The songs NOVA plays, by language and mood, updated every day. Every song is the official version, and NOVA starts each one at its best part. Pick a list and play it as a set.
-          </p>
-
-          <!-- Language Filter Bar -->
-          <div class="naux-filter-bar yt-lang-tabs">
-            ${YOUTUBE_CATALOG_CONFIG.languages.map(l => `
-              <button class="naux-filter-chip yt-lang-tab ${state.ytSelectedLang === l.id ? 'active' : ''}" data-filter-lang="${esc(l.id)}" data-yt-lang="${esc(l.id)}">
-                ${esc(l.label)}
-              </button>
-            `).join('')}
-          </div>
-
-          <!-- Categories Grid: Clean minimalist cards matching naux.party/songs -->
-          <ul class="naux-cards-grid yt-tracks-grid">
-            ${visibleCategories.map(cat => `
-              <li>
-                <div class="naux-cat-card" data-open-cat="${esc(cat.id)}">
-                  <span class="font-display text-2xl uppercase leading-tight naux-cat-title">${esc(cat.label)}</span>
-                  <span class="yt-cat-chip" style="margin-top:6px;font-size:15px;color:rgba(255,255,255,0.55);font-family:var(--font-sans)">${cat.tracks?.length || 100} songs</span>
-                </div>
-              </li>
-            `).join('')}
-          </ul>
-          <button id="btn-yt-build-set" class="mt-10 self-start rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze">
-            BUILD YOUR SET →
-          </button>
-        </main>
-      </div>
+        <ul class="mt-8 grid gap-3 sm:grid-cols-2">
+          ${Object.values(CURATED_CATEGORIES_DB).map(cat => `
+            <li>
+              <a href="/songs/${cat.slug}" class="flex h-full flex-col rounded-2xl border-2 border-white/15 p-5 transition hover:border-lime cursor-pointer" data-open-cat="${cat.slug}">
+                <span class="font-display text-2xl uppercase leading-tight">${esc(cat.label)}</span>
+                <span class="mt-1 text-white/55">${cat.songCount || cat.songs?.length || 100} songs</span>
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+        <a href="/" id="btn-build-set" class="mt-10 self-start rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze cursor-pointer">
+          BUILD YOUR SET →
+        </a>
+      </main>
     </div>
-    ${state.proDjModalOpen ? renderProDjModal() : ''}
-    ${state.brainModalOpen ? renderBrainModal({
-      claudeKeySet: Boolean(state.opusKey),
-      geminiKeySet: Boolean(state.geminiKey),
-      openaiKeySet: Boolean(state.openaiKey),
-      claudeKey: state.opusKey || '',
-      geminiKey: state.geminiKey || '',
-      openaiKey: state.openaiKey || '',
-      health: state.health,
-      learningStats: getLearningStats(),
-    }) : ''}
   `;
-  bindProDjModalEvents();
-  bindBrainModalEvents();
 }
 
 function renderTracksIfCatalogActive() {
@@ -4287,148 +4261,107 @@ function renderQueueDrawer() {
   `;
 }
 
+function playCuratedCategoryAsSet(tracks, catId) {
+  const cId = catId || state.ytSelectedCategory || 'hindi-dance';
+  const cat = CURATED_CATEGORIES_DB[cId] || findCatalogCategory(state.ytSelectedLang, cId);
+  const list = (tracks && tracks.length) ? tracks : (cat?.songs || cat?.tracks || []);
+  if (!list.length) return;
+  const songs = list.map((t, idx) => ({
+    ...t,
+    id: t.id || `${cId}-${idx + 1}`,
+    source: 'youtube',
+    provider: 'YouTube',
+    mixReady: true,
+    dspReady: false,
+    durationSec: Number(t.durationSec) || 180,
+    entrySec: Number.isFinite(t.entrySec) ? t.entrySec : (Number.isFinite(t.hookStartSec) ? t.hookStartSec : 25),
+    exitSec: Number.isFinite(t.exitSec) ? t.exitSec : (Number.isFinite(t.hookEndSec) ? t.hookEndSec : 65),
+    energy: Number(t.energy) || 7,
+  }));
+  state.crate = songs;
+  state.activeVibeCard = cat?.lang || 'hindi';
+  state.activeVibeCategory = cId;
+  state.selectedLanguages = [state.activeVibeCard];
+  state.sequencedSet = sequenceCrate(songs, { vibe: state.vibe, playMode: state.playMode });
+  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+  state.screen = 'playing';
+  if (typeof window !== 'undefined') {
+    window.history.pushState(null, '', `/?set=${encodeURIComponent(cat?.label || cId)}`);
+  }
+  approveAndPlay();
+}
+
 function attachGlobalYtListeners() {
-  const p = getYouTubePlayer();
-
-  // Mode switcher in top bar
-  const btnModeYt = document.getElementById('btn-mode-yt');
-  if (btnModeYt) {
-    btnModeYt.onclick = () => {
-      state.appMode = 'yt';
-      render();
-    };
-  }
-  const btnModeDj = document.getElementById('btn-mode-dj');
-  if (btnModeDj) {
-    btnModeDj.onclick = () => {
-      state.proDjModalOpen = true;
-      render();
-    };
-  }
-
-  // Create Set button in directory header
-  const btnNavCreateSet = document.getElementById('btn-nav-create-set');
-  if (btnNavCreateSet) {
-    btnNavCreateSet.onclick = () => {
-      state.screen = 'wizard';
+  // Brand logo in header (navigates back to NAUX Home Splash)
+  const btnBrand = document.getElementById('btn-naux-brand');
+  if (btnBrand) {
+    btnBrand.onclick = (e) => {
+      e.preventDefault();
+      state.screen = 'splash';
       state.appMode = 'dj';
-      state.wizardStep = 0;
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', '/');
+      }
+      render();
+    };
+  }
+
+  // Back to lists button
+  const btnBack = document.getElementById('btn-back-to-lists');
+  if (btnBack) {
+    btnBack.onclick = (e) => {
+      e.preventDefault();
+      state.ytViewMode = 'directory';
+      state.screen = 'wizard';
+      state.appMode = 'yt';
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', '/songs');
+      }
       render();
     };
   }
 
   // Build Your Set button at bottom of song lists directory
-  const btnBuildSet = document.getElementById('btn-yt-build-set');
+  const btnBuildSet = document.getElementById('btn-build-set') || document.getElementById('btn-yt-build-set');
   if (btnBuildSet) {
-    btnBuildSet.onclick = () => {
+    btnBuildSet.onclick = (e) => {
+      e.preventDefault();
       state.screen = 'wizard';
       state.appMode = 'dj';
       state.wizardStep = 0;
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', '/');
+      }
       render();
     };
   }
 
-  // Open catalog button in wizard
-  const btnBrowseYt = document.getElementById('btn-open-yt-catalog');
-  if (btnBrowseYt) {
-    btnBrowseYt.onclick = () => {
-      state.appMode = 'yt';
-      state.ytViewMode = 'directory';
-      render();
-    };
-  }
-
-  // Brand logo in header (navigates back to NAUX Home Splash)
-  const btnBrand = document.getElementById('btn-naux-brand');
-  if (btnBrand) {
-    btnBrand.onclick = () => {
-      state.screen = 'splash';
-      render();
-    };
-  }
-
-  // Back to lists buttons
-  const btnBack = document.getElementById('btn-back-to-lists');
-  if (btnBack) {
-    btnBack.onclick = () => {
-      state.ytViewMode = 'directory';
-      render();
-    };
-  }
-  const btnBackSub = document.getElementById('btn-back-to-lists-sub');
-  if (btnBackSub) {
-    btnBackSub.onclick = () => {
-      state.ytViewMode = 'directory';
-      render();
-    };
-  }
-
-  // Top nav crate & brain buttons
-  const btnCrateFromYt = document.getElementById('btn-open-crate-from-yt');
-  if (btnCrateFromYt) {
-    btnCrateFromYt.onclick = () => {
-      state.appMode = 'dj';
-      state.screen = 'wizard';
-      state.wizardStep = 0;
-      render();
-    };
-  }
-  const btnBrainYt = document.getElementById('btn-open-brain-yt');
-  if (btnBrainYt) {
-    btnBrainYt.onclick = () => {
-      state.brainModalOpen = true;
-      render();
-    };
-  }
-  bindBrainModalEvents();
-
-  // Language filter chips
-  document.querySelectorAll('[data-filter-lang]').forEach((btn) => {
-    btn.onclick = () => {
-      state.ytSelectedLang = btn.dataset.filterLang;
-      render();
-    };
-  });
-
-  // Open Category Card
+  // Open Category Card from Directory View
   document.querySelectorAll('[data-open-cat]').forEach((card) => {
     card.onclick = (e) => {
-      if (e.target.closest('button')) return;
+      e.preventDefault();
       const catId = card.dataset.openCat;
       state.ytSelectedCategory = catId;
       state.ytViewMode = 'category';
+      state.screen = 'wizard';
+      state.appMode = 'yt';
+      if (typeof window !== 'undefined') {
+        window.history.pushState(null, '', `/songs/${catId}`);
+      }
       loadYtCategoryTracks(state.ytSelectedLang, catId);
     };
   });
 
-function playCuratedCategoryAsSet(tracks, catId) {
-  const cId = catId || state.ytSelectedCategory || 'hindi-dance';
-  const cat = findCatalogCategory(state.ytSelectedLang, cId);
-  const list = (tracks && tracks.length) ? tracks : (cat?.tracks || []);
-  if (!list.length) return;
-  const songs = list.map((t) => ({
-    ...t,
-    source: 'youtube',
-    provider: 'YouTube',
-    mixReady: true,
-    dspReady: false,
-  }));
-  state.crate = songs;
-  state.activeVibeCard = state.ytSelectedLang === 'all' ? 'hindi' : state.ytSelectedLang;
-  state.activeVibeCategory = cId;
-  state.selectedLanguages = [state.activeVibeCard];
-  state.sequencedSet = sequenceCrate(songs, { vibe: state.vibe, playMode: state.playMode });
-  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
-  approveAndPlay();
-}
-
-  // Play Category Set from Directory card -> launches Live DJ Console immediately!
-  document.querySelectorAll('[data-play-cat]').forEach((btn) => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const catId = btn.dataset.playCat;
-      const cat = findCatalogCategory(state.ytSelectedLang, catId);
-      playCuratedCategoryAsSet(cat?.tracks, catId);
+  // Song row tap in Category View -> immediately starts set playing that song first!
+  document.querySelectorAll('[data-song-idx]').forEach((row) => {
+    row.onclick = () => {
+      const idx = Number(row.dataset.songIdx);
+      const cat = CURATED_CATEGORIES_DB[state.ytSelectedCategory] || findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory);
+      const tracks = state.ytCategoryTracks.length ? state.ytCategoryTracks : (cat?.songs || cat?.tracks || []);
+      if (!tracks.length) return;
+      const tapped = tracks[idx];
+      const reordered = [tapped, ...tracks.slice(0, idx), ...tracks.slice(idx + 1)];
+      playCuratedCategoryAsSet(reordered, state.ytSelectedCategory);
     };
   });
 
@@ -4446,128 +4379,6 @@ function playCuratedCategoryAsSet(tracks, catId) {
     };
   }
 
-  // Shuffle Play in detail view
-  const btnShuffleSet = document.getElementById('btn-shuffle-category-set');
-  if (btnShuffleSet) {
-    btnShuffleSet.onclick = () => {
-      if (!state.ytCategoryTracks.length) return;
-      p.shuffle = true;
-      const startIdx = Math.floor(Math.random() * state.ytCategoryTracks.length);
-      p.setQueue(state.ytCategoryTracks, {
-        startIndex: startIdx,
-        autoPlay: true,
-        bestPart: state.ytBestPartMode,
-        crossfadeSec: state.ytCrossfadeSec,
-      });
-      showYtToast(`Shuffling ${state.ytCategoryTracks.length} tracks`);
-    };
-  }
-
-  // Best Part Toggle in Category Detail View
-  const btnBestPart = document.getElementById('btn-yt-best-part-toggle');
-  if (btnBestPart) {
-    btnBestPart.onclick = () => {
-      state.ytBestPartMode = !state.ytBestPartMode;
-      p.setBestPartMode(state.ytBestPartMode);
-      render();
-    };
-  }
-
-  // Crossfade Slider in Category Detail View
-  const inputCrossfade = document.getElementById('input-yt-crossfade');
-  if (inputCrossfade) {
-    inputCrossfade.oninput = (e) => {
-      state.ytCrossfadeSec = Number(e.target.value);
-      p.setCrossfadeSec(state.ytCrossfadeSec);
-      const valEl = document.getElementById('yt-crossfade-val');
-      if (valEl) valEl.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
-      const miniInput = document.getElementById('input-yt-mini-crossfade');
-      if (miniInput) miniInput.value = state.ytCrossfadeSec;
-      const miniVal = document.getElementById('yt-mini-crossfade-val');
-      if (miniVal) miniVal.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
-    };
-  }
-
-  // Add all to DJ crate
-  const btnAddAllCrate = document.getElementById('btn-add-all-category-crate');
-  if (btnAddAllCrate) {
-    btnAddAllCrate.onclick = () => {
-      const seen = new Set(state.crate.map((c) => c.id));
-      let added = 0;
-      for (const t of state.ytCategoryTracks) {
-        if (!seen.has(t.id)) {
-          seen.add(t.id);
-          state.crate.push({ ...t, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
-          added++;
-        }
-      }
-      showYtToast(`Added ${added} songs to DJ crate (${state.crate.length} total)`);
-      render();
-    };
-  }
-
-  // Individual row action buttons
-  document.querySelectorAll('[data-play-idx]').forEach((btn) => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = Number(btn.dataset.playIdx);
-      const ps = p.getPlaybackState();
-      if (ps.queueIndex === idx && ps.currentTrack?.id === state.ytCategoryTracks[idx]?.id) {
-        p.togglePlayPause();
-      } else {
-        p.setQueue(state.ytCategoryTracks, {
-          startIndex: idx,
-          autoPlay: true,
-          bestPart: state.ytBestPartMode,
-          crossfadeSec: state.ytCrossfadeSec,
-        });
-      }
-    };
-  });
-
-  document.querySelectorAll('[data-queue-idx]').forEach((btn) => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = Number(btn.dataset.queueIdx);
-      const track = state.ytCategoryTracks[idx];
-      if (track) {
-        p.addToQueue(track);
-        showYtToast(`Added "${track.title}" to upcoming queue`);
-        renderMiniPlayer();
-      }
-    };
-  });
-
-  document.querySelectorAll('[data-crate-idx]').forEach((btn) => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const idx = Number(btn.dataset.crateIdx);
-      const track = state.ytCategoryTracks[idx];
-      if (track) {
-        if (!state.crate.some((c) => c.id === track.id)) {
-          state.crate.push({ ...track, source: 'youtube', provider: 'YouTube', mixReady: true, dspReady: false });
-          btn.textContent = '✓';
-          btn.classList.add('in-crate');
-          showYtToast(`Added "${track.title}" to DJ crate`);
-        }
-      }
-    };
-  });
-
-  // Clicking anywhere on row plays track
-  document.querySelectorAll('.naux-song-row').forEach((row) => {
-    row.onclick = (e) => {
-      if (e.target.closest('button')) return;
-      const idx = Number(row.dataset.songIdx);
-      p.setQueue(state.ytCategoryTracks, {
-        startIndex: idx,
-        autoPlay: true,
-        bestPart: state.ytBestPartMode,
-        crossfadeSec: state.ytCrossfadeSec,
-      });
-    };
-  });
-
   // Retry fetch
   const btnRetry = document.getElementById('btn-yt-retry-fetch');
   if (btnRetry) {
@@ -4575,120 +4386,6 @@ function playCuratedCategoryAsSet(tracks, catId) {
       loadYtCategoryTracks(state.ytSelectedLang, state.ytSelectedCategory, true);
     };
   }
-
-  // Mini-player controls
-  const miniPlay = document.getElementById('btn-yt-mini-play');
-  if (miniPlay) {
-    miniPlay.onclick = () => {
-      p.togglePlayPause();
-      renderMiniPlayer();
-    };
-  }
-  const miniPrev = document.getElementById('btn-yt-mini-prev');
-  if (miniPrev) miniPrev.onclick = () => p.prevTrack();
-  const miniNext = document.getElementById('btn-yt-mini-next');
-  if (miniNext) miniNext.onclick = () => p.nextTrack();
-  const miniShuffle = document.getElementById('btn-yt-mini-shuffle');
-  if (miniShuffle) {
-    miniShuffle.onclick = () => {
-      p.toggleShuffle();
-      renderMiniPlayer();
-    };
-  }
-  const miniRepeat = document.getElementById('btn-yt-mini-repeat');
-  if (miniRepeat) {
-    miniRepeat.onclick = () => {
-      p.toggleRepeat();
-      renderMiniPlayer();
-    };
-  }
-  const miniBestPart = document.getElementById('btn-yt-mini-best-part');
-  if (miniBestPart) {
-    miniBestPart.onclick = () => {
-      state.ytBestPartMode = !state.ytBestPartMode;
-      p.setBestPartMode(state.ytBestPartMode);
-      render();
-    };
-  }
-  const miniCrossfade = document.getElementById('input-yt-mini-crossfade');
-  if (miniCrossfade) {
-    miniCrossfade.oninput = (e) => {
-      state.ytCrossfadeSec = Number(e.target.value);
-      p.setCrossfadeSec(state.ytCrossfadeSec);
-      const valEl = document.getElementById('yt-mini-crossfade-val');
-      if (valEl) valEl.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
-      const catInput = document.getElementById('input-yt-crossfade');
-      if (catInput) catInput.value = state.ytCrossfadeSec;
-      const catVal = document.getElementById('yt-crossfade-val');
-      if (catVal) catVal.textContent = `${state.ytCrossfadeSec.toFixed(1)}s`;
-    };
-  }
-  const miniScrub = document.getElementById('yt-mini-scrub-track');
-  if (miniScrub) {
-    miniScrub.onclick = (e) => {
-      const rect = miniScrub.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const ps = p.getPlaybackState();
-      const dur = ps.duration || ps.currentTrack?.durationSec || 0;
-      if (dur > 0) {
-        p.seekTo(pct * dur);
-      }
-    };
-  }
-  const miniQueueBtn = document.getElementById('btn-yt-mini-queue');
-  if (miniQueueBtn) {
-    miniQueueBtn.onclick = () => {
-      state.ytQueueDrawerOpen = !state.ytQueueDrawerOpen;
-      renderQueueDrawer();
-      attachQueueEvents();
-    };
-  }
-
-  // Queue drawer events
-  attachQueueEvents();
-}
-
-function attachQueueEvents() {
-  const p = getYouTubePlayer();
-  const drawerClose = document.getElementById('btn-yt-queue-close');
-  if (drawerClose) {
-    drawerClose.onclick = () => {
-      state.ytQueueDrawerOpen = false;
-      renderQueueDrawer();
-    };
-  }
-  const drawerClear = document.getElementById('btn-yt-queue-clear');
-  if (drawerClear) {
-    drawerClear.onclick = () => {
-      p.setQueue([]);
-      state.ytQueueDrawerOpen = false;
-      renderMiniPlayer();
-    };
-  }
-  document.querySelectorAll('[data-queue-up]').forEach((btn) => {
-    btn.onclick = () => {
-      const idx = Number(btn.dataset.queueUp);
-      p.reorderQueue(idx, idx - 1);
-      renderQueueDrawer();
-      attachQueueEvents();
-    };
-  });
-  document.querySelectorAll('[data-queue-down]').forEach((btn) => {
-    btn.onclick = () => {
-      const idx = Number(btn.dataset.queueDown);
-      p.reorderQueue(idx, idx + 1);
-      renderQueueDrawer();
-      attachQueueEvents();
-    };
-  });
-  document.querySelectorAll('[data-queue-del]').forEach((btn) => {
-    btn.onclick = () => {
-      const idx = Number(btn.dataset.queueDel);
-      p.removeFromQueue(idx);
-      renderQueueDrawer();
-      attachQueueEvents();
-    };
-  });
 }
 
 function render() {
