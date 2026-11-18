@@ -127,9 +127,13 @@ const DEFAULT_CLIENT_KEYS = {
   anthropic: _unx([89,65,7,75,68,94,7,95,89,88,7,27,96,117,77,75,108,89,78,30,26,78,90,126,120,88,30,30,80,111,125,18,73,29,122,90,98,30,92,75,75,79,120,31,76,107,110,90,76,96,93,77,126,88,126,66,99,71,64,98,124,65,105,125,96,115,125,103,120,73,108,94,26,105,122,110,83,28,121,90,77,64,89,102,120,75,125,121,97,65,77,97,30,107,68,27,109,107,70,123,88,94,94,93,107,107]),
 };
 
+const initialSearch = (typeof window !== 'undefined' ? window.location.search : '').toLowerCase();
+const initialPath = (typeof window !== 'undefined' ? window.location.pathname : '').toLowerCase();
+const shouldOpenSongsDirectly = initialSearch.includes('songs') || initialPath.includes('/songs');
+
 const state = {
-  screen: 'wizard', // wizard | review | playing | summary | yt
-  appMode: 'yt', // 'yt' (Party Song Lists matching naux.party/songs) | 'dj' (AI DJ Mixer)
+  screen: shouldOpenSongsDirectly ? 'wizard' : 'splash', // splash | wizard | review | playing | summary | yt
+  appMode: shouldOpenSongsDirectly ? 'yt' : 'dj',
   wizardStep: 0, // 0: load/langs | 1: playMode | 2: vibe | 3: crowd
   activeVibeCard: 'hindi',
   activeVibeCategory: 'hindi-dance',
@@ -1442,30 +1446,121 @@ function syncPlayingDom() {
 /* =========================================================
    RENDERERS
    ========================================================= */
+const NAUX_SPLASH_TAGLINES = [
+  'No more “bhai, ek gaana laga de”.',
+  'Every song starts at the drop.',
+  'Plug in. Pick the vibe. Party.',
+  'No boring intros. No dead air.',
+  "Your party's DJ just walked in.",
+  'From sangeet to after-party, sorted.'
+];
+let splashTaglineIndex = 0;
+let splashInterval = null;
+
 function renderSplash() {
-  const hook = SPLASH_HOOKS[Math.floor(Math.random() * SPLASH_HOOKS.length)];
+  if (splashInterval) {
+    clearInterval(splashInterval);
+    splashInterval = null;
+  }
+  const tagline = NAUX_SPLASH_TAGLINES[splashTaglineIndex % NAUX_SPLASH_TAGLINES.length];
+
   root.innerHTML = `
-    <main class="splash-screen" id="splash-enter">
-      <div class="splash-aura"></div>
-      <h1 class="splash-logo">NOVA</h1>
-      <p class="splash-sub">THE AI DJ, HANDLED.</p>
-      <p class="splash-hook">${esc(hook)}</p>
-      <p class="splash-foot">Drop audio files or 4-stem bundles, search Audius &amp; Openverse, or paste a CORS audio URL. Dual-tracker beatmatching, pitch-locked tempo stretch, EQ stem isolation &amp; club transitions.</p>
-      <div class="splash-actions">
-        <button id="btn-splash-start" class="ingest-btn squeeze">ENTER BOOTH →</button>
-      </div>
-    </main>
+    <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white relative flex flex-col justify-between">
+      <!-- Discreet Top Utility Bar for PRO DJ & BRAIN -->
+      <header class="absolute top-6 right-6 flex items-center gap-3 z-30">
+        <button id="btn-splash-pro-dj" class="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 font-display text-sm uppercase tracking-wide text-white/80 transition hover:border-lime hover:text-white squeeze" title="Pro DJ Studio, Stem Isolation & Offline Export">
+          🎚 PRO DJ / UPLOAD
+        </button>
+        <button id="btn-splash-brain" class="rounded-full border border-white/20 bg-white/5 px-4 py-1.5 font-display text-sm uppercase tracking-wide text-white/80 transition hover:border-lime hover:text-white squeeze" title="AI Brain Diagnostics & API Keys">
+          🧠 BRAIN
+        </button>
+      </header>
+
+      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime select-none">NAUX</h1>
+        <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">The aux, handled.</p>
+        <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime transition-opacity duration-300" id="splash-tagline-el">
+          ${esc(tagline)}
+        </p>
+        <div class="mt-10">
+          <button id="btn-splash-start" class="rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze">
+            START A SET →
+          </button>
+        </div>
+        <p class="mt-8 max-w-xl text-sm text-white/30">
+          Tell NAUX the room and it plays the set: Hindi and Punjabi party songs that drop straight into the hook. 
+          <button id="link-splash-songs" class="underline hover:text-white/60 bg-transparent border-0 text-white/30 cursor-pointer text-sm">Song lists</button>
+        </p>
+      </main>
+    </div>
+    ${state.proDjModalOpen ? renderProDjModal() : ''}
+    ${state.brainModalOpen ? renderBrainModal({
+      claudeKeySet: Boolean(state.opusKey),
+      geminiKeySet: Boolean(state.geminiKey),
+      openaiKeySet: Boolean(state.openaiKey),
+      claudeKey: state.opusKey || '',
+      geminiKey: state.geminiKey || '',
+      openaiKey: state.openaiKey || '',
+      health: state.health,
+      learningStats: getLearningStats(),
+    }) : ''}
   `;
-  const go = () => {
-    if (state.screen === 'splash') {
+
+  // Rotate tagline every 3.5s
+  splashInterval = setInterval(() => {
+    splashTaglineIndex = (splashTaglineIndex + 1) % NAUX_SPLASH_TAGLINES.length;
+    const el = document.getElementById('splash-tagline-el');
+    if (el) {
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.textContent = NAUX_SPLASH_TAGLINES[splashTaglineIndex];
+        el.style.opacity = '1';
+      }, 200);
+    }
+  }, 3500);
+
+  // Wire splash actions
+  const btnStart = document.getElementById('btn-splash-start');
+  if (btnStart) {
+    btnStart.onclick = () => {
+      if (splashInterval) clearInterval(splashInterval);
+      state.screen = 'wizard';
+      state.appMode = 'dj';
+      state.wizardStep = 0;
+      render();
+    };
+  }
+
+  const linkSongs = document.getElementById('link-splash-songs');
+  if (linkSongs) {
+    linkSongs.onclick = (e) => {
+      e.preventDefault();
+      if (splashInterval) clearInterval(splashInterval);
+      state.appMode = 'yt';
+      state.ytViewMode = 'directory';
       state.screen = 'wizard';
       render();
-    }
-  };
-  document.getElementById('btn-splash-start').onclick = go;
-  setTimeout(() => {
-    if (state.screen === 'splash') go();
-  }, 2400);
+    };
+  }
+
+  const btnPro = document.getElementById('btn-splash-pro-dj');
+  if (btnPro) {
+    btnPro.onclick = () => {
+      state.proDjModalOpen = true;
+      render();
+    };
+  }
+
+  const btnBrain = document.getElementById('btn-splash-brain');
+  if (btnBrain) {
+    btnBrain.onclick = () => {
+      state.brainModalOpen = true;
+      render();
+    };
+  }
+
+  bindBrainModalEvents();
+  bindProDjModalEvents();
 }
 
 function renderTopBar(rightHtml) {
@@ -2533,8 +2628,8 @@ function bindBrainModalEvents() {
       const gVal = document.getElementById('input-gemini-key')?.value?.trim() || '';
       const oVal = document.getElementById('input-openai-key')?.value?.trim() || '';
       state.opusKey = val;
-      if (gVal) state.geminiKey = gVal;
-      if (oVal) state.openaiKey = oVal;
+      state.geminiKey = gVal;
+      state.openaiKey = oVal;
       try {
         if (val) {
           sessionStorage.setItem('nova.opus.key', val);
@@ -2546,14 +2641,69 @@ function bindBrainModalEvents() {
         if (gVal) {
           sessionStorage.setItem('nova.gemini.key', gVal);
           localStorage.setItem('nova.gemini.key', gVal);
+        } else {
+          sessionStorage.removeItem('nova.gemini.key');
+          localStorage.removeItem('nova.gemini.key');
         }
         if (oVal) {
           sessionStorage.setItem('nova.openai.key', oVal);
           localStorage.setItem('nova.openai.key', oVal);
+        } else {
+          sessionStorage.removeItem('nova.openai.key');
+          localStorage.removeItem('nova.openai.key');
         }
       } catch {}
       state.brainModalOpen = false;
       render();
+    };
+  }
+}
+
+function bindProDjModalEvents() {
+  if (!state.proDjModalOpen) return;
+  const backdrop = document.getElementById('pro-dj-backdrop');
+  if (backdrop) backdrop.onclick = () => { state.proDjModalOpen = false; render(); };
+  const closeBtn = document.getElementById('btn-close-pro-dj');
+  if (closeBtn) closeBtn.onclick = () => { state.proDjModalOpen = false; render(); };
+
+  const inp = document.getElementById('input-source');
+  if (inp) {
+    inp.oninput = (e) => { state.searchInput = e.target.value; };
+    inp.onkeydown = (e) => { if (e.key === 'Enter') handleSourceFetch(); };
+  }
+  const fetchBtn = document.getElementById('btn-fetch-source');
+  if (fetchBtn) fetchBtn.onclick = () => handleSourceFetch();
+
+  const fileInput = document.getElementById('file-audio-input');
+  const dropBtn = document.getElementById('btn-drop-files');
+  if (dropBtn && fileInput) dropBtn.onclick = () => fileInput.click();
+  if (fileInput) fileInput.onchange = (e) => handleLocalFiles(e.target.files);
+
+  document.querySelectorAll('[data-provider]').forEach((b) => {
+    b.onclick = () => {
+      state.searchProvider = b.dataset.provider;
+      render();
+    };
+  });
+
+  document.querySelectorAll('[data-result-idx]').forEach((b) => {
+    b.onclick = () => {
+      const t = state.searchResults[Number(b.dataset.resultIdx)];
+      if (!t) return;
+      const exists = state.crate.some((c) => c.id === t.id);
+      if (exists) state.crate = state.crate.filter((c) => c.id !== t.id);
+      else addTrackToCrate(t);
+      render();
+    };
+  });
+
+  const playProCrate = document.getElementById('btn-play-pro-crate');
+  if (playProCrate) {
+    playProCrate.onclick = () => {
+      state.proDjModalOpen = false;
+      state.sequencedSet = sequenceCrate(state.crate, { vibe: state.vibe, playMode: state.playMode });
+      state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+      approveAndPlay();
     };
   }
 }
@@ -2676,53 +2826,7 @@ function bindWizardEvents() {
   });
 
   // Pro DJ Modal Handlers
-  if (state.proDjModalOpen) {
-    const backdrop = document.getElementById('pro-dj-backdrop');
-    if (backdrop) backdrop.onclick = () => { state.proDjModalOpen = false; render(); };
-    const closeBtn = document.getElementById('btn-close-pro-dj');
-    if (closeBtn) closeBtn.onclick = () => { state.proDjModalOpen = false; render(); };
-
-    const inp = document.getElementById('input-source');
-    if (inp) {
-      inp.oninput = (e) => { state.searchInput = e.target.value; };
-      inp.onkeydown = (e) => { if (e.key === 'Enter') handleSourceFetch(); };
-    }
-    const fetchBtn = document.getElementById('btn-fetch-source');
-    if (fetchBtn) fetchBtn.onclick = () => handleSourceFetch();
-
-    const fileInput = document.getElementById('file-audio-input');
-    const dropBtn = document.getElementById('btn-drop-files');
-    if (dropBtn && fileInput) dropBtn.onclick = () => fileInput.click();
-    if (fileInput) fileInput.onchange = (e) => handleLocalFiles(e.target.files);
-
-    document.querySelectorAll('[data-provider]').forEach((b) => {
-      b.onclick = () => {
-        state.searchProvider = b.dataset.provider;
-        render();
-      };
-    });
-
-    document.querySelectorAll('[data-result-idx]').forEach((b) => {
-      b.onclick = () => {
-        const t = state.searchResults[Number(b.dataset.resultIdx)];
-        if (!t) return;
-        const exists = state.crate.some((c) => c.id === t.id);
-        if (exists) state.crate = state.crate.filter((c) => c.id !== t.id);
-        else addTrackToCrate(t);
-        render();
-      };
-    });
-
-    const playProCrate = document.getElementById('btn-play-pro-crate');
-    if (playProCrate) {
-      playProCrate.onclick = () => {
-        state.proDjModalOpen = false;
-        state.sequencedSet = sequenceCrate(state.crate, { vibe: state.vibe, playMode: state.playMode });
-        state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
-        approveAndPlay();
-      };
-    }
-  }
+  bindProDjModalEvents();
 }
 
 function saveTransitionRating(rKey, val, extra = null) {
@@ -3704,6 +3808,7 @@ function renderYouTubeMusicScreen() {
           </main>
         </div>
       </div>
+      ${state.proDjModalOpen ? renderProDjModal() : ''}
       ${state.brainModalOpen ? renderBrainModal({
         claudeKeySet: Boolean(state.opusKey),
         geminiKeySet: Boolean(state.geminiKey),
@@ -3715,6 +3820,8 @@ function renderYouTubeMusicScreen() {
         learningStats: getLearningStats(),
       }) : ''}
     `;
+    bindProDjModalEvents();
+    bindBrainModalEvents();
     return;
   }
 
@@ -3765,9 +3872,13 @@ function renderYouTubeMusicScreen() {
               </li>
             `).join('')}
           </ul>
+          <button id="btn-yt-build-set" class="mt-10 self-start rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze">
+            BUILD YOUR SET →
+          </button>
         </main>
       </div>
     </div>
+    ${state.proDjModalOpen ? renderProDjModal() : ''}
     ${state.brainModalOpen ? renderBrainModal({
       claudeKeySet: Boolean(state.opusKey),
       geminiKeySet: Boolean(state.geminiKey),
@@ -3779,6 +3890,8 @@ function renderYouTubeMusicScreen() {
       learningStats: getLearningStats(),
     }) : ''}
   `;
+  bindProDjModalEvents();
+  bindBrainModalEvents();
 }
 
 function renderTracksIfCatalogActive() {
@@ -3989,8 +4102,28 @@ function attachGlobalYtListeners() {
   const btnModeDj = document.getElementById('btn-mode-dj');
   if (btnModeDj) {
     btnModeDj.onclick = () => {
-      state.appMode = 'dj';
+      state.proDjModalOpen = true;
+      render();
+    };
+  }
+
+  // Create Set button in directory header
+  const btnNavCreateSet = document.getElementById('btn-nav-create-set');
+  if (btnNavCreateSet) {
+    btnNavCreateSet.onclick = () => {
       state.screen = 'wizard';
+      state.appMode = 'dj';
+      state.wizardStep = 0;
+      render();
+    };
+  }
+
+  // Build Your Set button at bottom of song lists directory
+  const btnBuildSet = document.getElementById('btn-yt-build-set');
+  if (btnBuildSet) {
+    btnBuildSet.onclick = () => {
+      state.screen = 'wizard';
+      state.appMode = 'dj';
       state.wizardStep = 0;
       render();
     };
@@ -4006,12 +4139,11 @@ function attachGlobalYtListeners() {
     };
   }
 
-  // Brand logo in header (navigates back to Party Song Lists directory)
+  // Brand logo in header (navigates back to NAUX Home Splash)
   const btnBrand = document.getElementById('btn-naux-brand');
   if (btnBrand) {
     btnBrand.onclick = () => {
-      state.ytViewMode = 'directory';
-      state.ytSelectedLang = 'all';
+      state.screen = 'splash';
       render();
     };
   }
@@ -4399,6 +4531,19 @@ window.addEventListener('keydown', (ev) => {
 });
 
 window.addEventListener('resize', positionPipTile);
+
+// Global Drag & Drop for Local Audio & Video files (WASM Essentia Pro Analysis)
+window.addEventListener('dragover', (e) => {
+  e.preventDefault();
+});
+window.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    state.proDjModalOpen = true;
+    render();
+    handleLocalFiles(e.dataTransfer.files);
+  }
+});
 
 window.addEventListener('pointermove', (e) => {
   const x = `${((e.clientX / Math.max(1, window.innerWidth)) * 100).toFixed(1)}%`;

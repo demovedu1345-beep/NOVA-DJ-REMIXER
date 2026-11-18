@@ -82,19 +82,22 @@ export function sequenceCrate(tracks, { vibe = 'peak', playMode = 'club' } = {})
   // Normalize entry/exit cues per chosen playMode
   return ordered.map((t) => {
     const dur = Number(t.durationSec) || 210;
+    const curatedEntry = t.hookStartSec ?? t.entrySec;
+    const curatedExit = t.hookEndSec ?? t.exitSec;
+
     if (playMode === 'hooks') {
-      const en = t.hookEntry ?? Math.min(Math.round(dur * 0.25), 50);
-      const ex = t.hookExit ?? Math.min(dur - 4, Math.max(en + 45, Math.round(dur * 0.72)));
+      const en = t.hookEntry ?? curatedEntry ?? Math.min(Math.round(dur * 0.25), 50);
+      const ex = t.hookExit ?? curatedExit ?? Math.min(dur - 4, Math.max(en + 45, Math.round(dur * 0.72)));
       return { ...t, entrySec: en, exitSec: ex, playFull: false };
     }
     if (playMode === 'festival') {
-      const en = t.clubEntry ?? Math.min(18, Math.round(dur * 0.08));
-      const ex = Math.min(dur - 4, Math.max(en + 75, Math.round(dur * 0.76)));
+      const en = t.clubEntry ?? curatedEntry ?? Math.min(18, Math.round(dur * 0.08));
+      const ex = curatedExit ?? Math.min(dur - 4, Math.max(en + 75, Math.round(dur * 0.76)));
       return { ...t, entrySec: en, exitSec: ex, playFull: false };
     }
-    // Club Mode (Default): full song body with clean intro/outro phrase cues
-    const en = t.clubEntry ?? Math.min(10, Math.round(dur * 0.04));
-    const ex = t.clubExit ?? Math.max(en + 60, Math.round(dur - Math.min(26, dur * 0.14)));
+    // Club Mode (Default): full song body with clean intro/outro phrase cues, honoring curated hook offsets
+    const en = t.clubEntry ?? curatedEntry ?? Math.min(10, Math.round(dur * 0.04));
+    const ex = t.clubExit ?? curatedExit ?? Math.max(en + 60, Math.round(dur - Math.min(26, dur * 0.14)));
     return { ...t, entrySec: en, exitSec: ex, playFull: false };
   });
 }
