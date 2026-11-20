@@ -53,7 +53,7 @@ function buildFallbackSet(body) {
           song_id: s.id || `${cat.slug}-${Math.random().toString(36).slice(2, 7)}`,
           title: s.title,
           artist: s.artist,
-          youtube_ids: s.youtube_ids || ['k89egJyAlDE'],
+          youtube_ids: s.youtube_ids && s.youtube_ids.length ? s.youtube_ids : [s.videoId || 'k89egJyAlDE'],
           duration_sec: s.durationSec || s.duration_sec || 180,
           entry_sec: s.entrySec || s.entry_sec || 30,
           exit_sec: s.exitSec || s.exit_sec || 140,
@@ -65,7 +65,7 @@ function buildFallbackSet(body) {
           tags: [],
           style: 'party',
           unsure: false,
-          heat: Array.from({ length: 100 }, (_, i) => 0.5 + 0.4 * Math.sin(i / 10))
+          heat: s.heat || Array.from({ length: 100 }, (_, i) => 0.5 + 0.4 * Math.sin(i / 10))
         });
       }
     }
