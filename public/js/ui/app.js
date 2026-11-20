@@ -1629,7 +1629,7 @@ function syncPlayingDom() {
 /* =========================================================
    RENDERERS
    ========================================================= */
-const NAUX_SPLASH_TAGLINES = [
+const AUDIFY_SPLASH_TAGLINES = [
   'No more “bhai, ek gaana laga de”.',
   'Every song starts at the drop.',
   'Plug in. Pick the vibe. Party.',
@@ -1678,18 +1678,18 @@ function renderSplash() {
     clearTimeout(state.splashAutoTimer);
     state.splashAutoTimer = null;
   }
-  const tagline = NAUX_SPLASH_TAGLINES[splashTaglineIndex % NAUX_SPLASH_TAGLINES.length];
+  const tagline = AUDIFY_SPLASH_TAGLINES[splashTaglineIndex % AUDIFY_SPLASH_TAGLINES.length];
 
   root.innerHTML = `
     <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white relative flex flex-col justify-between">
       <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center cursor-pointer select-none" id="splash-main-container">
-        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime select-none">NAUX</h1>
+        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime select-none">Audify</h1>
         <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">The aux, handled.</p>
         <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime transition-opacity duration-300" id="splash-tagline-el">
           ${esc(tagline)}
         </p>
         <p class="mt-8 max-w-xl text-sm text-white/30">
-          Tell NAUX the room and it plays the set: Hindi and Punjabi party songs that drop straight into the hook. 
+          Tell Audify the room and it plays the set: Hindi and Punjabi party songs that drop straight into the hook. 
           <a href="/songs" id="link-splash-songs" class="underline hover:text-white/60 bg-transparent border-0 text-white/30 cursor-pointer text-sm">Song lists</a>
         </p>
       </main>
@@ -1699,12 +1699,12 @@ function renderSplash() {
 
   // Rotate tagline every 3.5s
   splashInterval = setInterval(() => {
-    splashTaglineIndex = (splashTaglineIndex + 1) % NAUX_SPLASH_TAGLINES.length;
+    splashTaglineIndex = (splashTaglineIndex + 1) % AUDIFY_SPLASH_TAGLINES.length;
     const el = document.getElementById('splash-tagline-el');
     if (el) {
       el.style.opacity = '0';
       setTimeout(() => {
-        el.textContent = NAUX_SPLASH_TAGLINES[splashTaglineIndex];
+        el.textContent = AUDIFY_SPLASH_TAGLINES[splashTaglineIndex];
         el.style.opacity = '1';
       }, 200);
     }
@@ -1749,11 +1749,11 @@ function renderSplash() {
 }
 
 function renderBuilding() {
-  const tagline = NAUX_SPLASH_TAGLINES[splashTaglineIndex % NAUX_SPLASH_TAGLINES.length];
+  const tagline = AUDIFY_SPLASH_TAGLINES[splashTaglineIndex % AUDIFY_SPLASH_TAGLINES.length];
   root.innerHTML = `
     <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white">
       <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center select-none">
-        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime animate-pulse select-none">NAUX</h1>
+        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime animate-pulse select-none">Audify</h1>
         <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">Building your set…</p>
         <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime">
           ${esc(tagline)}
@@ -2115,7 +2115,7 @@ function renderWizard() {
   root.innerHTML = `
     <main class="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 pb-32 pt-10 md:px-10 md:pb-44 font-sans text-white">
       <div class="flex items-center justify-between font-display text-3xl tracking-wide">
-        <button id="btn-naux-brand" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
+        <button id="btn-naux-brand" class="text-lime cursor-pointer" aria-label="Audify home">Audify</button>
         <div class="flex items-center gap-5">
           <span class="text-white/50">${step + 1} / 4</span>
           ${step > 0 ? `<button id="btn-wiz-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/30 text-white/70 hover:border-white hover:text-white transition active:scale-95 cursor-pointer" aria-label="Exit"><svg viewBox="0 0 24 24" class="h-[42%] w-[42%]" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>` : ''}
@@ -2259,7 +2259,7 @@ function renderReview() {
   root.innerHTML = `
     <main class="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 pb-32 pt-10 md:px-10 md:pb-44 font-sans text-white">
       <div class="flex items-center justify-between font-display text-3xl tracking-wide">
-        <button id="btn-review-home" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
+        <button id="btn-review-home" class="text-lime cursor-pointer" aria-label="Audify home">Audify</button>
         <div class="flex items-center gap-5">
           <button id="btn-review-back" class="text-white/60 hover:text-white cursor-pointer font-display text-2xl tracking-wide">
             ← <span class="hidden sm:inline">CHANGE ANSWERS</span><span class="sm:hidden">BACK</span>
@@ -2729,7 +2729,7 @@ function renderPlaying() {
 
       <!-- Top bar matching 2yak1xb5ht175.js -->
       <div class="relative z-30 flex items-center gap-[2vw] font-display text-[clamp(26px,2.4vw,40px)] leading-none tracking-wide">
-        <span class="shrink-0 text-lime">NAUX</span>
+        <span class="shrink-0 text-lime">Audify</span>
 
         <button id="btn-open-vibe" class="absolute left-1/2 -translate-x-1/2 hidden max-w-[44vw] items-center gap-3 rounded-full border-2 border-white/20 px-5 py-2 text-[clamp(16px,1.3vw,22px)] uppercase text-white/75 transition-[transform,border-color,color] duration-300 ease-out hover:border-lime hover:text-white md:flex cursor-pointer">
           <span class="min-w-0 truncate">${esc(vibeLabel)}</span>
@@ -4098,7 +4098,7 @@ function renderYouTubeMusicScreen() {
     const currentCat = CURATED_CATEGORIES_DB[state.ytSelectedCategory] || findCatalogCategory(state.ytSelectedLang, state.ytSelectedCategory) || {
       slug: state.ytSelectedCategory,
       label: 'Hindi Dance Songs',
-      hint: 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.',
+      hint: 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and Audify starts each one at its best part.',
       songs: []
     };
 
@@ -4115,13 +4115,13 @@ function renderYouTubeMusicScreen() {
       <div class="min-h-dvh bg-ink font-sans text-white">
         <main class="mx-auto flex min-h-dvh max-w-4xl flex-col px-6 py-10 md:px-10">
           <div class="flex items-center justify-between font-display text-3xl tracking-wide">
-            <a href="/" class="text-lime cursor-pointer" id="btn-naux-brand">NAUX</a>
+            <a href="/" class="text-lime cursor-pointer" id="btn-naux-brand">Audify</a>
             <a href="/songs" class="text-2xl text-white/60 hover:text-white cursor-pointer" id="btn-back-to-lists">ALL LISTS</a>
           </div>
 
           <h1 class="mt-[4vh] font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(48px,5.5vw,84px)]">${esc(currentCat.label)} 2026</h1>
           <p class="mt-4 max-w-2xl text-lg text-white/65 md:text-xl">
-            ${esc(currentCat.hint || 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.')}
+            ${esc(currentCat.hint || 'Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and Audify starts each one at its best part.')}
           </p>
           <p class="mt-3 text-base text-white/45">
             ${tracks.length} songs${artistsPreview ? `, from ${esc(artistsPreview)}` : ''}. Updated daily.
@@ -4161,7 +4161,7 @@ function renderYouTubeMusicScreen() {
               PLAY THIS AS A SET →
             </button>
             <p class="mt-6 text-sm text-white/40">
-              Songs play through YouTube's official uploads. NAUX picks the order, starts each song at its hook and mixes one into the next.
+              Songs play through YouTube's official uploads. Audify picks the order, starts each song at its hook and mixes one into the next.
             </p>
           `}
         </main>
@@ -4174,10 +4174,10 @@ function renderYouTubeMusicScreen() {
   root.innerHTML = `
     <div class="min-h-dvh bg-ink font-sans text-white">
       <main class="mx-auto flex min-h-dvh max-w-4xl flex-col px-6 py-10 md:px-10">
-        <a href="/" class="font-display text-3xl tracking-wide text-lime cursor-pointer" id="btn-naux-brand">NAUX</a>
+        <a href="/" class="font-display text-3xl tracking-wide text-lime cursor-pointer" id="btn-naux-brand">Audify</a>
         <h1 class="mt-[4vh] font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(48px,5.5vw,84px)]">Party song lists</h1>
         <p class="mt-4 max-w-2xl text-lg text-white/65 md:text-xl">
-          The songs NAUX plays, by language and mood, updated every day. Every song is the official version, and NAUX starts each one at its best part. Pick a list and play it as a set.
+          The songs Audify plays, by language and mood, updated every day. Every song is the official version, and Audify starts each one at its best part. Pick a list and play it as a set.
         </p>
 
         <ul class="mt-8 grid gap-3 sm:grid-cols-2">
@@ -4339,7 +4339,7 @@ function playCuratedCategoryAsSet(tracks, catId) {
 }
 
 function attachGlobalYtListeners() {
-  // Brand logo in header (navigates back to NAUX Home Splash)
+  // Brand logo in header (navigates back to Audify Home Splash)
   const btnBrand = document.getElementById('btn-naux-brand');
   if (btnBrand) {
     btnBrand.onclick = (e) => {

@@ -82144,7 +82144,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "hindi-dance",
     "label": "Hindi Dance Songs",
     "lang": "hindi",
-    "hint": "Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Bollywood dance-floor hits from 2005 to now that every Indian house party knows, plus the biggest Hindi party songs of the last 12 months. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 358,
     "songs": [
       {
@@ -124397,7 +124397,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "hindi-retro",
     "label": "Hindi Retro Songs",
     "lang": "hindi",
-    "hint": "Timeless Bollywood party and sing-along classics from the 1960s to the 1990s (Kishore Kumar, R.D. Burman, Asha Bhosle, 90s hits). Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Timeless Bollywood party and sing-along classics from the 1960s to the 1990s (Kishore Kumar, R.D. Burman, Asha Bhosle, 90s hits). Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 165,
     "songs": [
       {
@@ -143876,7 +143876,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "hindi-romantic",
     "label": "Hindi Romantic Songs",
     "lang": "hindi",
-    "hint": "The most loved Bollywood romantic songs people sing together late at night, from the 1990s to now. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "The most loved Bollywood romantic songs people sing together late at night, from the 1990s to now. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 256,
     "songs": [
       {
@@ -174093,7 +174093,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "hindi-sufi",
     "label": "Hindi Sufi Songs",
     "lang": "hindi",
-    "hint": "Famous Sufi and qawwali-style Bollywood songs people sing along to. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Famous Sufi and qawwali-style Bollywood songs people sing along to. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 76,
     "songs": [
       {
@@ -183070,7 +183070,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "hindi-hiphop",
     "label": "Hindi Desi Hip-Hop Songs",
     "lang": "hindi",
-    "hint": "The most popular Hindi rap and desi hip-hop tracks (DIVINE, Badshah's rap songs, Raftaar, KR$NA, Seedhe Maut) that a young crowd knows. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "The most popular Hindi rap and desi hip-hop tracks (DIVINE, Badshah's rap songs, Raftaar, KR$NA, Seedhe Maut) that a young crowd knows. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 46,
     "songs": [
       {
@@ -188507,7 +188507,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "punjabi-party",
     "label": "Punjabi Party Songs",
     "lang": "punjabi",
-    "hint": "The biggest Punjabi party and bhangra-pop hits, including what is trending in the last 12 months. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "The biggest Punjabi party and bhangra-pop hits, including what is trending in the last 12 months. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 454,
     "songs": [
       {
@@ -242088,7 +242088,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "punjabi-wedding",
     "label": "Punjabi Wedding Songs",
     "lang": "punjabi",
-    "hint": "Punjabi songs that always play at weddings and sangeets: bhangra classics and modern wedding bangers. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Punjabi songs that always play at weddings and sangeets: bhangra classics and modern wedding bangers. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 201,
     "songs": [
       {
@@ -265815,7 +265815,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "punjabi-sad",
     "label": "Punjabi Sad Songs",
     "lang": "punjabi",
-    "hint": "Famous Punjabi sad and heartbreak songs people sing along to. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Famous Punjabi sad and heartbreak songs people sing along to. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 83,
     "songs": [
       {
@@ -275618,7 +275618,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "punjabi-gym",
     "label": "Punjabi Gym / Workout Songs",
     "lang": "punjabi",
-    "hint": "High-energy Punjabi tracks people use for workouts: hard-hitting, swagger, hip-hop influenced. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "High-energy Punjabi tracks people use for workouts: hard-hitting, swagger, hip-hop influenced. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 284,
     "songs": [
       {
@@ -309139,7 +309139,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "english-hiphop",
     "label": "English Hip-Hop Songs",
     "lang": "english",
-    "hint": "Hip-hop and rap party anthems an Indian urban crowd knows every word of. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Hip-hop and rap party anthems an Indian urban crowd knows every word of. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 46,
     "songs": [
       {
@@ -314576,7 +314576,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "english-pop",
     "label": "English Pop Songs",
     "lang": "english",
-    "hint": "Global pop party hits an Indian urban crowd sings along to, from 2010 to now. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Global pop party hits an Indian urban crowd sings along to, from 2010 to now. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 107,
     "songs": [
       {
@@ -327211,7 +327211,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "english-love",
     "label": "English Love Songs",
     "lang": "english",
-    "hint": "Famous English love songs for a late-night singalong. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Famous English love songs for a late-night singalong. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 22,
     "songs": [
       {
@@ -329816,7 +329816,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "english-edm",
     "label": "English EDM Songs",
     "lang": "english",
-    "hint": "EDM and dance anthems that work at a house party. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "EDM and dance anthems that work at a house party. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 34,
     "songs": [
       {
@@ -333837,7 +333837,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "tamil-telugu-kuthu",
     "label": "Tamil & Telugu Kuthu Songs",
     "lang": "south",
-    "hint": "Famous Tamil and Telugu kuthu and dance numbers that get everyone dancing. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Famous Tamil and Telugu kuthu and dance numbers that get everyone dancing. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 14,
     "songs": [
       {
@@ -335498,7 +335498,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "tamil-telugu-mass",
     "label": "Tamil & Telugu Mass Songs",
     "lang": "south",
-    "hint": "Tamil and Telugu mass hero and blockbuster songs. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Tamil and Telugu mass hero and blockbuster songs. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 13,
     "songs": [
       {
@@ -337041,7 +337041,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "haryanvi-bhojpuri-party",
     "label": "Haryanvi & Bhojpuri Party Songs",
     "lang": "haryanvi-bhojpuri",
-    "hint": "The biggest Haryanvi and Bhojpuri party hits. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "The biggest Haryanvi and Bhojpuri party hits. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 6,
     "songs": [
       {
@@ -337758,7 +337758,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "haryanvi-bhojpuri-desi-beats",
     "label": "Haryanvi & Bhojpuri Desi Beats Songs",
     "lang": "haryanvi-bhojpuri",
-    "hint": "Desi beats and folk-pop Haryanvi and Bhojpuri songs. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Desi beats and folk-pop Haryanvi and Bhojpuri songs. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 11,
     "songs": [
       {
@@ -339065,7 +339065,7 @@ export const CURATED_CATEGORIES_DB = {
     "slug": "gujarati-garba",
     "label": "Garba & Gujarati Garba & Dandiya Songs",
     "lang": "gujarati",
-    "hint": "Garba and dandiya songs played at every Navratri: Gujarati folk garba, popular garba remakes and Bollywood garba songs. Every song here is the official version, and NAUX starts each one at its best part.",
+    "hint": "Garba and dandiya songs played at every Navratri: Gujarati folk garba, popular garba remakes and Bollywood garba songs. Every song here is the official version, and Audify starts each one at its best part.",
     "songCount": 46,
     "songs": [
       {
