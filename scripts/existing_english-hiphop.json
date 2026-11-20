@@ -1,0 +1,792 @@
+[
+  {
+    "title": "Goosebumps",
+    "artist": "Travis Scott",
+    "videoId": "Dst9gZkq1a8",
+    "year": "2016",
+    "durationSec": 243,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "Sicko Mode",
+    "artist": "Travis Scott",
+    "videoId": "6ONRf7h3Mdk",
+    "year": "2018",
+    "durationSec": 312,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 10
+  },
+  {
+    "title": "FE!N",
+    "artist": "Travis Scott ft. Playboi Carti",
+    "videoId": "B9synWjqBn8",
+    "year": "2023",
+    "durationSec": 191,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "HIGHEST IN THE ROOM",
+    "artist": "Travis Scott",
+    "videoId": "tfSS1e3kYeo",
+    "year": "2019",
+    "durationSec": 176,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "BUTTERFLY EFFECT",
+    "artist": "Travis Scott",
+    "videoId": "_EyZUTDAH0U",
+    "year": "2017",
+    "durationSec": 191,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "God's Plan",
+    "artist": "Drake",
+    "videoId": "xpVfcZ0ZcFM",
+    "year": "2018",
+    "durationSec": 238,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "One Dance",
+    "artist": "Drake ft. Wizkid & Kyla",
+    "videoId": "mym4sKoAnKs",
+    "year": "2016",
+    "durationSec": 174,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Hotline Bling",
+    "artist": "Drake",
+    "videoId": "uxpDa-c-4Mc",
+    "year": "2015",
+    "durationSec": 267,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "In My Feelings",
+    "artist": "Drake",
+    "videoId": "DRS_PpOrUZ4",
+    "year": "2018",
+    "durationSec": 217,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Laugh Now Cry Later",
+    "artist": "Drake ft. Lil Durk",
+    "videoId": "JFm7YDVlqnI",
+    "year": "2020",
+    "durationSec": 261,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 9
+  },
+  {
+    "title": "HUMBLE.",
+    "artist": "Kendrick Lamar",
+    "videoId": "tvTRZJ-4EyI",
+    "year": "2017",
+    "durationSec": 177,
+    "hookStartSec": 28,
+    "hookEndSec": 68,
+    "energy": 10
+  },
+  {
+    "title": "Not Like Us",
+    "artist": "Kendrick Lamar",
+    "videoId": "H58vbez_m4E",
+    "year": "2024",
+    "durationSec": 274,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 10
+  },
+  {
+    "title": "DNA.",
+    "artist": "Kendrick Lamar",
+    "videoId": "NLZRYQMLDW4",
+    "year": "2017",
+    "durationSec": 185,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 10
+  },
+  {
+    "title": "Alright",
+    "artist": "Kendrick Lamar",
+    "videoId": "Z-48u_uWMHY",
+    "year": "2015",
+    "durationSec": 212,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Swimming Pools (Drank)",
+    "artist": "Kendrick Lamar",
+    "videoId": "8-ejyHzz3XE",
+    "year": "2012",
+    "durationSec": 247,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Lose Yourself",
+    "artist": "Eminem",
+    "videoId": "_Yhyp-_hX2s",
+    "year": "2002",
+    "durationSec": 326,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 10
+  },
+  {
+    "title": "Without Me",
+    "artist": "Eminem",
+    "videoId": "YVkUvmDQ3HY",
+    "year": "2002",
+    "durationSec": 298,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 10
+  },
+  {
+    "title": "The Real Slim Shady",
+    "artist": "Eminem",
+    "videoId": "eJO5HU_7_1w",
+    "year": "2000",
+    "durationSec": 284,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 10
+  },
+  {
+    "title": "Circles",
+    "artist": "Post Malone",
+    "videoId": "wXhTHyIgQ_U",
+    "year": "2019",
+    "durationSec": 215,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Sunflower",
+    "artist": "Post Malone, Swae Lee",
+    "videoId": "ApXoWvfEYVU",
+    "year": "2018",
+    "durationSec": 158,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Rockstar",
+    "artist": "Post Malone ft. 21 Savage",
+    "videoId": "UceaB4D0jpo",
+    "year": "2017",
+    "durationSec": 218,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 10
+  },
+  {
+    "title": "Congratulations",
+    "artist": "Post Malone ft. Quavo",
+    "videoId": "SC4xMk98Pdc",
+    "year": "2016",
+    "durationSec": 220,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Better Now",
+    "artist": "Post Malone",
+    "videoId": "UYwF-jdcVjY",
+    "year": "2018",
+    "durationSec": 231,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "Industry Baby",
+    "artist": "Lil Nas X ft. Jack Harlow",
+    "videoId": "UTHLKHL_whs",
+    "year": "2021",
+    "durationSec": 212,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 10
+  },
+  {
+    "title": "Old Town Road",
+    "artist": "Lil Nas X ft. Billy Ray Cyrus",
+    "videoId": "r7qovpFAGrQ",
+    "year": "2019",
+    "durationSec": 157,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 9
+  },
+  {
+    "title": "Praise God",
+    "artist": "Kanye West",
+    "videoId": "9sJZOGxRxwM",
+    "year": "2021",
+    "durationSec": 226,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Can't Tell Me Nothing",
+    "artist": "Kanye West",
+    "videoId": "E58qLXBfLrs",
+    "year": "2007",
+    "durationSec": 271,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Stronger",
+    "artist": "Kanye West",
+    "videoId": "PsO6ZnUZI0g",
+    "year": "2007",
+    "durationSec": 311,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "C.R.E.A.M.",
+    "artist": "Wu-Tang Clan",
+    "videoId": "PBwAxmrE194",
+    "year": "1993",
+    "durationSec": 252,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Hypnotize",
+    "artist": "The Notorious B.I.G.",
+    "videoId": "glEiPXAYE-U",
+    "year": "1997",
+    "durationSec": 230,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 10
+  },
+  {
+    "title": "Juicy",
+    "artist": "The Notorious B.I.G.",
+    "videoId": "_JZom_gVfuw",
+    "year": "1994",
+    "durationSec": 251,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 10
+  },
+  {
+    "title": "California Love",
+    "artist": "2Pac ft. Dr. Dre",
+    "videoId": "omfz62qu_Bc",
+    "year": "1995",
+    "durationSec": 285,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 10
+  },
+  {
+    "title": "Changes",
+    "artist": "2Pac",
+    "videoId": "eXvBjCO19QY",
+    "year": "1998",
+    "durationSec": 269,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "In Da Club",
+    "artist": "50 Cent",
+    "videoId": "5qm8PH4xAss",
+    "year": "2003",
+    "durationSec": 193,
+    "hookStartSec": 28,
+    "hookEndSec": 68,
+    "energy": 10
+  },
+  {
+    "title": "Candy Shop",
+    "artist": "50 Cent ft. Olivia",
+    "videoId": "SRcnnId15BA",
+    "year": "2005",
+    "durationSec": 209,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "Still D.R.E.",
+    "artist": "Dr. Dre ft. Snoop Dogg",
+    "videoId": "_CL6n0FJZpk",
+    "year": "1999",
+    "durationSec": 270,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 10
+  },
+  {
+    "title": "The Next Episode",
+    "artist": "Dr. Dre ft. Snoop Dogg",
+    "videoId": "QZXc39hT8t4",
+    "year": "2000",
+    "durationSec": 161,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 10
+  },
+  {
+    "title": "Gangsta's Paradise",
+    "artist": "Coolio ft. L.V.",
+    "videoId": "fPO76Jlnz6c",
+    "year": "1995",
+    "durationSec": 240,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 10
+  },
+  {
+    "title": "First Class",
+    "artist": "Jack Harlow",
+    "videoId": "yQBImEeXNZ4",
+    "year": "2022",
+    "durationSec": 174,
+    "hookStartSec": 28,
+    "hookEndSec": 68,
+    "energy": 9
+  },
+  {
+    "title": "Lovin On Me",
+    "artist": "Jack Harlow",
+    "videoId": "Iq8h3GEe22o",
+    "year": "2023",
+    "durationSec": 138,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 9
+  },
+  {
+    "title": "WHATS POPPIN",
+    "artist": "Jack Harlow",
+    "videoId": "w9uWPBDHEKE",
+    "year": "2020",
+    "durationSec": 140,
+    "hookStartSec": 20,
+    "hookEndSec": 60,
+    "energy": 9
+  },
+  {
+    "title": "Bank Account",
+    "artist": "21 Savage",
+    "videoId": "H1KBHFXm2Bg",
+    "year": "2017",
+    "durationSec": 220,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "redrum",
+    "artist": "21 Savage",
+    "videoId": "U4mADkt6o-M",
+    "year": "2024",
+    "durationSec": 270,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 10
+  },
+  {
+    "title": "Superhero (Heroes & Villains)",
+    "artist": "Metro Boomin, Future, Chris Brown",
+    "videoId": "_WCD3Z9UmJ4",
+    "year": "2022",
+    "durationSec": 182,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 10
+  },
+  {
+    "title": "Creepin'",
+    "artist": "Metro Boomin, The Weeknd, 21 Savage",
+    "videoId": "61ymOWwOwuk",
+    "year": "2022",
+    "durationSec": 221,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Like That",
+    "artist": "Future, Metro Boomin, Kendrick Lamar",
+    "videoId": "N9bKBAA22Go",
+    "year": "2024",
+    "durationSec": 267,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Mask Off",
+    "artist": "Future",
+    "videoId": "xvZqHgFz51I",
+    "year": "2017",
+    "durationSec": 204,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "Bodak Yellow",
+    "artist": "Cardi B",
+    "videoId": "PEGccV-NOm8",
+    "year": "2017",
+    "durationSec": 223,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 10
+  },
+  {
+    "title": "Lucid Dreams",
+    "artist": "Juice WRLD",
+    "videoId": "mzB1VGEGcSU",
+    "year": "2018",
+    "durationSec": 239,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "The Box",
+    "artist": "Roddy Ricch",
+    "videoId": "UNZqm3dxd2w",
+    "year": "2019",
+    "durationSec": 196,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 10
+  },
+  {
+    "title": "Shabang",
+    "artist": "Drake \u00b7 2026",
+    "videoId": "OPf0YbXqDm0",
+    "year": "2026",
+    "durationSec": 180,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Big Dawgs",
+    "artist": "Hanumankind & Kalmi \u00b7 2024",
+    "videoId": "k2qgadSvNyU",
+    "year": "2024",
+    "durationSec": 193,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Dead Fresh",
+    "artist": "Lil Baby \u00b7 2024",
+    "videoId": "hT_nvWreIhg",
+    "year": "2024",
+    "durationSec": 206,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Love The Way You Lie",
+    "artist": "Eminem ft. Rihanna",
+    "videoId": "uelHwf8o7_U",
+    "year": "2010",
+    "durationSec": 266,
+    "hookStartSec": 0,
+    "hookEndSec": 32,
+    "energy": 8
+  },
+  {
+    "title": "'Till I Collapse",
+    "artist": "Eminem ft. Nate Dogg",
+    "videoId": "ytQ5CYE1VZw",
+    "year": "2002",
+    "durationSec": 298,
+    "hookStartSec": 42,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "All The Stars",
+    "artist": "Kendrick Lamar, SZA",
+    "videoId": "GfCqMv--ncA",
+    "year": "2018",
+    "durationSec": 232,
+    "hookStartSec": 28,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "Life Is Good",
+    "artist": "Future ft. Drake",
+    "videoId": "l0U7SxXHkPY",
+    "year": "2020",
+    "durationSec": 335,
+    "hookStartSec": 25,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "Started From The Bottom",
+    "artist": "Drake",
+    "videoId": "RubBzkZzpUA",
+    "year": "2013",
+    "durationSec": 279,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Money In The Grave",
+    "artist": "Drake ft. Rick Ross",
+    "videoId": "17j38q3_W2s",
+    "year": "2019",
+    "durationSec": 205,
+    "hookStartSec": 25,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "White Iverson",
+    "artist": "Post Malone",
+    "videoId": "SLsTskih710",
+    "year": "2015",
+    "durationSec": 256,
+    "hookStartSec": 45,
+    "hookEndSec": 80,
+    "energy": 7
+  },
+  {
+    "title": "Runnin",
+    "artist": "21 Savage & Metro Boomin",
+    "videoId": "hG4lT4gk5eQ",
+    "year": "2020",
+    "durationSec": 200,
+    "hookStartSec": 30,
+    "hookEndSec": 66,
+    "energy": 8
+  },
+  {
+    "title": "I Like It",
+    "artist": "Cardi B ft. Bad Bunny & J Balvin",
+    "videoId": "xTlNMmZKwpA",
+    "year": "2018",
+    "durationSec": 256,
+    "hookStartSec": 34,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "WAP",
+    "artist": "Cardi B ft. Megan Thee Stallion",
+    "videoId": "hsm4poTWjMs",
+    "year": "2020",
+    "durationSec": 252,
+    "hookStartSec": 20,
+    "hookEndSec": 55,
+    "energy": 9
+  },
+  {
+    "title": "Super Bass",
+    "artist": "Nicki Minaj",
+    "videoId": "4JipHEz53sU",
+    "year": "2011",
+    "durationSec": 261,
+    "hookStartSec": 38,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Starships",
+    "artist": "Nicki Minaj",
+    "videoId": "SeIJmciN8mo",
+    "year": "2012",
+    "durationSec": 236,
+    "hookStartSec": 42,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Anaconda",
+    "artist": "Nicki Minaj",
+    "videoId": "LDZX4ooRsWs",
+    "year": "2014",
+    "durationSec": 290,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 9
+  },
+  {
+    "title": "Drip Too Hard",
+    "artist": "Lil Baby & Gunna",
+    "videoId": "bjf92dK84uA",
+    "year": "2018",
+    "durationSec": 146,
+    "hookStartSec": 18,
+    "hookEndSec": 50,
+    "energy": 8
+  },
+  {
+    "title": "The Bigger Picture",
+    "artist": "Lil Baby",
+    "videoId": "_VDGysJGNoI",
+    "year": "2020",
+    "durationSec": 253,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 8
+  },
+  {
+    "title": "SAD!",
+    "artist": "XXXTENTACION",
+    "videoId": "iAeYPfrXwk4",
+    "year": "2018",
+    "durationSec": 167,
+    "hookStartSec": 18,
+    "hookEndSec": 50,
+    "energy": 7
+  },
+  {
+    "title": "No Role Modelz",
+    "artist": "J. Cole",
+    "videoId": "0En_3Ue4cWw",
+    "year": "2014",
+    "durationSec": 293,
+    "hookStartSec": 40,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "N.Y. State of Mind",
+    "artist": "Nas",
+    "videoId": "hI8A14QWx68",
+    "year": "1994",
+    "durationSec": 210,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Shook Ones, Pt. II",
+    "artist": "Mobb Deep",
+    "videoId": "yoYZf-lBF_U",
+    "year": "1995",
+    "durationSec": 210,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "Dear Mama",
+    "artist": "2Pac",
+    "videoId": "Mb1ZvUDvLDY",
+    "year": "1995",
+    "durationSec": 210,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Ms. Jackson",
+    "artist": "Outkast",
+    "videoId": "MYxAiK6VnXw",
+    "year": "2000",
+    "durationSec": 210,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "B.O.B.",
+    "artist": "Outkast",
+    "videoId": "lVehcuJUX6U",
+    "year": "2000",
+    "durationSec": 210,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 8
+  },
+  {
+    "title": "Empire State of Mind",
+    "artist": "JAY-Z, Alicia Keys",
+    "videoId": "vk6014HuxcE",
+    "year": "2009",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Niggas in Paris",
+    "artist": "JAY-Z, Kanye West",
+    "videoId": "gG_dA32oJ48",
+    "year": "2011",
+    "durationSec": 210,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Gold Digger",
+    "artist": "Kanye West ft. Jamie Foxx",
+    "videoId": "6vwNcNOTVzY",
+    "year": "2005",
+    "durationSec": 210,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 8
+  },
+  {
+    "title": "Heartless",
+    "artist": "Kanye West",
+    "videoId": "Co0tTeuUVhU",
+    "year": "2008",
+    "durationSec": 210,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 8
+  }
+]

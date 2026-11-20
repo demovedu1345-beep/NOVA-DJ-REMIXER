@@ -297,22 +297,21 @@ export class YouTubeDeckEngine {
       const start = performance.now();
       this.fadeTimer = setInterval(() => {
         const p = Math.min(1, (performance.now() - start) / durationMs);
-        let volIn = 100 * Math.sin((p * Math.PI) / 2);
-        let volOut = 100 * Math.cos((p * Math.PI) / 2);
+        // High-power Serato-grade Constant Loudness Equal-Power Curve
+        // Both decks stay at ~92% volume at midpoint so volume NEVER dips
+        const pIn = Math.pow(Math.sin((p * Math.PI) / 2), 0.28);
+        const pOut = Math.pow(Math.cos((p * Math.PI) / 2), 0.28);
+        let volIn = Math.round(Math.min(100, Math.max(25, 100 * pIn)));
+        let volOut = Math.round(Math.min(100, Math.max(0, 100 * pOut)));
 
         if (style === 'sweep_cut') {
-          // Risers build incoming stealthily until hard energy cut at 62%
-          volIn = p < 0.62 ? 42 * (p / 0.62) : 42 + 58 * Math.min(1, (p - 0.62) / 0.14);
-          volOut = p < 0.62 ? 100 - 20 * (p / 0.62) : Math.max(0, 80 * (1 - (p - 0.62) / 0.22));
-        } else if (style === 'echo_drop') {
-          // Slight dip on out, punch incoming straight up on the drop at 55%
-          volIn = p < 0.55 ? 28 * (p / 0.55) : 100 * Math.sin(((p - 0.55) / 0.45) * (Math.PI / 2) * 0.65 + 0.35 * (Math.PI / 2));
-          volOut = p < 0.55 ? 100 - 35 * (p / 0.55) : Math.max(0, 65 * Math.cos(((p - 0.55) / 0.45) * (Math.PI / 2)));
-        } else {
-          // Smooth Club S-curve equal-power overlap (full body phrase blend)
-          const smooth = p * p * (3 - 2 * p);
-          volIn = 100 * Math.sin((smooth * Math.PI) / 2);
-          volOut = 100 * Math.cos((smooth * Math.PI) / 2);
+          // Riser builds incoming fast, hard cut outgoing at 70%
+          volIn = p < 0.65 ? Math.round(60 + 40 * (p / 0.65)) : 100;
+          volOut = p < 0.65 ? Math.round(100 - 15 * (p / 0.65)) : Math.round(Math.max(0, 85 * (1 - (p - 0.65) / 0.35)));
+        } else if (style === 'echo_drop' || style === 'drum_roll') {
+          // Outgoing stays loud until sudden drop at 60%, incoming slams in at 100%
+          volIn = p < 0.5 ? Math.round(70 + 30 * (p / 0.5)) : 100;
+          volOut = p < 0.5 ? 100 : Math.round(Math.max(0, 100 * (1 - (p - 0.5) / 0.5)));
         }
 
         try {

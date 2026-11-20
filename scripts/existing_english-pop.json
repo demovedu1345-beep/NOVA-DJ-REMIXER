@@ -1,0 +1,622 @@
+[
+  {
+    "title": "Blinding Lights",
+    "artist": "The Weeknd",
+    "videoId": "4NRXx6U8ABQ",
+    "year": "2019",
+    "durationSec": 263,
+    "hookStartSec": 56,
+    "hookEndSec": 96,
+    "energy": 10
+  },
+  {
+    "title": "Starboy",
+    "artist": "The Weeknd ft. Daft Punk",
+    "videoId": "34Na4j8AVgA",
+    "year": "2016",
+    "durationSec": 273,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 9
+  },
+  {
+    "title": "Cruel Summer",
+    "artist": "Taylor Swift",
+    "videoId": "ic8j13piAhQ",
+    "year": "2019",
+    "durationSec": 178,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Shake It Off",
+    "artist": "Taylor Swift",
+    "videoId": "nfWlot6h_JM",
+    "year": "2014",
+    "durationSec": 242,
+    "hookStartSec": 39,
+    "hookEndSec": 79,
+    "energy": 10
+  },
+  {
+    "title": "Blank Space",
+    "artist": "Taylor Swift",
+    "videoId": "e-ORhEE9VVg",
+    "year": "2014",
+    "durationSec": 272,
+    "hookStartSec": 37,
+    "hookEndSec": 77,
+    "energy": 9
+  },
+  {
+    "title": "Levitating",
+    "artist": "Dua Lipa",
+    "videoId": "TUVcZfQe-Kw",
+    "year": "2020",
+    "durationSec": 204,
+    "hookStartSec": 46,
+    "hookEndSec": 86,
+    "energy": 10
+  },
+  {
+    "title": "Don't Start Now",
+    "artist": "Dua Lipa",
+    "videoId": "oygrmJFKYZY",
+    "year": "2019",
+    "durationSec": 182,
+    "hookStartSec": 31,
+    "hookEndSec": 71,
+    "energy": 9
+  },
+  {
+    "title": "24K Magic",
+    "artist": "Bruno Mars",
+    "videoId": "UqyT8IEBkvY",
+    "year": "2016",
+    "durationSec": 226,
+    "hookStartSec": 58,
+    "hookEndSec": 98,
+    "energy": 10
+  },
+  {
+    "title": "Uptown Funk",
+    "artist": "Mark Ronson ft. Bruno Mars",
+    "videoId": "OPf0YbXqDm0",
+    "year": "2014",
+    "durationSec": 270,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 10
+  },
+  {
+    "title": "Shape of You",
+    "artist": "Ed Sheeran",
+    "videoId": "JGwWNGJdvx8",
+    "year": "2017",
+    "durationSec": 263,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Bad Habits",
+    "artist": "Ed Sheeran",
+    "videoId": "orJSJGHjBLI",
+    "year": "2021",
+    "durationSec": 239,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 9
+  },
+  {
+    "title": "7 rings",
+    "artist": "Ariana Grande",
+    "videoId": "QYh6mYIJG2Y",
+    "year": "2019",
+    "durationSec": 184,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 9
+  },
+  {
+    "title": "thank u, next",
+    "artist": "Ariana Grande",
+    "videoId": "gl1aHhXnN1k",
+    "year": "2018",
+    "durationSec": 331,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "STAY",
+    "artist": "The Kid LAROI & Justin Bieber",
+    "videoId": "kTJczUoc26U",
+    "year": "2021",
+    "durationSec": 158,
+    "hookStartSec": 15,
+    "hookEndSec": 55,
+    "energy": 10
+  },
+  {
+    "title": "Peaches",
+    "artist": "Justin Bieber ft. Daniel Caesar & Giveon",
+    "videoId": "tQ0yjYUFKAE",
+    "year": "2021",
+    "durationSec": 198,
+    "hookStartSec": 13,
+    "hookEndSec": 53,
+    "energy": 8
+  },
+  {
+    "title": "Sorry",
+    "artist": "Justin Bieber",
+    "videoId": "fRh_vgS2dFE",
+    "year": "2015",
+    "durationSec": 206,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "bad guy",
+    "artist": "Billie Eilish",
+    "videoId": "DyDfgMOUjCI",
+    "year": "2019",
+    "durationSec": 206,
+    "hookStartSec": 36,
+    "hookEndSec": 76,
+    "energy": 9
+  },
+  {
+    "title": "As It Was",
+    "artist": "Harry Styles",
+    "videoId": "H5v3kku4y6Q",
+    "year": "2022",
+    "durationSec": 166,
+    "hookStartSec": 43,
+    "hookEndSec": 83,
+    "energy": 9
+  },
+  {
+    "title": "Rolling in the Deep",
+    "artist": "Adele",
+    "videoId": "rYEDA3JcQqw",
+    "year": "2010",
+    "durationSec": 234,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Watermelon Sugar",
+    "artist": "Harry Styles",
+    "videoId": "E07s5ZYygMg",
+    "year": "2019",
+    "durationSec": 189,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Houdini",
+    "artist": "Dua Lipa",
+    "videoId": "suAR1PYFNYA",
+    "year": "2023",
+    "durationSec": 186,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Espresso",
+    "artist": "Sabrina Carpenter",
+    "videoId": "eVli-tstM5E",
+    "year": "2024",
+    "durationSec": 201,
+    "hookStartSec": 25,
+    "hookEndSec": 65,
+    "energy": 9
+  },
+  {
+    "title": "Please Please Please",
+    "artist": "Sabrina Carpenter",
+    "videoId": "cF1Na4AIecM",
+    "year": "2024",
+    "durationSec": 263,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "Dance The Night",
+    "artist": "Dua Lipa",
+    "videoId": "OiC1rgCPmUQ",
+    "year": "2023",
+    "durationSec": 177,
+    "hookStartSec": 33,
+    "hookEndSec": 73,
+    "energy": 9
+  },
+  {
+    "title": "Can't Stop the Feeling!",
+    "artist": "Justin Timberlake",
+    "videoId": "ru0K8uYEZWw",
+    "year": "2016",
+    "durationSec": 286,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Flowers",
+    "artist": "Miley Cyrus",
+    "videoId": "G7KNmW9a75Y",
+    "year": "2023",
+    "durationSec": 202,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Anti-Hero",
+    "artist": "Taylor Swift",
+    "videoId": "b1kbLwvqugk",
+    "year": "2022",
+    "durationSec": 310,
+    "hookStartSec": 43,
+    "hookEndSec": 83,
+    "energy": 8
+  },
+  {
+    "title": "Cheap Thrills",
+    "artist": "Sia ft. Sean Paul",
+    "videoId": "nYh-n7EOtMA",
+    "year": "2016",
+    "durationSec": 262,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Havana",
+    "artist": "Camila Cabello ft. Young Thug",
+    "videoId": "HCjNJDNzw8Y",
+    "year": "2017",
+    "durationSec": 219,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Closer",
+    "artist": "The Chainsmokers ft. Halsey",
+    "videoId": "PT2_F-1esPk",
+    "year": "2016",
+    "durationSec": 262,
+    "hookStartSec": 41,
+    "hookEndSec": 81,
+    "energy": 9
+  },
+  {
+    "title": "Counting Stars",
+    "artist": "OneRepublic",
+    "videoId": "hT_nvWreIhg",
+    "year": "2013",
+    "durationSec": 284,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Sugar",
+    "artist": "Maroon 5",
+    "videoId": "09R8_2nJtjg",
+    "year": "2015",
+    "durationSec": 302,
+    "hookStartSec": 41,
+    "hookEndSec": 81,
+    "energy": 9
+  },
+  {
+    "title": "Moves Like Jagger",
+    "artist": "Maroon 5 ft. Christina Aguilera",
+    "videoId": "iEPTlhBmwRg",
+    "year": "2011",
+    "durationSec": 284,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Roar",
+    "artist": "Katy Perry",
+    "videoId": "CevxZvSJLk8",
+    "year": "2013",
+    "durationSec": 271,
+    "hookStartSec": 39,
+    "hookEndSec": 79,
+    "energy": 9
+  },
+  {
+    "title": "Dark Horse",
+    "artist": "Katy Perry ft. Juicy J",
+    "videoId": "0KSOMA3QBU0",
+    "year": "2013",
+    "durationSec": 226,
+    "hookStartSec": 44,
+    "hookEndSec": 84,
+    "energy": 9
+  },
+  {
+    "title": "Firework",
+    "artist": "Katy Perry",
+    "videoId": "QGJuMBdaqIw",
+    "year": "2010",
+    "durationSec": 234,
+    "hookStartSec": 49,
+    "hookEndSec": 89,
+    "energy": 9
+  },
+  {
+    "title": "Side to Side",
+    "artist": "Ariana Grande ft. Nicki Minaj",
+    "videoId": "SXiSVQZLje8",
+    "year": "2016",
+    "durationSec": 238,
+    "hookStartSec": 44,
+    "hookEndSec": 84,
+    "energy": 9
+  },
+  {
+    "title": "Bad Romance",
+    "artist": "Lady Gaga",
+    "videoId": "qrO4YZeyl0I",
+    "year": "2009",
+    "durationSec": 308,
+    "hookStartSec": 56,
+    "hookEndSec": 96,
+    "energy": 10
+  },
+  {
+    "title": "Poker Face",
+    "artist": "Lady Gaga",
+    "videoId": "bESGLojNYSo",
+    "year": "2008",
+    "durationSec": 215,
+    "hookStartSec": 36,
+    "hookEndSec": 76,
+    "energy": 9
+  },
+  {
+    "title": "Senorita",
+    "artist": "Shawn Mendes & Camila Cabello",
+    "videoId": "Pkh8UtuejGw",
+    "year": "2019",
+    "durationSec": 206,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "Treat You Better",
+    "artist": "Shawn Mendes",
+    "videoId": "lY2yjAdbvdQ",
+    "year": "2016",
+    "durationSec": 257,
+    "hookStartSec": 34,
+    "hookEndSec": 74,
+    "energy": 9
+  },
+  {
+    "title": "Attention",
+    "artist": "Charlie Puth",
+    "videoId": "nfs8NYg7yQM",
+    "year": "2017",
+    "durationSec": 212,
+    "hookStartSec": 47,
+    "hookEndSec": 87,
+    "energy": 9
+  },
+  {
+    "title": "We Don't Talk Anymore",
+    "artist": "Charlie Puth ft. Selena Gomez",
+    "videoId": "3AtDnEC4zak",
+    "year": "2016",
+    "durationSec": 231,
+    "hookStartSec": 20,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "Calm Down",
+    "artist": "Rema & Selena Gomez",
+    "videoId": "WcIcVapfqXw",
+    "year": "2022",
+    "durationSec": 239,
+    "hookStartSec": 27,
+    "hookEndSec": 67,
+    "energy": 9
+  },
+  {
+    "title": "vampire",
+    "artist": "Olivia Rodrigo",
+    "videoId": "RlPNh_PBZb4",
+    "year": "2023",
+    "durationSec": 244,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 9
+  },
+  {
+    "title": "good 4 u",
+    "artist": "Olivia Rodrigo",
+    "videoId": "gNi_6U5Pm_o",
+    "year": "2021",
+    "durationSec": 198,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 10
+  },
+  {
+    "title": "drivers license",
+    "artist": "Olivia Rodrigo",
+    "videoId": "ZmDBbnmKpqQ",
+    "year": "2021",
+    "durationSec": 248,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 8
+  },
+  {
+    "title": "Dynamite",
+    "artist": "BTS",
+    "videoId": "gdZLi9oWNZg",
+    "year": "2020",
+    "durationSec": 224,
+    "hookStartSec": 33,
+    "hookEndSec": 73,
+    "energy": 10
+  },
+  {
+    "title": "Butter",
+    "artist": "BTS",
+    "videoId": "WMweEpGlu_U",
+    "year": "2021",
+    "durationSec": 183,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "Wake Me Up",
+    "artist": "Avicii",
+    "videoId": "IcrbM1l_BoI",
+    "year": "2013",
+    "durationSec": 273,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 10
+  },
+  {
+    "title": "Titanium",
+    "artist": "David Guetta ft. Sia",
+    "videoId": "JRfuAukYTKg",
+    "year": "2011",
+    "durationSec": 246,
+    "hookStartSec": 41,
+    "hookEndSec": 81,
+    "energy": 10
+  },
+  {
+    "title": "Something Just Like This",
+    "artist": "The Chainsmokers & Coldplay",
+    "videoId": "fZUfdnmtg4Y",
+    "year": "2017",
+    "durationSec": 241,
+    "hookStartSec": 47,
+    "hookEndSec": 87,
+    "energy": 9
+  },
+  {
+    "title": "Chandelier",
+    "artist": "Sia",
+    "videoId": "2vjPBrBU-TM",
+    "year": "2014",
+    "durationSec": 232,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 9
+  },
+  {
+    "title": "Locked Out of Heaven",
+    "artist": "Bruno Mars",
+    "videoId": "e-fA-gBCkj0",
+    "year": "2012",
+    "durationSec": 234,
+    "hookStartSec": 37,
+    "hookEndSec": 77,
+    "energy": 9
+  },
+  {
+    "title": "Treasure",
+    "artist": "Bruno Mars",
+    "videoId": "nPvuNsRccVw",
+    "year": "2013",
+    "durationSec": 209,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Single Ladies (Put a Ring on It)",
+    "artist": "Beyonc\u00e9",
+    "videoId": "4m1EFMoRFvY",
+    "year": "2008",
+    "durationSec": 199,
+    "hookStartSec": 32,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "Starships",
+    "artist": "Nicki Minaj",
+    "videoId": "SeIJmciN8mo",
+    "year": "2012",
+    "durationSec": 263,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 10
+  },
+  {
+    "title": "Super Bass",
+    "artist": "Nicki Minaj",
+    "videoId": "4JipHEz53sU",
+    "year": "2011",
+    "durationSec": 255,
+    "hookStartSec": 43,
+    "hookEndSec": 83,
+    "energy": 9
+  },
+  {
+    "title": "Sunroof",
+    "artist": "Nicky Youre & dazy",
+    "videoId": "G5xSLbYMr-I",
+    "year": "2021",
+    "durationSec": 163,
+    "hookStartSec": 20,
+    "hookEndSec": 60,
+    "energy": 9
+  },
+  {
+    "title": "BIRDS OF A FEATHER",
+    "artist": "Billie Eilish",
+    "videoId": "d5gf9dXbPi0",
+    "year": "2024",
+    "durationSec": 194,
+    "hookStartSec": 29,
+    "hookEndSec": 69,
+    "energy": 9
+  },
+  {
+    "title": "The Fate of Ophelia",
+    "artist": "Taylor Swift \u00b7 2025",
+    "videoId": "kJQP7kiw5Fk",
+    "year": "2025",
+    "durationSec": 193,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Housewife",
+    "artist": "Tate McRae \u00b7 2024",
+    "videoId": "k2qgadSvNyU",
+    "year": "2024",
+    "durationSec": 232,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  }
+]

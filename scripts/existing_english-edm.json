@@ -1,0 +1,802 @@
+[
+  {
+    "title": "Levels",
+    "artist": "Avicii",
+    "videoId": "_ovdm2yX4MA",
+    "year": "2011",
+    "durationSec": 202,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 10
+  },
+  {
+    "title": "Wake Me Up",
+    "artist": "Avicii",
+    "videoId": "IcrbM1l_BoI",
+    "year": "2013",
+    "durationSec": 250,
+    "hookStartSec": 80,
+    "hookEndSec": 120,
+    "energy": 10
+  },
+  {
+    "title": "The Nights",
+    "artist": "Avicii",
+    "videoId": "UtF6Jej8yb4",
+    "year": "2014",
+    "durationSec": 190,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 10
+  },
+  {
+    "title": "Waiting For Love",
+    "artist": "Avicii",
+    "videoId": "cHHLHGNpCSA",
+    "year": "2015",
+    "durationSec": 230,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 10
+  },
+  {
+    "title": "Hey Brother",
+    "artist": "Avicii",
+    "videoId": "6Cp6mKbRTQY",
+    "year": "2013",
+    "durationSec": 255,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 9
+  },
+  {
+    "title": "Animals",
+    "artist": "Martin Garrix",
+    "videoId": "gCYcHz2k5x0",
+    "year": "2013",
+    "durationSec": 195,
+    "hookStartSec": 56,
+    "hookEndSec": 96,
+    "energy": 10
+  },
+  {
+    "title": "In The Name Of Love",
+    "artist": "Martin Garrix & Bebe Rexha",
+    "videoId": "RnBT9uUYb1w",
+    "year": "2016",
+    "durationSec": 195,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 9
+  },
+  {
+    "title": "Scared To Be Lonely",
+    "artist": "Martin Garrix & Dua Lipa",
+    "videoId": "e2vBLd5Egnk",
+    "year": "2017",
+    "durationSec": 220,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 9
+  },
+  {
+    "title": "High On Life",
+    "artist": "Martin Garrix ft. Bonn",
+    "videoId": "Lpjcm1F8tY8",
+    "year": "2018",
+    "durationSec": 230,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 10
+  },
+  {
+    "title": "Tremor",
+    "artist": "Dimitri Vegas & Like Mike, Martin Garrix",
+    "videoId": "9vMh9f41pqE",
+    "year": "2014",
+    "durationSec": 195,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "Titanium",
+    "artist": "David Guetta ft. Sia",
+    "videoId": "JRfuAukYTKg",
+    "year": "2011",
+    "durationSec": 245,
+    "hookStartSec": 58,
+    "hookEndSec": 98,
+    "energy": 10
+  },
+  {
+    "title": "Don't You Worry Child",
+    "artist": "Swedish House Mafia ft. John Martin",
+    "videoId": "1y6smkh6c-0",
+    "year": "2012",
+    "durationSec": 215,
+    "hookStartSec": 70,
+    "hookEndSec": 110,
+    "energy": 10
+  },
+  {
+    "title": "Save The World",
+    "artist": "Swedish House Mafia",
+    "videoId": "BXpdmKELE1k",
+    "year": "2011",
+    "durationSec": 213,
+    "hookStartSec": 62,
+    "hookEndSec": 102,
+    "energy": 9
+  },
+  {
+    "title": "Moth To A Flame",
+    "artist": "Swedish House Mafia & The Weeknd",
+    "videoId": "u9n7Cw-4_HQ",
+    "year": "2021",
+    "durationSec": 234,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Summer",
+    "artist": "Calvin Harris",
+    "videoId": "ebXbLfLACGM",
+    "year": "2014",
+    "durationSec": 220,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 10
+  },
+  {
+    "title": "This Is What You Came For",
+    "artist": "Calvin Harris ft. Rihanna",
+    "videoId": "kOkQ4T5WO9E",
+    "year": "2016",
+    "durationSec": 235,
+    "hookStartSec": 72,
+    "hookEndSec": 112,
+    "energy": 10
+  },
+  {
+    "title": "One Kiss",
+    "artist": "Calvin Harris, Dua Lipa",
+    "videoId": "DkeiKbqa02g",
+    "year": "2018",
+    "durationSec": 215,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "How Deep Is Your Love",
+    "artist": "Calvin Harris & Disciples",
+    "videoId": "EgqUJOudrcM",
+    "year": "2015",
+    "durationSec": 210,
+    "hookStartSec": 58,
+    "hookEndSec": 98,
+    "energy": 9
+  },
+  {
+    "title": "Under Control",
+    "artist": "Calvin Harris & Alesso ft. Hurts",
+    "videoId": "yZqmarGShxg",
+    "year": "2013",
+    "durationSec": 185,
+    "hookStartSec": 62,
+    "hookEndSec": 102,
+    "energy": 10
+  },
+  {
+    "title": "Feel So Close",
+    "artist": "Calvin Harris",
+    "videoId": "dGghkjpNCQ8",
+    "year": "2011",
+    "durationSec": 206,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 9
+  },
+  {
+    "title": "I Need Your Love",
+    "artist": "Calvin Harris ft. Ellie Goulding",
+    "videoId": "AtKZKl7Bgu0",
+    "year": "2013",
+    "durationSec": 225,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 9
+  },
+  {
+    "title": "Clarity",
+    "artist": "Zedd ft. Foxes",
+    "videoId": "IxxstCcJlsc",
+    "year": "2012",
+    "durationSec": 250,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 10
+  },
+  {
+    "title": "Stay The Night",
+    "artist": "Zedd ft. Hayley Williams",
+    "videoId": "i-gyZ35074k",
+    "year": "2013",
+    "durationSec": 225,
+    "hookStartSec": 52,
+    "hookEndSec": 92,
+    "energy": 10
+  },
+  {
+    "title": "The Middle",
+    "artist": "Zedd, Maren Morris, Grey",
+    "videoId": "M3mJkSqZbX4",
+    "year": "2018",
+    "durationSec": 185,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 9
+  },
+  {
+    "title": "Stay",
+    "artist": "Zedd & Alessia Cara",
+    "videoId": "h--P8HzYZ74",
+    "year": "2017",
+    "durationSec": 210,
+    "hookStartSec": 46,
+    "hookEndSec": 86,
+    "energy": 9
+  },
+  {
+    "title": "I Want You To Know",
+    "artist": "Zedd ft. Selena Gomez",
+    "videoId": "X46t8ZFqUB4",
+    "year": "2015",
+    "durationSec": 240,
+    "hookStartSec": 52,
+    "hookEndSec": 92,
+    "energy": 9
+  },
+  {
+    "title": "Lean On",
+    "artist": "Major Lazer & DJ Snake ft. M\u00d8",
+    "videoId": "YqeW9_5kURI",
+    "year": "2015",
+    "durationSec": 180,
+    "hookStartSec": 42,
+    "hookEndSec": 82,
+    "energy": 10
+  },
+  {
+    "title": "Turn Down For What",
+    "artist": "DJ Snake, Lil Jon",
+    "videoId": "HMUDVMiITOU",
+    "year": "2013",
+    "durationSec": 215,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Faded",
+    "artist": "Alan Walker",
+    "videoId": "60ItHLz5WEA",
+    "year": "2015",
+    "durationSec": 212,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 9
+  },
+  {
+    "title": "Alone",
+    "artist": "Marshmello",
+    "videoId": "ALZHF5UqnU4",
+    "year": "2016",
+    "durationSec": 200,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "Silence",
+    "artist": "Marshmello ft. Khalid",
+    "videoId": "Tx1sqYc3qas",
+    "year": "2017",
+    "durationSec": 180,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Happier",
+    "artist": "Marshmello ft. Bastille",
+    "videoId": "m7Bc3pLyij0",
+    "year": "2018",
+    "durationSec": 215,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Something Just Like This",
+    "artist": "The Chainsmokers & Coldplay",
+    "videoId": "FM7MFYoylVs",
+    "year": "2017",
+    "durationSec": 245,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 10
+  },
+  {
+    "title": "Closer",
+    "artist": "The Chainsmokers ft. Halsey",
+    "videoId": "0zGcUoRlhmw",
+    "year": "2016",
+    "durationSec": 245,
+    "hookStartSec": 58,
+    "hookEndSec": 98,
+    "energy": 10
+  },
+  {
+    "title": "Don't Let Me Down",
+    "artist": "The Chainsmokers ft. Daya",
+    "videoId": "Io0fBr1XBUA",
+    "year": "2016",
+    "durationSec": 208,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Roses",
+    "artist": "The Chainsmokers ft. ROZES",
+    "videoId": "G5Mv2iV0wkU",
+    "year": "2015",
+    "durationSec": 226,
+    "hookStartSec": 52,
+    "hookEndSec": 92,
+    "energy": 9
+  },
+  {
+    "title": "Tsunami",
+    "artist": "DVBBS & Borgeous",
+    "videoId": "0EWbonj7f18",
+    "year": "2013",
+    "durationSec": 235,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 10
+  },
+  {
+    "title": "Reload",
+    "artist": "Sebastian Ingrosso, Tommy Trash, John Martin",
+    "videoId": "GuAtcpFQpMw",
+    "year": "2013",
+    "durationSec": 220,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 10
+  },
+  {
+    "title": "Calling (Lose My Mind)",
+    "artist": "Sebastian Ingrosso & Alesso ft. Ryan Tedder",
+    "videoId": "9G1I16gJBvU",
+    "year": "2012",
+    "durationSec": 205,
+    "hookStartSec": 75,
+    "hookEndSec": 115,
+    "energy": 10
+  },
+  {
+    "title": "Heroes (we could be)",
+    "artist": "Alesso ft. Tove Lo",
+    "videoId": "a7SouU3ECpU",
+    "year": "2014",
+    "durationSec": 210,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 9
+  },
+  {
+    "title": "If I Lose Myself",
+    "artist": "Alesso vs OneRepublic",
+    "videoId": "OOevVQwQ-LM",
+    "year": "2013",
+    "durationSec": 215,
+    "hookStartSec": 75,
+    "hookEndSec": 115,
+    "energy": 10
+  },
+  {
+    "title": "Sandstorm",
+    "artist": "Darude",
+    "videoId": "y6120QOlsfU",
+    "year": "1999",
+    "durationSec": 225,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 10
+  },
+  {
+    "title": "Bangarang",
+    "artist": "Skrillex ft. Sirah",
+    "videoId": "YJVmu6yttiw",
+    "year": "2011",
+    "durationSec": 215,
+    "hookStartSec": 30,
+    "hookEndSec": 70,
+    "energy": 10
+  },
+  {
+    "title": "Scary Monsters and Nice Sprites",
+    "artist": "Skrillex",
+    "videoId": "WSeNSzJ2-Jw",
+    "year": "2010",
+    "durationSec": 245,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 10
+  },
+  {
+    "title": "Where Are \u00dc Now",
+    "artist": "Skrillex & Diplo with Justin Bieber",
+    "videoId": "nntGTK2Fhb0",
+    "year": "2015",
+    "durationSec": 250,
+    "hookStartSec": 54,
+    "hookEndSec": 94,
+    "energy": 9
+  },
+  {
+    "title": "The Business",
+    "artist": "Ti\u00ebsto",
+    "videoId": "nCg3ufihKyU",
+    "year": "2020",
+    "durationSec": 165,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Red Lights",
+    "artist": "Ti\u00ebsto",
+    "videoId": "CFF0mV24WCY",
+    "year": "2013",
+    "durationSec": 202,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 9
+  },
+  {
+    "title": "Losing It",
+    "artist": "FISHER",
+    "videoId": "wE8Az1EV6UQ",
+    "year": "2018",
+    "durationSec": 248,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 10
+  },
+  {
+    "title": "(It Goes Like) Nanana",
+    "artist": "Peggy Gou",
+    "videoId": "sCz5y84dwuA",
+    "year": "2023",
+    "durationSec": 230,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 9
+  },
+  {
+    "title": "Firestone",
+    "artist": "Kygo ft. Conrad Sewell",
+    "videoId": "9Sc-ir2UwGU",
+    "year": "2014",
+    "durationSec": 212,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 9
+  },
+  {
+    "title": "Jamaican (Bam Bam)",
+    "artist": "HUGEL & SOLTO (FR) \u00b7 2025",
+    "videoId": "JGwWNGJdvx8",
+    "year": "2025",
+    "durationSec": 193,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Dance The Night",
+    "artist": "Dua Lipa \u00b7 2023",
+    "videoId": "OPf0YbXqDm0",
+    "year": "2023",
+    "durationSec": 206,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Miracle",
+    "artist": "Calvin Harris, Ellie Goulding",
+    "videoId": "1K93VwU9qH4",
+    "year": "2023",
+    "durationSec": 187,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 9
+  },
+  {
+    "title": "Slide",
+    "artist": "Calvin Harris ft. Frank Ocean, Migos",
+    "videoId": "WFqc3m_8_fE",
+    "year": "2017",
+    "durationSec": 232,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 7
+  },
+  {
+    "title": "Sexy Bitch",
+    "artist": "David Guetta ft. Akon",
+    "videoId": "N9hazmsUxrM",
+    "year": "2009",
+    "durationSec": 196,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 9
+  },
+  {
+    "title": "When Love Takes Over",
+    "artist": "David Guetta ft. Kelly Rowland",
+    "videoId": "zudbz4hOcBC",
+    "year": "2009",
+    "durationSec": 192,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Memories",
+    "artist": "David Guetta ft. Kid Cudi",
+    "videoId": "NUVCQXMUVnI",
+    "year": "2010",
+    "durationSec": 209,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Hey Mama",
+    "artist": "David Guetta ft. Nicki Minaj, Bebe Rexha, Afrojack",
+    "videoId": "uO59tfQ2TbA",
+    "year": "2015",
+    "durationSec": 203,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Dreams",
+    "artist": "David Guetta & MORTEN ft. Lanie Gardner",
+    "videoId": "765d75v56b8",
+    "year": "2020",
+    "durationSec": 175,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Play Hard",
+    "artist": "David Guetta ft. Ne-Yo, Akon",
+    "videoId": "5dbEhBKGOtY",
+    "year": "2013",
+    "durationSec": 210,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 9
+  },
+  {
+    "title": "Ocean",
+    "artist": "Martin Garrix ft. Khalid",
+    "videoId": "BDocp-VpCwY",
+    "year": "2018",
+    "durationSec": 217,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 7
+  },
+  {
+    "title": "Don't Look Down",
+    "artist": "Martin Garrix ft. Usher",
+    "videoId": "bdu9iO6wQ24",
+    "year": "2015",
+    "durationSec": 223,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Paris",
+    "artist": "The Chainsmokers",
+    "videoId": "fN1gw8PHkAI",
+    "year": "2017",
+    "durationSec": 215,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 7
+  },
+  {
+    "title": "Greyhound",
+    "artist": "Swedish House Mafia",
+    "videoId": "hBRKSIj2tMc",
+    "year": "2012",
+    "durationSec": 203,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Don't Be Shy",
+    "artist": "Ti\u00ebsto & Karol G",
+    "videoId": "Odf3y8K6j9s",
+    "year": "2021",
+    "durationSec": 148,
+    "hookStartSec": 25,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "The Motto",
+    "artist": "Ti\u00ebsto & Ava Max",
+    "videoId": "1_4ELAxKrDc",
+    "year": "2021",
+    "durationSec": 164,
+    "hookStartSec": 25,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "Jackie Chan",
+    "artist": "Ti\u00ebsto & Dzeko ft. Preme, Post Malone",
+    "videoId": "-30A_eHnZtI",
+    "year": "2018",
+    "durationSec": 218,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 8
+  },
+  {
+    "title": "Years",
+    "artist": "Alesso ft. Matthew Koma",
+    "videoId": "E4b0qU4D5y8",
+    "year": "2012",
+    "durationSec": 205,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "Remedy",
+    "artist": "Alesso",
+    "videoId": "a5uQMwRMHcs",
+    "year": "2018",
+    "durationSec": 191,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Beautiful Now",
+    "artist": "Zedd ft. Jon Bellion",
+    "videoId": "n1a7o44WJSg",
+    "year": "2015",
+    "durationSec": 238,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 9
+  },
+  {
+    "title": "It Ain't Me",
+    "artist": "Kygo & Selena Gomez",
+    "videoId": "D5drYkLiLI8",
+    "year": "2017",
+    "durationSec": 221,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 8
+  },
+  {
+    "title": "Higher Love",
+    "artist": "Kygo & Whitney Houston",
+    "videoId": "JR49dyo-y0E",
+    "year": "2019",
+    "durationSec": 233,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "Stole The Show",
+    "artist": "Kygo ft. Parson James",
+    "videoId": "BgfcToAjFdE",
+    "year": "2015",
+    "durationSec": 223,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Cold Water",
+    "artist": "Major Lazer ft. Justin Bieber, M\u00d8",
+    "videoId": "a59gmGkq_38",
+    "year": "2016",
+    "durationSec": 188,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Spaceman",
+    "artist": "Hardwell",
+    "videoId": "lETmskoqh30",
+    "year": "2012",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Apollo",
+    "artist": "Hardwell ft. Amba Shepherd",
+    "videoId": "q8kUckZ15fE",
+    "year": "2012",
+    "durationSec": 210,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "Sweet Nothing",
+    "artist": "Calvin Harris ft. Florence Welch",
+    "videoId": "17ozSeGw-mM",
+    "year": "2012",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Blame",
+    "artist": "Calvin Harris ft. John Newman",
+    "videoId": "6ACl8s_tJUw",
+    "year": "2014",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "The Spectre",
+    "artist": "Alan Walker",
+    "videoId": "wJnBTPUQS5A",
+    "year": "2017",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  },
+  {
+    "title": "Closer (EDM Mix)",
+    "artist": "The Chainsmokers ft. Halsey",
+    "videoId": "PT2_F-1esPk",
+    "year": "2016",
+    "durationSec": 210,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  }
+]

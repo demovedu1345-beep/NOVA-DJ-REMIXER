@@ -3,31 +3,39 @@ import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
 
 const MASTER_COUNTS = {
   "counts": {
-    "hindi": 1003,
-    "hindi:diwali": 80,
+    "hindi": 1453,
+    "hindi:diwali": 218,
     "hindi:dance": 253,
     "hindi:romantic": 200,
     "hindi:retro": 220,
-    "hindi:sufi": 133,
-    "hindi:hiphop": 117,
-    "punjabi": 889,
+    "hindi:sufi": 275,
+    "hindi:hiphop": 287,
+    "punjabi": 1097,
     "punjabi:party": 385,
-    "punjabi:wedding": 169,
-    "punjabi:sad": 110,
+    "punjabi:wedding": 273,
+    "punjabi:sad": 214,
     "punjabi:gym": 225,
-    "english": 467,
-    "english:pop": 136,
-    "english:edm": 104,
-    "english:hiphop": 108,
-    "english:love": 119,
-    "tamil-telugu": 245,
-    "tamil-telugu:kuthu": 113,
-    "tamil-telugu:mass": 132,
-    "haryanvi-bhojpuri": 243,
-    "haryanvi-bhojpuri:party": 113,
-    "haryanvi-bhojpuri:desi-beats": 130,
-    "gujarati": 75,
-    "gujarati:garba": 75
+    "english": 825,
+    "english:pop": 225,
+    "english:edm": 200,
+    "english:hiphop": 200,
+    "english:love": 200,
+    "tamil-telugu": 400,
+    "tamil-telugu:kuthu": 200,
+    "tamil-telugu:mass": 200,
+    "haryanvi-bhojpuri": 400,
+    "haryanvi-bhojpuri:party": 200,
+    "haryanvi-bhojpuri:desi-beats": 200,
+    "gujarati": 221,
+    "gujarati:garba": 221,
+    "marathi": 200,
+    "marathi:party": 200,
+    "marwadi": 200,
+    "marwadi:rajasthani": 200,
+    "kannada": 200,
+    "kannada:hits": 200,
+    "odia": 200,
+    "odia:hits": 200
   },
   "unsure": 484
 };
@@ -64,6 +72,10 @@ function slugMatchesSubtype(slug, subtype) {
   if (bare === 'mass') return s === 'tamil-telugu-mass';
   if (bare === 'desi-beats') return s === 'haryanvi-bhojpuri-desi-beats';
   if (bare === 'garba') return s === 'gujarati-garba';
+  if (bare === 'marathi' || bare === 'marathi:party') return s === 'marathi-party';
+  if (bare === 'marwadi' || bare === 'marwadi:rajasthani') return s === 'marwadi-rajasthani';
+  if (bare === 'kannada' || bare === 'kannada:hits') return s === 'kannada-hits';
+  if (bare === 'odia' || bare === 'odia:hits') return s === 'odia-hits';
   return s.includes(bare);
 }
 
@@ -72,8 +84,12 @@ function catMatchesLang(catLang, requestedLangs) {
   for (const rl of requestedLangs) {
     if (cl === rl) return true;
     if ((rl === 'tamil-telugu' || rl === 'south') && (cl === 'south' || cl === 'tamil-telugu' || cl === 'tamil' || cl === 'telugu')) return true;
-    if ((rl === 'haryanvi-bhojpuri' || rl === 'regional') && (cl === 'haryanvi-bhojpuri' || cl === 'regional')) return true;
+    if ((rl === 'haryanvi-bhojpuri' || rl === 'regional') && (cl === 'haryanvi-bhojpuri' || cl === 'regional' || cl === 'haryanvi' || cl === 'bhojpuri')) return true;
     if (rl === 'gujarati' && (cl === 'gujarati' || cl === 'garba')) return true;
+    if (rl === 'marathi' && cl === 'marathi') return true;
+    if (rl === 'marwadi' && (cl === 'marwadi' || cl === 'rajasthani')) return true;
+    if (rl === 'kannada' && cl === 'kannada') return true;
+    if (rl === 'odia' && cl === 'odia') return true;
   }
   return false;
 }

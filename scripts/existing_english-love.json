@@ -1,0 +1,982 @@
+[
+  {
+    "title": "Perfect",
+    "artist": "Ed Sheeran",
+    "videoId": "2Vv-BfVoq4g",
+    "year": "2017",
+    "durationSec": 282,
+    "hookStartSec": 63,
+    "hookEndSec": 103,
+    "energy": 8
+  },
+  {
+    "title": "Thinking Out Loud",
+    "artist": "Ed Sheeran",
+    "videoId": "lp-EO5I60KA",
+    "year": "2014",
+    "durationSec": 297,
+    "hookStartSec": 56,
+    "hookEndSec": 96,
+    "energy": 8
+  },
+  {
+    "title": "All of Me",
+    "artist": "John Legend",
+    "videoId": "450p7goxZqg",
+    "year": "2013",
+    "durationSec": 308,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 8
+  },
+  {
+    "title": "Someone You Loved",
+    "artist": "Lewis Capaldi",
+    "videoId": "zABLecsR5UE",
+    "year": "2018",
+    "durationSec": 182,
+    "hookStartSec": 49,
+    "hookEndSec": 89,
+    "energy": 8
+  },
+  {
+    "title": "A Thousand Years",
+    "artist": "Christina Perri",
+    "videoId": "rtOvBOTyX00",
+    "year": "2011",
+    "durationSec": 288,
+    "hookStartSec": 64,
+    "hookEndSec": 104,
+    "energy": 8
+  },
+  {
+    "title": "Until I Found You",
+    "artist": "Stephen Sanchez",
+    "videoId": "GxldQ9eX2wo",
+    "year": "2021",
+    "durationSec": 176,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "Say You Won't Let Go",
+    "artist": "James Arthur",
+    "videoId": "0yW7w8F2TVA",
+    "year": "2016",
+    "durationSec": 230,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 8
+  },
+  {
+    "title": "Stay With Me",
+    "artist": "Sam Smith",
+    "videoId": "pB-5XG-DbAA",
+    "year": "2014",
+    "durationSec": 173,
+    "hookStartSec": 44,
+    "hookEndSec": 84,
+    "energy": 8
+  },
+  {
+    "title": "Love Me Like You Do",
+    "artist": "Ellie Goulding",
+    "videoId": "AJtDXIazrMo",
+    "year": "2015",
+    "durationSec": 250,
+    "hookStartSec": 48,
+    "hookEndSec": 88,
+    "energy": 9
+  },
+  {
+    "title": "Golden Hour",
+    "artist": "JVKE",
+    "videoId": "PEM0Vs8jf1w",
+    "year": "2022",
+    "durationSec": 210,
+    "hookStartSec": 46,
+    "hookEndSec": 86,
+    "energy": 9
+  },
+  {
+    "title": "Yellow",
+    "artist": "Coldplay",
+    "videoId": "yKNxeF4KMsY",
+    "year": "2000",
+    "durationSec": 271,
+    "hookStartSec": 44,
+    "hookEndSec": 84,
+    "energy": 8
+  },
+  {
+    "title": "Fix You",
+    "artist": "Coldplay",
+    "videoId": "k4V3Mo61fJM",
+    "year": "2005",
+    "durationSec": 296,
+    "hookStartSec": 83,
+    "hookEndSec": 123,
+    "energy": 8
+  },
+  {
+    "title": "double take",
+    "artist": "dhruv",
+    "videoId": "R8FHtIhWqNo",
+    "year": "2019",
+    "durationSec": 170,
+    "hookStartSec": 38,
+    "hookEndSec": 78,
+    "energy": 8
+  },
+  {
+    "title": "Die For You",
+    "artist": "The Weeknd",
+    "videoId": "uPD0QOGTmMI",
+    "year": "2016",
+    "durationSec": 280,
+    "hookStartSec": 49,
+    "hookEndSec": 89,
+    "energy": 9
+  },
+  {
+    "title": "Adore You",
+    "artist": "Harry Styles",
+    "videoId": "VF-r5TtlT9w",
+    "year": "2019",
+    "durationSec": 219,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 8
+  },
+  {
+    "title": "Make You Feel My Love",
+    "artist": "Adele",
+    "videoId": "0put0_a--Ng",
+    "year": "2008",
+    "durationSec": 212,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "Easy On Me",
+    "artist": "Adele",
+    "videoId": "U3ASj1L6_sY",
+    "year": "2021",
+    "durationSec": 332,
+    "hookStartSec": 63,
+    "hookEndSec": 103,
+    "energy": 8
+  },
+  {
+    "title": "Just the Way You Are",
+    "artist": "Bruno Mars",
+    "videoId": "LjhCEhWiKXk",
+    "year": "2010",
+    "durationSec": 237,
+    "hookStartSec": 49,
+    "hookEndSec": 89,
+    "energy": 9
+  },
+  {
+    "title": "Grenade",
+    "artist": "Bruno Mars",
+    "videoId": "SR6iYWJxHqs",
+    "year": "2010",
+    "durationSec": 221,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 9
+  },
+  {
+    "title": "Lover",
+    "artist": "Taylor Swift",
+    "videoId": "-BjZmE2gtdo",
+    "year": "2019",
+    "durationSec": 239,
+    "hookStartSec": 63,
+    "hookEndSec": 103,
+    "energy": 8
+  },
+  {
+    "title": "Enchanted (Taylor's Version)",
+    "artist": "Taylor Swift",
+    "videoId": "igIfiqqVHtA",
+    "year": "2023",
+    "durationSec": 357,
+    "hookStartSec": 77,
+    "hookEndSec": 117,
+    "energy": 8
+  },
+  {
+    "title": "Photograph",
+    "artist": "Ed Sheeran",
+    "videoId": "nSDgHBxUbVQ",
+    "year": "2014",
+    "durationSec": 275,
+    "hookStartSec": 69,
+    "hookEndSec": 109,
+    "energy": 8
+  },
+  {
+    "title": "Shallow",
+    "artist": "Lady Gaga & Bradley Cooper",
+    "videoId": "bo_efYhYU2A",
+    "year": "2018",
+    "durationSec": 216,
+    "hookStartSec": 88,
+    "hookEndSec": 128,
+    "energy": 9
+  },
+  {
+    "title": "Always Remember Us This Way",
+    "artist": "Lady Gaga",
+    "videoId": "5vheNbQlsyU",
+    "year": "2018",
+    "durationSec": 242,
+    "hookStartSec": 56,
+    "hookEndSec": 96,
+    "energy": 8
+  },
+  {
+    "title": "Like I'm Gonna Lose You",
+    "artist": "Meghan Trainor ft. John Legend",
+    "videoId": "2-MBfn8XjIU",
+    "year": "2015",
+    "durationSec": 235,
+    "hookStartSec": 51,
+    "hookEndSec": 91,
+    "energy": 8
+  },
+  {
+    "title": "Before You Go",
+    "artist": "Lewis Capaldi",
+    "videoId": "Jtauh8GcxBY",
+    "year": "2019",
+    "durationSec": 246,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 8
+  },
+  {
+    "title": "You Are The Reason",
+    "artist": "Calum Scott",
+    "videoId": "ShZ978fBl6Y",
+    "year": "2017",
+    "durationSec": 205,
+    "hookStartSec": 49,
+    "hookEndSec": 89,
+    "energy": 8
+  },
+  {
+    "title": "Dancing On My Own",
+    "artist": "Calum Scott",
+    "videoId": "q31tGyBJhRY",
+    "year": "2016",
+    "durationSec": 264,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 8
+  },
+  {
+    "title": "I'm Yours",
+    "artist": "Jason Mraz",
+    "videoId": "EkHTsc9PU2A",
+    "year": "2008",
+    "durationSec": 222,
+    "hookStartSec": 53,
+    "hookEndSec": 93,
+    "energy": 8
+  },
+  {
+    "title": "Lucky",
+    "artist": "Jason Mraz & Colbie Caillat",
+    "videoId": "acvIVA9-FMQ",
+    "year": "2008",
+    "durationSec": 190,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 8
+  },
+  {
+    "title": "Bubbly",
+    "artist": "Colbie Caillat",
+    "videoId": "AWGqoCNbsvM",
+    "year": "2007",
+    "durationSec": 196,
+    "hookStartSec": 44,
+    "hookEndSec": 84,
+    "energy": 8
+  },
+  {
+    "title": "Put Your Records On",
+    "artist": "Corinne Bailey Rae",
+    "videoId": "rjOhZZyn30k",
+    "year": "2006",
+    "durationSec": 234,
+    "hookStartSec": 41,
+    "hookEndSec": 81,
+    "energy": 8
+  },
+  {
+    "title": "Can't Help Falling in Love",
+    "artist": "Haley Reinhart",
+    "videoId": "d924LLHxSqk",
+    "year": "2015",
+    "durationSec": 222,
+    "hookStartSec": 35,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "Let Her Go",
+    "artist": "Passenger",
+    "videoId": "RBumgq5yVrA",
+    "year": "2012",
+    "durationSec": 255,
+    "hookStartSec": 41,
+    "hookEndSec": 81,
+    "energy": 8
+  },
+  {
+    "title": "Dandelions",
+    "artist": "Ruth B.",
+    "videoId": "W8a4sUabCUo",
+    "year": "2017",
+    "durationSec": 234,
+    "hookStartSec": 51,
+    "hookEndSec": 91,
+    "energy": 8
+  },
+  {
+    "title": "Here With Me",
+    "artist": "d4vd",
+    "videoId": "Ip6cw8gfHHI",
+    "year": "2022",
+    "durationSec": 221,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "Romantic Homicide",
+    "artist": "d4vd",
+    "videoId": "eKL3TceSxvk",
+    "year": "2022",
+    "durationSec": 151,
+    "hookStartSec": 31,
+    "hookEndSec": 71,
+    "energy": 8
+  },
+  {
+    "title": "Daylight",
+    "artist": "David Kushner",
+    "videoId": "MoN9ql6Yymw",
+    "year": "2023",
+    "durationSec": 213,
+    "hookStartSec": 47,
+    "hookEndSec": 87,
+    "energy": 8
+  },
+  {
+    "title": "Pointless",
+    "artist": "Lewis Capaldi",
+    "videoId": "HlNGI4LbAto",
+    "year": "2022",
+    "durationSec": 253,
+    "hookStartSec": 58,
+    "hookEndSec": 98,
+    "energy": 8
+  },
+  {
+    "title": "Lose You To Love Me",
+    "artist": "Selena Gomez",
+    "videoId": "zlJDTxahav0",
+    "year": "2019",
+    "durationSec": 207,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 8
+  },
+  {
+    "title": "Calm Down",
+    "artist": "Rema \u00b7 2022",
+    "videoId": "YQHsXMglC9A",
+    "year": "2022",
+    "durationSec": 193,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Snooze",
+    "artist": "SZA \u00b7 2022",
+    "videoId": "LsoLEjrDogU",
+    "year": "2022",
+    "durationSec": 206,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Save Your Tears",
+    "artist": "The Weeknd \u00b7 2020",
+    "videoId": "JGwWNGJdvx8",
+    "year": "2020",
+    "durationSec": 219,
+    "hookStartSec": null,
+    "hookEndSec": null,
+    "energy": 7
+  },
+  {
+    "title": "Shivers",
+    "artist": "Ed Sheeran",
+    "videoId": "Il0S8BoucSA",
+    "year": "2021",
+    "durationSec": 208,
+    "hookStartSec": 32,
+    "hookEndSec": 65,
+    "energy": 7
+  },
+  {
+    "title": "Bad Habits",
+    "artist": "Ed Sheeran",
+    "videoId": "orJSJGHjBLI",
+    "year": "2021",
+    "durationSec": 231,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "Castle on the Hill",
+    "artist": "Ed Sheeran",
+    "videoId": "K0ibBPhiaG0",
+    "year": "2017",
+    "durationSec": 261,
+    "hookStartSec": 45,
+    "hookEndSec": 82,
+    "energy": 7
+  },
+  {
+    "title": "I Don't Care",
+    "artist": "Ed Sheeran & Justin Bieber",
+    "videoId": "y83x7MgzWOA",
+    "year": "2019",
+    "durationSec": 219,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 7
+  },
+  {
+    "title": "Love Story",
+    "artist": "Taylor Swift",
+    "videoId": "8xg3vE8Ie_E",
+    "year": "2008",
+    "durationSec": 237,
+    "hookStartSec": 45,
+    "hookEndSec": 82,
+    "energy": 6
+  },
+  {
+    "title": "You Belong With Me",
+    "artist": "Taylor Swift",
+    "videoId": "VuNIsY6JdUw",
+    "year": "2008",
+    "durationSec": 231,
+    "hookStartSec": 40,
+    "hookEndSec": 75,
+    "energy": 7
+  },
+  {
+    "title": "Blank Space",
+    "artist": "Taylor Swift",
+    "videoId": "e-ORhEE9VVg",
+    "year": "2014",
+    "durationSec": 272,
+    "hookStartSec": 42,
+    "hookEndSec": 78,
+    "energy": 7
+  },
+  {
+    "title": "Delicate",
+    "artist": "Taylor Swift",
+    "videoId": "tCXGJQYZ9JA",
+    "year": "2017",
+    "durationSec": 235,
+    "hookStartSec": 48,
+    "hookEndSec": 85,
+    "energy": 6
+  },
+  {
+    "title": "cardigan",
+    "artist": "Taylor Swift",
+    "videoId": "K-a8s8OLBSE",
+    "year": "2020",
+    "durationSec": 275,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 5
+  },
+  {
+    "title": "Anti-Hero",
+    "artist": "Taylor Swift",
+    "videoId": "b1kbLwvqugk",
+    "year": "2022",
+    "durationSec": 200,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 7
+  },
+  {
+    "title": "Style",
+    "artist": "Taylor Swift",
+    "videoId": "-CMADIYUrs8",
+    "year": "2014",
+    "durationSec": 231,
+    "hookStartSec": 40,
+    "hookEndSec": 78,
+    "energy": 7
+  },
+  {
+    "title": "Wildest Dreams",
+    "artist": "Taylor Swift",
+    "videoId": "IdneKLhsWOQ",
+    "year": "2014",
+    "durationSec": 220,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 6
+  },
+  {
+    "title": "When I Was Your Man",
+    "artist": "Bruno Mars",
+    "videoId": "ekzHIWGv82Q",
+    "year": "2012",
+    "durationSec": 214,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 5
+  },
+  {
+    "title": "Marry You",
+    "artist": "Bruno Mars",
+    "videoId": "8v_4O44sf4M",
+    "year": "2010",
+    "durationSec": 230,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 7
+  },
+  {
+    "title": "Locked Out of Heaven",
+    "artist": "Bruno Mars",
+    "videoId": "e-fA-gBCkj0",
+    "year": "2012",
+    "durationSec": 233,
+    "hookStartSec": 40,
+    "hookEndSec": 75,
+    "energy": 8
+  },
+  {
+    "title": "Leave the Door Open",
+    "artist": "Bruno Mars, Anderson .Paak, Silk Sonic",
+    "videoId": "uRVZpar18hE",
+    "year": "2021",
+    "durationSec": 242,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 6
+  },
+  {
+    "title": "Die With A Smile",
+    "artist": "Lady Gaga & Bruno Mars",
+    "videoId": "kPa7bsKwL-8",
+    "year": "2024",
+    "durationSec": 252,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 7
+  },
+  {
+    "title": "Blinding Lights",
+    "artist": "The Weeknd",
+    "videoId": "4NRXx6U8ABQ",
+    "year": "2019",
+    "durationSec": 200,
+    "hookStartSec": 38,
+    "hookEndSec": 72,
+    "energy": 8
+  },
+  {
+    "title": "Earned It",
+    "artist": "The Weeknd",
+    "videoId": "waU75jdUnYw",
+    "year": "2015",
+    "durationSec": 278,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 6
+  },
+  {
+    "title": "Call Out My Name",
+    "artist": "The Weeknd",
+    "videoId": "M4ZoCHID9GI",
+    "year": "2018",
+    "durationSec": 228,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 6
+  },
+  {
+    "title": "Starboy",
+    "artist": "The Weeknd ft. Daft Punk",
+    "videoId": "34Na4j8AVgA",
+    "year": "2016",
+    "durationSec": 230,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 8
+  },
+  {
+    "title": "Someone Like You",
+    "artist": "Adele",
+    "videoId": "hLQl3WQQoQ0",
+    "year": "2011",
+    "durationSec": 285,
+    "hookStartSec": 65,
+    "hookEndSec": 105,
+    "energy": 5
+  },
+  {
+    "title": "Rolling in the Deep",
+    "artist": "Adele",
+    "videoId": "rYEDA3JcQqw",
+    "year": "2010",
+    "durationSec": 228,
+    "hookStartSec": 40,
+    "hookEndSec": 78,
+    "energy": 7
+  },
+  {
+    "title": "Set Fire to the Rain",
+    "artist": "Adele",
+    "videoId": "Ri7-vNRNw5E",
+    "year": "2011",
+    "durationSec": 242,
+    "hookStartSec": 52,
+    "hookEndSec": 90,
+    "energy": 7
+  },
+  {
+    "title": "ocean eyes",
+    "artist": "Billie Eilish",
+    "videoId": "viimfQi_pUw",
+    "year": "2016",
+    "durationSec": 200,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 4
+  },
+  {
+    "title": "lovely",
+    "artist": "Billie Eilish with Khalid",
+    "videoId": "V1Pl8CzNzCw",
+    "year": "2018",
+    "durationSec": 200,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 5
+  },
+  {
+    "title": "BIRDS OF A FEATHER",
+    "artist": "Billie Eilish",
+    "videoId": "d5gf9dXbPi0",
+    "year": "2024",
+    "durationSec": 195,
+    "hookStartSec": 35,
+    "hookEndSec": 72,
+    "energy": 6
+  },
+  {
+    "title": "everything i wanted",
+    "artist": "Billie Eilish",
+    "videoId": "egVU289T208",
+    "year": "2019",
+    "durationSec": 245,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 5
+  },
+  {
+    "title": "Happier Than Ever",
+    "artist": "Billie Eilish",
+    "videoId": "5GJWxDKyk3A",
+    "year": "2021",
+    "durationSec": 298,
+    "hookStartSec": 60,
+    "hookEndSec": 100,
+    "energy": 6
+  },
+  {
+    "title": "Bruises",
+    "artist": "Lewis Capaldi",
+    "videoId": "fH7g9yVf2_0",
+    "year": "2017",
+    "durationSec": 220,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 5
+  },
+  {
+    "title": "drivers license",
+    "artist": "Olivia Rodrigo",
+    "videoId": "ZmDBbnmKpqQ",
+    "year": "2021",
+    "durationSec": 247,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 6
+  },
+  {
+    "title": "deja vu",
+    "artist": "Olivia Rodrigo",
+    "videoId": "cii6ruuyc5k",
+    "year": "2021",
+    "durationSec": 231,
+    "hookStartSec": 40,
+    "hookEndSec": 78,
+    "energy": 6
+  },
+  {
+    "title": "vampire",
+    "artist": "Olivia Rodrigo",
+    "videoId": "RlPNh_PBZb4",
+    "year": "2023",
+    "durationSec": 238,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 7
+  },
+  {
+    "title": "traitor",
+    "artist": "Olivia Rodrigo",
+    "videoId": "SNpt_O8vGbg",
+    "year": "2021",
+    "durationSec": 229,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 6
+  },
+  {
+    "title": "Love Yourself",
+    "artist": "Justin Bieber",
+    "videoId": "oyEuk8j8imI",
+    "year": "2015",
+    "durationSec": 272,
+    "hookStartSec": 50,
+    "hookEndSec": 88,
+    "energy": 5
+  },
+  {
+    "title": "Ghost",
+    "artist": "Justin Bieber",
+    "videoId": "Fp8msa5uYsc",
+    "year": "2021",
+    "durationSec": 153,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 7
+  },
+  {
+    "title": "Peaches",
+    "artist": "Justin Bieber ft. Daniel Caesar, Giveon",
+    "videoId": "tQ0yjYUFKAE",
+    "year": "2021",
+    "durationSec": 198,
+    "hookStartSec": 12,
+    "hookEndSec": 45,
+    "energy": 7
+  },
+  {
+    "title": "Anyone",
+    "artist": "Justin Bieber",
+    "videoId": "KIK3azN4w34",
+    "year": "2021",
+    "durationSec": 190,
+    "hookStartSec": 42,
+    "hookEndSec": 80,
+    "energy": 7
+  },
+  {
+    "title": "Sorry",
+    "artist": "Justin Bieber",
+    "videoId": "fRh_vgS2dFE",
+    "year": "2015",
+    "durationSec": 205,
+    "hookStartSec": 38,
+    "hookEndSec": 72,
+    "energy": 8
+  },
+  {
+    "title": "thank u, next",
+    "artist": "Ariana Grande",
+    "videoId": "gl1aHhXnN1k",
+    "year": "2018",
+    "durationSec": 331,
+    "hookStartSec": 42,
+    "hookEndSec": 80,
+    "energy": 7
+  },
+  {
+    "title": "positions",
+    "artist": "Ariana Grande",
+    "videoId": "tcYodQoapMg",
+    "year": "2020",
+    "durationSec": 172,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 7
+  },
+  {
+    "title": "Into You",
+    "artist": "Ariana Grande",
+    "videoId": "1ekZEVeXwek",
+    "year": "2016",
+    "durationSec": 255,
+    "hookStartSec": 45,
+    "hookEndSec": 82,
+    "energy": 8
+  },
+  {
+    "title": "we can't be friends (wait for your love)",
+    "artist": "Ariana Grande",
+    "videoId": "KNtJGQkC-WI",
+    "year": "2024",
+    "durationSec": 284,
+    "hookStartSec": 50,
+    "hookEndSec": 90,
+    "energy": 7
+  },
+  {
+    "title": "7 rings",
+    "artist": "Ariana Grande",
+    "videoId": "QYh6mYIJG2Y",
+    "year": "2019",
+    "durationSec": 184,
+    "hookStartSec": 25,
+    "hookEndSec": 60,
+    "energy": 8
+  },
+  {
+    "title": "Treat You Better",
+    "artist": "Shawn Mendes",
+    "videoId": "lY2yjAqqMxM",
+    "year": "2016",
+    "durationSec": 256,
+    "hookStartSec": 42,
+    "hookEndSec": 78,
+    "energy": 7
+  },
+  {
+    "title": "Stitches",
+    "artist": "Shawn Mendes",
+    "videoId": "VbfpW0pbvaU",
+    "year": "2015",
+    "durationSec": 239,
+    "hookStartSec": 45,
+    "hookEndSec": 80,
+    "energy": 7
+  },
+  {
+    "title": "Havana",
+    "artist": "Camila Cabello ft. Young Thug",
+    "videoId": "BQ0mxQXDG3k",
+    "year": "2017",
+    "durationSec": 402,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 7
+  },
+  {
+    "title": "Levitating",
+    "artist": "Dua Lipa",
+    "videoId": "TUVcZfQe-Kw",
+    "year": "2020",
+    "durationSec": 203,
+    "hookStartSec": 30,
+    "hookEndSec": 65,
+    "energy": 8
+  },
+  {
+    "title": "Don't Start Now",
+    "artist": "Dua Lipa",
+    "videoId": "oygrmJFKYZY",
+    "year": "2019",
+    "durationSec": 181,
+    "hookStartSec": 35,
+    "hookEndSec": 70,
+    "energy": 8
+  },
+  {
+    "title": "New Rules",
+    "artist": "Dua Lipa",
+    "videoId": "k2qgadSvNyU",
+    "year": "2017",
+    "durationSec": 225,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "I'm Not The Only One",
+    "artist": "Sam Smith",
+    "videoId": "nCkpzqqog4k",
+    "year": "2014",
+    "durationSec": 239,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 5
+  },
+  {
+    "title": "Dusk Till Dawn",
+    "artist": "Zayn ft. Sia",
+    "videoId": "tt2k8PGm-TI",
+    "year": "2017",
+    "durationSec": 337,
+    "hookStartSec": 55,
+    "hookEndSec": 95,
+    "energy": 7
+  },
+  {
+    "title": "Chandelier",
+    "artist": "Sia",
+    "videoId": "2vjPBrBU-TM",
+    "year": "2014",
+    "durationSec": 232,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 8
+  },
+  {
+    "title": "Be Alright",
+    "artist": "Dean Lewis",
+    "videoId": "I0czvJ_ijk8",
+    "year": "2018",
+    "durationSec": 197,
+    "hookStartSec": 45,
+    "hookEndSec": 85,
+    "energy": 5
+  },
+  {
+    "title": "When We Were Young",
+    "artist": "Adele",
+    "videoId": "DDWKuo3gXMQ",
+    "year": "2015",
+    "durationSec": 210,
+    "hookStartSec": 40,
+    "hookEndSec": 80,
+    "energy": 8
+  }
+]
