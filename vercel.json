@@ -1,11 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/api/auth/logout", "destination": "/api/logout" },
-    { "source": "/songs", "destination": "/songs/index.html" },
-    { "source": "/songs/:slug", "destination": "/songs/:slug/index.html" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
