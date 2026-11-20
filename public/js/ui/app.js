@@ -1855,16 +1855,53 @@ function buildMultiLanguagePartySet() {
     ? state.selectedLanguages
     : ['hindi'];
 
+  const BLACKLIST = new Set([
+    'BddP6PYo2gs', '7PCkvCPvDXk', 'vX2cDW8LUWk', 'VAdGW7QDJUI', 'V7LwfY5U5WI',
+    'CZt-rVn2BJs', 'Gr8G_ldltDE', 'GftlBD-Apu8', 'k_WdQe_6k4g'
+  ]);
+
   const allSongs = [];
-  selectedLangs.forEach(langId => {
-    const cats = VIBE_CATEGORIES_MAP[langId] || VIBE_CATEGORIES_MAP['hindi'] || [];
-    let chosenCat = cats.find(c => c.id === state.activeVibeCategory) || cats[0];
-    const dbKey = chosenCat?.dbKey || chosenCat?.id || 'hindi-dance';
-    const dbEntry = CURATED_CATEGORIES_DB[dbKey] || CURATED_CATEGORIES_DB['hindi-dance'];
-    if (dbEntry && dbEntry.songs) {
-      allSongs.push(...dbEntry.songs.slice(0, 30));
+  const seenIds = new Set();
+  const seenVids = new Set();
+
+  // If a specific subcategory is chosen
+  if (state.activeVibeCategory) {
+    const dbEntry = CURATED_CATEGORIES_DB[state.activeVibeCategory];
+    if (dbEntry && dbEntry.songs && dbEntry.songs.length) {
+      for (const s of dbEntry.songs) {
+        const vid = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+        if (!vid || vid.length !== 11 || BLACKLIST.has(vid)) continue;
+        const key = (s.title || '').toLowerCase().trim();
+        if (seenIds.has(key) || seenVids.has(vid)) continue;
+        seenIds.add(key);
+        seenVids.add(vid);
+        allSongs.push(s);
+        if (allSongs.length >= 100) break;
+      }
     }
-  });
+  }
+
+  // If no category was chosen or fewer than 50 songs collected, mix from selected languages
+  if (allSongs.length < 50) {
+    selectedLangs.forEach(langId => {
+      const cats = VIBE_CATEGORIES_MAP[langId] || VIBE_CATEGORIES_MAP['hindi'] || [];
+      cats.forEach(c => {
+        const dbEntry = CURATED_CATEGORIES_DB[c.dbKey] || CURATED_CATEGORIES_DB[c.id];
+        if (dbEntry && dbEntry.songs) {
+          for (const s of dbEntry.songs) {
+            const vid = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+            if (!vid || vid.length !== 11 || BLACKLIST.has(vid)) continue;
+            const key = (s.title || '').toLowerCase().trim();
+            if (seenIds.has(key) || seenVids.has(vid)) continue;
+            seenIds.add(key);
+            seenVids.add(vid);
+            allSongs.push(s);
+            if (allSongs.length >= 100) break;
+          }
+        }
+      });
+    });
+  }
 
   const formatted = allSongs.map((t, idx) => ({
     ...t,
@@ -1892,20 +1929,40 @@ function populateVibeTracksToCrate(vibeId, catId) {
   const cId = catId || state.activeVibeCategory || cats[0].id;
   const cat = cats.find(c => c.id === cId) || cats[0];
   const dbEntry = CURATED_CATEGORIES_DB[cat.dbKey] || CURATED_CATEGORIES_DB[cat.id];
-  const songs = (dbEntry?.songs || []).map((t) => ({
-    ...t,
-    source: 'youtube',
-    provider: 'YouTube',
-    mixReady: true,
-    dspReady: false,
-  }));
+
+  const BLACKLIST = new Set([
+    'BddP6PYo2gs', '7PCkvCPvDXk', 'vX2cDW8LUWk', 'VAdGW7QDJUI', 'V7LwfY5U5WI',
+    'CZt-rVn2BJs', 'Gr8G_ldltDE', 'GftlBD-Apu8', 'k_WdQe_6k4g'
+  ]);
+
+  const seenIds = new Set();
+  const seenVids = new Set();
+  const validSongs = [];
+
+  for (const t of (dbEntry?.songs || [])) {
+    const vid = t.videoId || (t.youtube_ids && t.youtube_ids[0]);
+    if (!vid || vid.length !== 11 || BLACKLIST.has(vid)) continue;
+    const key = (t.title || '').toLowerCase().trim();
+    if (seenIds.has(key) || seenVids.has(vid)) continue;
+    seenIds.add(key);
+    seenVids.add(vid);
+    validSongs.push({
+      ...t,
+      source: 'youtube',
+      provider: 'YouTube',
+      mixReady: true,
+      dspReady: false,
+    });
+    if (validSongs.length >= 100) break;
+  }
+
   state.activeVibeCard = vId;
   state.activeVibeCategory = cat.id;
   state.selectedLanguages = [vId];
-  state.crate = songs;
-  state.sequencedSet = sequenceCrate(songs, { vibe: state.vibe, playMode: state.playMode });
+  state.crate = validSongs;
+  state.sequencedSet = sequenceCrate(validSongs, { vibe: state.vibe, playMode: state.playMode });
   state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
-  return songs;
+  return validSongs;
 }
 function renderVibeMusicExplorer() {
   const activeVibe = state.activeVibeCard || 'hindi';
