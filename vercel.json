@@ -1,11 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
     { "source": "/songs", "destination": "/songs/index.html" },
-    { "source": "/songs/:slug", "destination": "/songs/:slug.html" }
+    { "source": "/songs/:slug", "destination": "/songs/:slug/index.html" }
   ],
   "headers": [
     {
@@ -23,8 +21,8 @@
     }
   ],
   "functions": {
-    "api/*.js": {
-      "maxDuration": 15
+    "api/**/*.js": {
+      "maxDuration": 10
     }
   }
 }
