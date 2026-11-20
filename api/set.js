@@ -32,36 +32,51 @@ const MASTER_COUNTS = {
   unsure: 484
 };
 
-function buildFallbackSet(body) {
-  const answers = body?.answers || {};
-  const requestedLangs = (answers.languages || ['hindi', 'punjabi']).map(l => String(l).toLowerCase());
-  const requestedSubtypes = (answers.subtypes || []).map(s => String(s).toLowerCase());
+function slugToSubtype(slug) {
+  return slug.replace(/^[a-z]+-/, '');
+}
 
-  let pool = [];
-  for (const cat of Object.values(CURATED_CATEGORIES_DB)) {
-    const catLang = (cat.lang || 'hindi').toLowerCase();
+function buildSetFromCuratedDb(body) {
+  const answers = body?.answers || {};
+  const requestedLangs = (answers.languages || []).map(l => String(l).toLowerCase());
+  const requestedSubtypes = (answers.subtypes || []).map(s => String(s).toLowerCase());
+  const energy = answers.energy || 'peak';
+
+  let matchingSongs = [];
+  const allCategories = Object.values(CURATED_CATEGORIES_DB);
+
+  // 1. Try to find categories matching requested subtypes first
+  for (const cat of allCategories) {
     const catSlug = (cat.slug || '').toLowerCase();
-    const matchesLang = requestedLangs.includes(catLang);
+    const catLang = (cat.lang || '').toLowerCase();
+
     const matchesSubtype = requestedSubtypes.some(s => {
-      const bareSub = s.includes(':') ? s.split(':')[1] : s;
-      return catSlug.includes(bareSub);
+      const bare = s.includes(':') ? s.split(':')[1] : s;
+      return catSlug.includes(bare);
     });
 
-    if (matchesLang || matchesSubtype || pool.length < 15) {
+    const matchesLang = requestedLangs.includes(catLang);
+
+    if (matchesSubtype || (requestedSubtypes.length === 0 && matchesLang)) {
       for (const s of cat.songs || []) {
-        pool.push({
-          song_id: s.id || `${cat.slug}-${Math.random().toString(36).slice(2, 7)}`,
+        const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]) || 'BddP6PYo2gs';
+        const dur = Number(s.durationSec) || 180;
+        const entry = Number.isFinite(s.entrySec) ? s.entrySec : (Number.isFinite(s.hookStartSec) ? s.hookStartSec : 30);
+        const exit = Number.isFinite(s.exitSec) ? s.exitSec : (Number.isFinite(s.hookEndSec) ? s.hookEndSec : Math.min(entry + 40, dur));
+
+        matchingSongs.push({
+          song_id: s.id || `${cat.slug}-${matchingSongs.length + 1}`,
           title: s.title,
           artist: s.artist,
-          youtube_ids: s.youtube_ids && s.youtube_ids.length ? s.youtube_ids : [s.videoId || 'k89egJyAlDE'],
-          duration_sec: s.durationSec || s.duration_sec || 180,
-          entry_sec: s.entrySec || s.entry_sec || 30,
-          exit_sec: s.exitSec || s.exit_sec || 140,
-          play_full: Boolean(s.playFull || s.play_full),
-          era: 'post2020',
+          youtube_ids: [vId],
+          duration_sec: dur,
+          entry_sec: entry,
+          exit_sec: exit,
+          play_full: Boolean(s.playFull),
+          era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
           language: catLang,
-          subtype: catSlug.replace(/^[a-z]+-/, ''),
-          energy: s.energy || 7,
+          subtype: slugToSubtype(cat.slug),
+          energy: s.energy || (energy === 'bangers' ? 9 : 8),
           tags: [],
           style: 'party',
           unsure: false,
@@ -71,10 +86,42 @@ function buildFallbackSet(body) {
     }
   }
 
-  // Deduplicate pool by title+artist
+  // 2. If nothing matched, fall back to all Hindi & Punjabi party songs
+  if (!matchingSongs.length) {
+    for (const cat of allCategories) {
+      if (['hindi-dance', 'punjabi-party', 'hindi-retro', 'english-pop'].includes(cat.slug)) {
+        for (const s of cat.songs || []) {
+          const vId = s.videoId || 'BddP6PYo2gs';
+          const dur = Number(s.durationSec) || 180;
+          const entry = s.entrySec || 30;
+          const exit = s.exitSec || Math.min(entry + 40, dur);
+          matchingSongs.push({
+            song_id: s.id || `${cat.slug}-${matchingSongs.length + 1}`,
+            title: s.title,
+            artist: s.artist,
+            youtube_ids: [vId],
+            duration_sec: dur,
+            entry_sec: entry,
+            exit_sec: exit,
+            play_full: Boolean(s.playFull),
+            era: 'post2020',
+            language: cat.lang,
+            subtype: slugToSubtype(cat.slug),
+            energy: s.energy || 8,
+            tags: [],
+            style: 'party',
+            unsure: false,
+            heat: s.heat || Array.from({ length: 100 }, (_, i) => 0.5 + 0.4 * Math.sin(i / 10))
+          });
+        }
+      }
+    }
+  }
+
+  // 3. Deduplicate
   const seen = new Set();
   const deduped = [];
-  for (const item of pool) {
+  for (const item of matchingSongs) {
     const key = `${item.title.toLowerCase()}::${item.artist.toLowerCase()}`;
     if (!seen.has(key)) {
       seen.add(key);
@@ -82,13 +129,13 @@ function buildFallbackSet(body) {
     }
   }
 
-  // Pick 30 songs
+  // 4. Return top 30
   const cues = deduped.slice(0, 30);
   return {
     cues,
     fillers: [],
-    note: null,
-    more: "fallback-more-token"
+    note: "Tonight's set, curated from official YouTube party hits. Tap APPROVE & PLAY.",
+    more: "more-token-audify"
   };
 }
 
@@ -96,18 +143,6 @@ export default async function handler(req, res) {
   if (handlePreflight(req, res)) return;
 
   if (req.method === 'GET') {
-    try {
-      const remote = await fetch('https://www.naux.party/api/set', {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(4000)
-      });
-      if (remote.ok) {
-        const data = await remote.json();
-        return sendJson(res, 200, data, 'public, max-age=60');
-      }
-    } catch (e) {
-      console.warn('GET /api/set upstream fetch failed, using fallback:', e.message);
-    }
     return sendJson(res, 200, MASTER_COUNTS, 'public, max-age=60');
   }
 
@@ -117,6 +152,12 @@ export default async function handler(req, res) {
       body = await readJsonBody(req);
     } catch {}
 
+    const localSet = buildSetFromCuratedDb(body);
+    if (localSet.cues && localSet.cues.length >= 10) {
+      return sendJson(res, 200, localSet);
+    }
+
+    // Upstream fallback if needed
     try {
       const remote = await fetch('https://www.naux.party/api/set', {
         method: 'POST',
@@ -125,18 +166,17 @@ export default async function handler(req, res) {
           'Accept': 'application/json'
         },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(7000)
+        signal: AbortSignal.timeout(4000)
       });
       if (remote.ok) {
         const data = await remote.json();
         return sendJson(res, 200, data);
       }
     } catch (e) {
-      console.warn('POST /api/set upstream fetch failed, using fallback:', e.message);
+      console.warn('POST /api/set upstream fetch failed:', e.message);
     }
 
-    const fallbackData = buildFallbackSet(body);
-    return sendJson(res, 200, fallbackData);
+    return sendJson(res, 200, localSet);
   }
 
   res.setHeader('Allow', 'GET, POST');
