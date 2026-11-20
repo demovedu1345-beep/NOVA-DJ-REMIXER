@@ -1,5 +1,5 @@
 import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
-import { CURATED_CATEGORIES_DB } from '../public/js/engine/curated-songs-db.js';
+import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
 
 const MASTER_COUNTS = {
   counts: {
