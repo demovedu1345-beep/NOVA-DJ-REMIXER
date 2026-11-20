@@ -493,6 +493,22 @@
     }
   ];
 
+  // Pre-parse and pre-calculate all palette colors & OKLCH stops once at initialization (Zero GC Churn)
+  const PRECOMPUTED_PALETTES = MOOD_PALETTES.map((pal) => {
+    const c1 = parseColor(pal.soft.c1);
+    const c2 = parseColor(pal.soft.c2);
+    const curtainStops = pal.curtain.map(parseColor);
+    const curtainBuf = new Float32Array(MAX_STOPS * 3);
+    unwrapHues(curtainStops.map(toOklch)).forEach((stop, idx) => {
+      curtainBuf.set(stop, idx * 3);
+    });
+    return {
+      ...pal,
+      parsedSoft: { c1, c2 },
+      curtainBuffer: curtainBuf
+    };
+  });
+
   let currentPaletteIdx = 0;
   let targetPaletteIdx = 0;
   let paletteTransition = 1.0;
@@ -599,9 +615,24 @@
   // -----------------------------------------------------------------------
   // 6. Main WebGL2 Render Loop (Dual Shaders Orchestration)
   // -----------------------------------------------------------------------
+  let isContextLost = false;
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    isContextLost = true;
+    console.warn('[Audify Aurora] WebGL context lost.');
+  });
+  canvas.addEventListener('webglcontextrestored', () => {
+    isContextLost = false;
+    console.log('[Audify Aurora] WebGL context restored.');
+  });
+
   function render(now) {
     requestAnimationFrame(render);
-    if (document.hidden) return;
+    if (isContextLost || (gl.isContextLost && gl.isContextLost())) return;
+    if (document.hidden) {
+      lastTime = now;
+      return;
+    }
 
     const dt = clamp((now - lastTime) / 1000 || 0, 0, 0.05);
     lastTime = now;
@@ -641,8 +672,8 @@
       pulseData[idx * 4 + 3] = p.age;
     });
 
-    const activePal = MOOD_PALETTES[currentPaletteIdx];
-    const targetPal = MOOD_PALETTES[targetPaletteIdx];
+    const activePal = PRECOMPUTED_PALETTES[currentPaletteIdx];
+    const targetPal = PRECOMPUTED_PALETTES[targetPaletteIdx];
     const aspect = canvas.width / canvas.height;
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -651,28 +682,33 @@
 
     const whichEffect = auroraMode === 'auto' ? activeEffect : auroraMode;
 
-    // RENDER 1: SoftAurora Shader
+    // RENDER 1: SoftAurora Shader (Zero per-frame allocations)
     if ((whichEffect === 'soft' || whichEffect === 'fusion') && softShader) {
       gl.useProgram(softShader.program);
       gl.bindVertexArray(softVao);
       const u = softShader.uniforms;
 
-      const c1A = parseColor(activePal.soft.c1);
-      const c1B = parseColor(targetPal.soft.c1);
-      const c2A = parseColor(activePal.soft.c2);
-      const c2B = parseColor(targetPal.soft.c2);
+      const c1A = activePal.parsedSoft.c1;
+      const c1B = targetPal.parsedSoft.c1;
+      const c2A = activePal.parsedSoft.c2;
+      const c2B = targetPal.parsedSoft.c2;
+      const tP = paletteTransition;
 
-      const mixCol = (a, b, m) => [a[0] + (b[0] - a[0]) * m, a[1] + (b[1] - a[1]) * m, a[2] + (b[2] - a[2]) * m];
-      const col1 = mixCol(c1A, c1B, paletteTransition);
-      const col2 = mixCol(c2A, c2B, paletteTransition);
+      const c1R = c1A[0] + (c1B[0] - c1A[0]) * tP;
+      const c1G = c1A[1] + (c1B[1] - c1A[1]) * tP;
+      const c1Bval = c1A[2] + (c1B[2] - c1A[2]) * tP;
+
+      const c2R = c2A[0] + (c2B[0] - c2A[0]) * tP;
+      const c2G = c2A[1] + (c2B[1] - c2A[1]) * tP;
+      const c2Bval = c2A[2] + (c2B[2] - c2A[2]) * tP;
 
       gl.uniform2f(u.uResolution, canvas.width, canvas.height);
       gl.uniform1f(u.uFlow, flow);
       gl.uniform1f(u.uHue, hue);
       gl.uniform1f(u.uScale, 1.45);
       gl.uniform1f(u.uBrightness, 1.15 * (1 + (beatPulse - 1) * 0.55));
-      gl.uniform3f(u.uColor1, col1[0], col1[1], col1[2]);
-      gl.uniform3f(u.uColor2, col2[0], col2[1], col2[2]);
+      gl.uniform3f(u.uColor1, c1R, c1G, c1Bval);
+      gl.uniform3f(u.uColor2, c2R, c2G, c2Bval);
       gl.uniform1f(u.uNoiseFreq, 2.4);
       gl.uniform1f(u.uNoiseAmp, 1.05);
       gl.uniform1f(u.uBandHeight, activePal.soft.bandHeight || 0.5);
@@ -690,18 +726,26 @@
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
-    // RENDER 2: Curtain Aurora Shader
+    // RENDER 2: Curtain Aurora Shader (Zero per-frame allocations)
     if ((whichEffect === 'curtain' || whichEffect === 'fusion') && curtainShader) {
       gl.useProgram(curtainShader.program);
       gl.bindVertexArray(curtainVao);
       const u = curtainShader.uniforms;
 
-      const currentStops = activePal.curtain.map(parseColor);
-      unwrapHues(currentStops.map(toOklch)).forEach((stop, idx) => paletteBuffer.set(stop, idx * 3));
+      if (paletteTransition >= 1.0) {
+        gl.uniform3fv(u.uStops, activePal.curtainBuffer);
+      } else {
+        const aBuf = activePal.curtainBuffer;
+        const bBuf = targetPal.curtainBuffer;
+        const tP = paletteTransition;
+        for (let i = 0; i < MAX_STOPS * 3; i++) {
+          paletteBuffer[i] = aBuf[i] + (bBuf[i] - aBuf[i]) * tP;
+        }
+        gl.uniform3fv(u.uStops, paletteBuffer);
+      }
 
       gl.uniform2f(u.uResolution, canvas.width, canvas.height);
       gl.uniform1f(u.uTime, curtainState.clock);
-      gl.uniform3fv(u.uStops, paletteBuffer);
       gl.uniform1i(u.uStopCount, activePal.curtain.length);
       gl.uniform1f(u.uAmplitude, 1.25 + (beatPulse - 1) * 0.7);
       gl.uniform1f(u.uBlend, 0.55);
@@ -927,11 +971,12 @@
     }
   }, true);
 
-  // Detect play state to keep aurora breathing
+  // Detect play state to keep aurora breathing (Zero layout reflow)
   setInterval(() => {
-    const playBtn = document.querySelector('button[aria-label*="Pause"], button[aria-label*="pause"]');
-    const hasPause = Boolean(playBtn) || document.body.innerText.includes('PAUSE');
-    isPlaying = hasPause;
+    const isPaused = Boolean(document.querySelector('.paused-stamp, #btn-paused-resume, [data-paused="true"]'));
+    const hasPlayClock = Boolean(document.getElementById('btn-clock-pause'));
+    const isAudioPlaying = Boolean(window.__nova_orchestrator && !window.__nova_orchestrator.getSnapshot()?.paused);
+    isPlaying = isAudioPlaying || (hasPlayClock && !isPaused);
     if (isPlaying) {
       window.triggerAudifyBeatPulse(1.15);
     }
@@ -1087,124 +1132,6 @@
           if (auroraDd) auroraDd.style.display = 'none';
         });
       }
-    }
-
-    // 2. Language Section
-    if (!document.getElementById('audify-languages-section')) {
-      const mainContainer = document.querySelector('main') || document.body;
-      const langSection = document.createElement('section');
-      langSection.id = 'audify-languages-section';
-      langSection.style.cssText = `
-        margin: 40px auto;
-        max-width: 1040px;
-        padding: 24px;
-        border-radius: 24px;
-        border: 1.5px solid rgba(255,255,255,0.1);
-        background: rgba(10,10,12,0.85);
-        backdrop-filter: blur(24px);
-        position: relative;
-        z-index: 20;
-        box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-      `;
-
-      const ALL_LANGUAGES = [
-        { id: 'hindi', label: 'Hindi', count: '1000+ Songs', tag: 'Bollywood · Dance · Retro · Hip-Hop' },
-        { id: 'punjabi', label: 'Punjabi', count: '900+ Songs', tag: 'Bhangra · Wedding · Gym · Bass' },
-        { id: 'english', label: 'Hollywood', count: '500+ Songs', tag: 'Global Pop · EDM · Rap · Love' },
-        { id: 'marathi', label: 'Marathi', count: '100 Top Songs', tag: 'Zingaat · Dhol Tasha · Sairat · Lavani' },
-        { id: 'gujarati', label: 'Gujarati', count: '100 Top Songs', tag: 'Garba · Dandiya · Folk · Dholida' },
-        { id: 'tamil', label: 'Tamil', count: '100 Top Songs', tag: 'Anirudh · Kuthu · Mass · Whistle' },
-        { id: 'telugu', label: 'Telugu', count: '100 Top Songs', tag: 'DSP · Thaman · Theater Mass · RRR' },
-        { id: 'kannada', label: 'Kannada', count: '100 Top Songs', tag: 'KGF · Salaar · Kantara · Sandalwood' },
-        { id: 'marwadi', label: 'Marwadi', count: '100 Top Songs', tag: 'Chaudhary · Ghoomar · Folk Party' },
-        { id: 'odia', label: 'Odia', count: '100 Top Songs', tag: 'Rangabati · Sambalpuri · Ollywood' },
-        { id: 'bhojpuri', label: 'Bhojpuri', count: '100 Top Songs', tag: 'Pawan Singh · Khesari Lal · Party' },
-        { id: 'haryanvi', label: 'Haryanvi', count: '100 Top Songs', tag: '52 Gaj · Balam Thanedar · Ragni' },
-      ];
-
-      langSection.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-          <div>
-            <div style="font-family:var(--font-mono), monospace;font-size:11px;font-weight:800;letter-spacing:0.1em;color:#c8ff00;text-transform:uppercase">
-              EXPLORE ALL REGIONS · TOP 100 GREATEST HITS
-            </div>
-            <h2 style="font-family:var(--font-anton), 'Anton', sans-serif;font-size:clamp(26px, 3.4vw, 38px);color:#fff;margin:4px 0 0 0;text-transform:uppercase;letter-spacing:0.02em">
-              BROWSE BY LANGUAGE
-            </h2>
-          </div>
-          <span style="font-family:var(--font-mono), monospace;font-size:12px;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15);padding:6px 12px;border-radius:9999px">
-            12 LANGUAGES AVAILABLE
-          </span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:14px">
-          ${ALL_LANGUAGES.map((l) => `
-            <div class="audify-lang-card squeeze" data-lang="${l.id}" style="
-              background:rgba(255,255,255,0.03);
-              border:1px solid rgba(255,255,255,0.08);
-              border-radius:16px;
-              padding:16px 18px;
-              cursor:pointer;
-              transition:all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-            ">
-              <div style="display:flex;justify-content:space-between;align-items:baseline">
-                <span style="font-family:var(--font-anton), 'Anton', sans-serif;font-size:22px;color:#fff;letter-spacing:0.03em">${l.label.toUpperCase()}</span>
-                <span style="font-family:var(--font-mono), monospace;font-size:10px;color:#c8ff00;font-weight:700">${l.count}</span>
-              </div>
-              <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:6px 0 10px 0;line-height:1.3">${l.tag}</p>
-              <button class="squeeze" style="
-                width:100%;
-                background:transparent;
-                border:1px solid rgba(200,255,0,0.5);
-                color:#c8ff00;
-                font-family:var(--font-anton), 'Anton', sans-serif;
-                font-size:12px;
-                padding:6px 0;
-                border-radius:8px;
-                letter-spacing:0.04em;
-                cursor:pointer;
-                transition:all 0.15s;
-              ">PLAY SET →</button>
-            </div>
-          `).join('')}
-        </div>
-      `;
-
-      mainContainer.appendChild(langSection);
-
-      langSection.querySelectorAll('.audify-lang-card').forEach((card) => {
-        card.addEventListener('mouseenter', () => {
-          card.style.borderColor = '#c8ff00';
-          card.style.background = 'rgba(200,255,0,0.06)';
-          card.style.transform = 'translateY(-2px)';
-        });
-        card.addEventListener('mouseleave', () => {
-          card.style.borderColor = 'rgba(255,255,255,0.08)';
-          card.style.background = 'rgba(255,255,255,0.03)';
-          card.style.transform = 'translateY(0)';
-        });
-        card.addEventListener('click', async () => {
-          const lang = card.dataset.lang;
-          window.triggerAudifyBeatPulse(2.0);
-          window.onAudifySongChange({ title: `Language: ${lang}` });
-          try {
-            const res = await fetch('/api/set', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ answers: { languages: [lang], energy: 'peak' } })
-            });
-            const data = await res.json();
-            if (data.cues && data.cues.length) {
-              if (window.__audify_player_engine) {
-                window.__audify_player_engine.start(data.cues);
-              }
-              const approveBtn = document.querySelector('button[aria-label*="Approve"], button[aria-label*="play"]');
-              if (approveBtn) approveBtn.click();
-            }
-          } catch (e) {
-            console.warn('Set fetch error:', e);
-          }
-        });
-      });
     }
   }
 

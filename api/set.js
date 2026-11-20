@@ -3,6 +3,16 @@ import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
 
 const MASTER_COUNTS = {
   "counts": {
+    "language": 3118,
+    "language:punjabi": 1097,
+    "language:marathi": 200,
+    "language:gujarati": 221,
+    "language:tamil-telugu": 400,
+    "language:kannada": 200,
+    "language:marwadi": 200,
+    "language:odia": 200,
+    "language:bhojpuri-haryanvi": 400,
+    "language:haryanvi-bhojpuri": 400,
     "hindi": 1453,
     "hindi:diwali": 218,
     "hindi:dance": 253,
@@ -48,6 +58,16 @@ function slugMatchesSubtype(slug, subtype) {
   const isFull = subtype.includes(':');
   const [lang, bareSub] = isFull ? subtype.split(':') : [null, subtype];
   const s = slug.toLowerCase();
+  if (lang === 'language') {
+    if (bareSub === 'punjabi') return s.startsWith('punjabi');
+    if (bareSub === 'marathi') return s.startsWith('marathi');
+    if (bareSub === 'gujarati') return s.startsWith('gujarati');
+    if (bareSub === 'tamil-telugu') return s.startsWith('tamil-telugu');
+    if (bareSub === 'kannada') return s.startsWith('kannada');
+    if (bareSub === 'marwadi') return s.startsWith('marwadi');
+    if (bareSub === 'odia') return s.startsWith('odia');
+    if (bareSub === 'haryanvi-bhojpuri' || bareSub === 'bhojpuri-haryanvi') return s.startsWith('haryanvi-bhojpuri');
+  }
 
   if (lang === 'hindi' && bareSub === 'hiphop') return s === 'hindi-hiphop';
   if (lang === 'english' && bareSub === 'hiphop') return s === 'english-hiphop';
@@ -83,6 +103,7 @@ function catMatchesLang(catLang, requestedLangs) {
   const cl = (catLang || '').toLowerCase();
   for (const rl of requestedLangs) {
     if (cl === rl) return true;
+    if (rl === 'language' && cl !== 'hindi' && cl !== 'english') return true;
     if ((rl === 'tamil-telugu' || rl === 'south') && (cl === 'south' || cl === 'tamil-telugu' || cl === 'tamil' || cl === 'telugu')) return true;
     if ((rl === 'haryanvi-bhojpuri' || rl === 'regional') && (cl === 'haryanvi-bhojpuri' || cl === 'regional' || cl === 'haryanvi' || cl === 'bhojpuri')) return true;
     if (rl === 'gujarati' && (cl === 'gujarati' || cl === 'garba')) return true;
