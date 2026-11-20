@@ -1640,43 +1640,61 @@ const NAUX_SPLASH_TAGLINES = [
 let splashTaglineIndex = 0;
 let splashInterval = null;
 
+function renderRequestSongButton() {
+  if (state.requestFormOpen) {
+    if (state.requestFormStatus === 'sent') {
+      return `
+        <div class="flex w-full max-w-2xl basis-full flex-col gap-3 pt-2">
+          <p class="text-xl text-lime">Got it. It gets added, usually within a day.</p>
+        </div>
+      `;
+    }
+    return `
+      <div class="flex w-full max-w-2xl basis-full flex-col gap-3 pt-2">
+        <label class="text-xl text-white/70" for="naux-request-input">Which song? Add the artist if you know it.</label>
+        <div class="flex gap-3">
+          <input id="naux-request-input" value="${esc(state.requestSongText || '')}" maxlength="200" placeholder="e.g. Tauba Tauba, Karan Aujla" class="h-16 flex-1 rounded-2xl border-2 border-white/25 bg-transparent px-5 text-xl text-white placeholder:text-white/30 focus:border-lime focus:outline-none" />
+          <button id="btn-naux-request-send" class="h-16 rounded-2xl bg-lime px-7 font-display text-3xl text-ink disabled:opacity-40 cursor-pointer" ${(state.requestSongText || '').trim().length >= 2 ? '' : 'disabled'}>
+            ${state.requestFormStatus === 'sending' ? '…' : 'SEND'}
+          </button>
+        </div>
+        ${state.requestFormStatus === 'error' ? '<p class="text-lg text-white/60">Couldn\'t send that. Try again in a moment.</p>' : ''}
+      </div>
+    `;
+  }
+  return `
+    <button id="btn-open-request-song" class="shrink-0 whitespace-nowrap rounded-full md:ml-auto border-2 border-lime/70 bg-lime/10 px-4 py-1.5 text-base text-lime transition hover:bg-lime/20 md:text-lg cursor-pointer">
+      ＋ Missing a song? Request it
+    </button>
+  `;
+}
+
 function renderSplash() {
   if (splashInterval) {
     clearInterval(splashInterval);
     splashInterval = null;
   }
+  if (state.splashAutoTimer) {
+    clearTimeout(state.splashAutoTimer);
+    state.splashAutoTimer = null;
+  }
   const tagline = NAUX_SPLASH_TAGLINES[splashTaglineIndex % NAUX_SPLASH_TAGLINES.length];
 
   root.innerHTML = `
     <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white relative flex flex-col justify-between">
-      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center cursor-pointer select-none">
+      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center cursor-pointer select-none" id="splash-main-container">
         <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime select-none">NAUX</h1>
         <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">The aux, handled.</p>
         <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime transition-opacity duration-300" id="splash-tagline-el">
           ${esc(tagline)}
         </p>
-        <div class="mt-10">
-          <button id="btn-splash-start" class="rounded-2xl bg-lime px-8 py-4 font-display text-2xl tracking-wide text-ink transition active:scale-[0.98] squeeze cursor-pointer">
-            START A SET →
-          </button>
-        </div>
         <p class="mt-8 max-w-xl text-sm text-white/30">
           Tell NAUX the room and it plays the set: Hindi and Punjabi party songs that drop straight into the hook. 
-          <button id="link-splash-songs" class="underline hover:text-white/60 bg-transparent border-0 text-white/30 cursor-pointer text-sm">Song lists</button>
+          <a href="/songs" id="link-splash-songs" class="underline hover:text-white/60 bg-transparent border-0 text-white/30 cursor-pointer text-sm">Song lists</a>
         </p>
       </main>
+      <div aria-hidden="true" class="naux-players" data-visible="false"></div>
     </div>
-    ${state.proDjModalOpen ? renderProDjModal() : ''}
-    ${state.brainModalOpen ? renderBrainModal({
-      claudeKeySet: Boolean(state.opusKey),
-      geminiKeySet: Boolean(state.geminiKey),
-      openaiKeySet: Boolean(state.openaiKey),
-      claudeKey: state.opusKey || '',
-      geminiKey: state.geminiKey || '',
-      openaiKey: state.openaiKey || '',
-      health: state.health,
-      learningStats: getLearningStats(),
-    }) : ''}
   `;
 
   // Rotate tagline every 3.5s
@@ -1692,15 +1710,24 @@ function renderSplash() {
     }
   }, 3500);
 
-  // Wire splash actions
-  const btnStart = document.getElementById('btn-splash-start');
-  if (btnStart) {
-    btnStart.onclick = () => {
-      if (splashInterval) clearInterval(splashInterval);
-      state.screen = 'wizard';
-      state.appMode = 'dj';
-      state.wizardStep = 0;
-      render();
+  const startFunnel = () => {
+    if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
+    if (state.splashAutoTimer) { clearTimeout(state.splashAutoTimer); state.splashAutoTimer = null; }
+    state.screen = 'wizard';
+    state.appMode = 'dj';
+    state.wizardStep = 0;
+    render();
+  };
+
+  // 2.5s auto transition matching naux.party
+  state.splashAutoTimer = setTimeout(startFunnel, 2500);
+
+  // Click on splash advances immediately
+  const splashMain = document.getElementById('splash-main-container');
+  if (splashMain) {
+    splashMain.onclick = (e) => {
+      if (e.target && (e.target.id === 'link-splash-songs' || e.target.closest('#link-splash-songs'))) return;
+      startFunnel();
     };
   }
 
@@ -1709,33 +1736,33 @@ function renderSplash() {
     linkSongs.onclick = (e) => {
       e.preventDefault();
       if (splashInterval) clearInterval(splashInterval);
+      if (state.splashAutoTimer) clearTimeout(state.splashAutoTimer);
       state.appMode = 'yt';
       state.ytViewMode = 'directory';
       state.screen = 'wizard';
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.pushState({}, '', '/songs');
+      }
       render();
     };
   }
-
-  const btnPro = document.getElementById('btn-splash-pro-dj');
-  if (btnPro) {
-    btnPro.onclick = () => {
-      state.proDjModalOpen = true;
-      render();
-    };
-  }
-
-  const btnBrain = document.getElementById('btn-splash-brain');
-  if (btnBrain) {
-    btnBrain.onclick = () => {
-      state.brainModalOpen = true;
-      render();
-    };
-  }
-
-  bindBrainModalEvents();
-  bindProDjModalEvents();
 }
 
+function renderBuilding() {
+  const tagline = NAUX_SPLASH_TAGLINES[splashTaglineIndex % NAUX_SPLASH_TAGLINES.length];
+  root.innerHTML = `
+    <div class="anton_3de222df-module__cdpv1W__variable inter_5901b7c6-module__ec5Qua__variable min-h-dvh bg-ink font-sans text-white">
+      <main class="flex min-h-dvh flex-col items-center justify-center px-6 text-center select-none">
+        <h1 class="font-display text-[clamp(120px,22vw,360px)] leading-none tracking-tight text-lime animate-pulse select-none">NAUX</h1>
+        <p class="font-display text-[clamp(28px,3vw,48px)] uppercase tracking-wide text-white/60">Building your set…</p>
+        <p class="splash-line mt-6 min-h-[1.2em] font-display text-[clamp(26px,2.6vw,42px)] uppercase leading-tight tracking-wide text-lime">
+          ${esc(tagline)}
+        </p>
+      </main>
+      <div aria-hidden="true" class="naux-players" data-visible="false"></div>
+    </div>
+  `;
+}
 function renderTopBar(rightHtml) {
   const modeSwitcher = `
     <div class="app-mode-switcher">
@@ -1807,6 +1834,58 @@ const VIBE_CATEGORIES_MAP = {
   ],
 };
 
+function sendSongRequest() {
+  if (!state.requestSongText || state.requestSongText.trim().length < 2) return;
+  state.requestFormStatus = 'sending';
+  render();
+  setTimeout(() => {
+    state.requestFormStatus = 'sent';
+    render();
+    setTimeout(() => {
+      state.requestFormOpen = false;
+      state.requestFormStatus = 'idle';
+      state.requestSongText = '';
+      render();
+    }, 3000);
+  }, 600);
+}
+
+function buildMultiLanguagePartySet() {
+  const selectedLangs = (state.selectedLanguages && state.selectedLanguages.length)
+    ? state.selectedLanguages
+    : ['hindi'];
+
+  const allSongs = [];
+  selectedLangs.forEach(langId => {
+    const cats = VIBE_CATEGORIES_MAP[langId] || VIBE_CATEGORIES_MAP['hindi'] || [];
+    let chosenCat = cats.find(c => c.id === state.activeVibeCategory) || cats[0];
+    const dbKey = chosenCat?.dbKey || chosenCat?.id || 'hindi-dance';
+    const dbEntry = CURATED_CATEGORIES_DB[dbKey] || CURATED_CATEGORIES_DB['hindi-dance'];
+    if (dbEntry && dbEntry.songs) {
+      allSongs.push(...dbEntry.songs.slice(0, 30));
+    }
+  });
+
+  const formatted = allSongs.map((t, idx) => ({
+    ...t,
+    id: t.id || `set-track-${idx + 1}`,
+    source: 'youtube',
+    provider: 'YouTube',
+    mixReady: true,
+    dspReady: false,
+    durationSec: Number(t.durationSec) || 180,
+    entrySec: Number.isFinite(t.entrySec) ? t.entrySec : (Number.isFinite(t.hookStartSec) ? t.hookStartSec : 25),
+    exitSec: Number.isFinite(t.exitSec) ? t.exitSec : (Number.isFinite(t.hookEndSec) ? t.hookEndSec : 65),
+    energy: Number(t.energy) || 7,
+  }));
+
+  state.crate = formatted;
+  state.sequencedSet = sequenceCrate(formatted, { vibe: state.vibe, playMode: state.playMode });
+  state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
+  state.reviewNote = null;
+  return formatted;
+}
+
 function populateVibeTracksToCrate(vibeId, catId) {
   const vId = vibeId || state.activeVibeCard || 'hindi';
   const cats = VIBE_CATEGORIES_MAP[vId] || VIBE_CATEGORIES_MAP['hindi'];
@@ -1828,16 +1907,6 @@ function populateVibeTracksToCrate(vibeId, catId) {
   state.setPlan = planSetHeuristic(state.sequencedSet, { vibe: state.vibe, playMode: state.playMode });
   return songs;
 }
-
-function getActiveVibeTracks() {
-  const vibeId = state.activeVibeCard || 'hindi';
-  const cats = VIBE_CATEGORIES_MAP[vibeId] || VIBE_CATEGORIES_MAP['hindi'];
-  const catId = state.activeVibeCategory || cats[0].id;
-  const cat = cats.find(c => c.id === catId) || cats[0];
-  const dbEntry = CURATED_CATEGORIES_DB[cat.dbKey] || CURATED_CATEGORIES_DB[cat.id];
-  return dbEntry?.songs || [];
-}
-
 function renderVibeMusicExplorer() {
   const activeVibe = state.activeVibeCard || 'hindi';
   const vibeMeta = LANGUAGES.find(l => l.id === activeVibe) || LANGUAGES[0];
@@ -1896,13 +1965,13 @@ function renderVibeMusicExplorer() {
 function renderWizard() {
   const step = state.wizardStep;
 
-  // Track counts from CURATED_CATEGORIES_DB
-  const hindiCount = CURATED_CATEGORIES_DB['hindi-dance']?.songs?.length || 358;
-  const punjabiCount = CURATED_CATEGORIES_DB['punjabi-party']?.songs?.length || 454;
-  const englishCount = CURATED_CATEGORIES_DB['english-pop']?.songs?.length || 107;
-  const southCount = CURATED_CATEGORIES_DB['tamil-telugu-kuthu']?.songs?.length || 14;
+  // Real song counts from CURATED_CATEGORIES_DB
+  const hindiCount = (CURATED_CATEGORIES_DB['hindi-dance']?.songs?.length || 358) + (CURATED_CATEGORIES_DB['hindi-romantic']?.songs?.length || 256) + (CURATED_CATEGORIES_DB['hindi-retro']?.songs?.length || 165);
+  const punjabiCount = (CURATED_CATEGORIES_DB['punjabi-party']?.songs?.length || 454) + (CURATED_CATEGORIES_DB['punjabi-wedding']?.songs?.length || 207) + (CURATED_CATEGORIES_DB['punjabi-gym']?.songs?.length || 284);
+  const englishCount = (CURATED_CATEGORIES_DB['english-pop']?.songs?.length || 107) + (CURATED_CATEGORIES_DB['english-hiphop']?.songs?.length || 53) + (CURATED_CATEGORIES_DB['english-edm']?.songs?.length || 42);
+  const southCount = (CURATED_CATEGORIES_DB['tamil-telugu-kuthu']?.songs?.length || 14) + (CURATED_CATEGORIES_DB['tamil-telugu-mass']?.songs?.length || 15);
   const garbaCount = CURATED_CATEGORIES_DB['gujarati-garba']?.songs?.length || 46;
-  const haryanviCount = CURATED_CATEGORIES_DB['haryanvi-bhojpuri-party']?.songs?.length || 11;
+  const haryanviCount = (CURATED_CATEGORIES_DB['haryanvi-bhojpuri-party']?.songs?.length || 11) + (CURATED_CATEGORIES_DB['haryanvi-bhojpuri-desi-beats']?.songs?.length || 15);
 
   const WIZARD_LANGUAGES = [
     { id: 'hindi', label: 'Hindi', count: hindiCount, hint: `${hindiCount} songs ready` },
@@ -1921,6 +1990,7 @@ function renderWizard() {
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What are we playing?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <p class="text-xl text-white/60 md:text-2xl">Pick every language the room wants.</p>
+          ${renderRequestSongButton()}
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2 mt-7 md:mt-10">
@@ -1935,13 +2005,23 @@ function renderWizard() {
           }).join('')}
         </div>
 
-        <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] disabled:bg-[#3a4500] disabled:text-ink/70 md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer" ${(state.selectedLanguages || []).length ? '' : 'disabled'}>
-          NEXT →
-        </button>
+        <p class="mt-6 text-lg text-white/45">
+          Coming soon: Marathi, Bengali.
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center justify-end gap-6">
+          <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] disabled:bg-[#3a4500] disabled:text-ink/70 md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer" ${(state.selectedLanguages || []).length ? '' : 'disabled'}>
+            NEXT →
+          </button>
+        </div>
 
         <p class="mt-12 text-lg text-white/40">
-          Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a>
+          Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
         </p>
+        <a href="https://www.instagram.com/swpnldubey/" target="_blank" rel="noopener" class="group mt-4 inline-flex items-center gap-2.5 text-lg text-white/50 transition hover:text-white">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5 fill-none stroke-current stroke-2"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.6" class="fill-current"></circle></svg>
+          Made by Swapnil · <span class="text-lime group-hover:underline">@swpnldubey</span>
+        </a>
       </section>
     `;
   } else if (step === 1) {
@@ -1952,6 +2032,7 @@ function renderWizard() {
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What kind?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <p class="text-xl text-white/60 md:text-2xl">Optional. Skip a language to take anything in it.</p>
+          ${renderRequestSongButton()}
         </div>
 
         <div class="flex flex-col gap-8 mt-7 md:mt-10">
@@ -1990,6 +2071,9 @@ function renderWizard() {
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
         <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">Where in the night are we?</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          ${renderRequestSongButton()}
+        </div>
 
         <div class="grid gap-4 md:grid-cols-2 mt-7 md:mt-10">
           ${NIGHT_VIBES.map((v) => {
@@ -2002,10 +2086,6 @@ function renderWizard() {
             `;
           }).join('')}
         </div>
-
-        <button id="btn-wiz-next" class="fixed inset-x-6 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-20 rounded-3xl bg-lime font-display text-4xl tracking-wide text-ink shadow-[0_-12px_40px_16px_rgba(8,8,8,0.9)] transition active:scale-[0.97] md:inset-x-auto md:bottom-8 md:right-[max(2.5rem,calc((100vw-72rem)/2+2.5rem))] md:h-24 md:px-14 md:text-5xl cursor-pointer">
-          NEXT →
-        </button>
       </section>
     `;
   } else if (step === 3) {
@@ -2013,6 +2093,9 @@ function renderWizard() {
       <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
         <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">How many people?</h1>
+        <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+          ${renderRequestSongButton()}
+        </div>
 
         <div class="grid gap-4 md:grid-cols-3 mt-7 md:mt-10">
           ${CROWD_SIZES.map((c) => {
@@ -2035,27 +2118,15 @@ function renderWizard() {
         <button id="btn-naux-brand" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
         <div class="flex items-center gap-5">
           <span class="text-white/50">${step + 1} / 4</span>
-          ${step > 0 ? `<button id="btn-wiz-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/25 text-white/75 hover:border-white hover:text-white font-display text-3xl leading-none tracking-wide transition-all duration-200 active:scale-95 cursor-pointer" aria-label="Exit">✕</button>` : ''}
+          ${step > 0 ? `<button id="btn-wiz-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/30 text-white/70 hover:border-white hover:text-white transition active:scale-95 cursor-pointer" aria-label="Exit"><svg viewBox="0 0 24 24" class="h-[42%] w-[42%]" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>` : ''}
         </div>
       </div>
       ${bodyHtml}
     </main>
-    ${state.proDjModalOpen ? renderProDjModal() : ''}
-    ${state.brainModalOpen ? renderBrainModal({
-      claudeKeySet: Boolean(state.opusKey),
-      geminiKeySet: Boolean(state.geminiKey),
-      openaiKeySet: Boolean(state.openaiKey),
-      claudeKey: state.opusKey || '',
-      geminiKey: state.geminiKey || '',
-      openaiKey: state.openaiKey || '',
-      health: state.health,
-      learningStats: getLearningStats(),
-    }) : ''}
   `;
 
   bindWizardEvents();
 }
-
 function renderProDjModal() {
   return `
     <div class="modal-backdrop" id="pro-dj-backdrop">
@@ -2188,12 +2259,14 @@ function renderReview() {
   root.innerHTML = `
     <main class="mx-auto flex min-h-dvh max-w-6xl flex-col px-6 pb-32 pt-10 md:px-10 md:pb-44 font-sans text-white">
       <div class="flex items-center justify-between font-display text-3xl tracking-wide">
-        <button id="btn-home" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
+        <button id="btn-review-home" class="text-lime cursor-pointer" aria-label="NAUX home">NAUX</button>
         <div class="flex items-center gap-5">
           <button id="btn-review-back" class="text-white/60 hover:text-white cursor-pointer font-display text-2xl tracking-wide">
             ← <span class="hidden sm:inline">CHANGE ANSWERS</span><span class="sm:hidden">BACK</span>
           </button>
-          <button id="btn-review-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/25 text-white/75 hover:border-white hover:text-white font-display text-3xl leading-none tracking-wide transition-all duration-200 active:scale-95 cursor-pointer" aria-label="Exit">✕</button>
+          <button id="btn-review-exit" class="h-14 min-w-14 flex items-center justify-center gap-3 rounded-full border-2 border-white/30 text-white/70 hover:border-white hover:text-white transition active:scale-95 cursor-pointer" aria-label="Exit">
+            <svg viewBox="0 0 24 24" class="h-[42%] w-[42%]" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+          </button>
         </div>
       </div>
 
@@ -2202,7 +2275,10 @@ function renderReview() {
         <p class="text-xl text-white/60 md:text-xl">
           ${state.sequencedSet.length} songs · about ${mins} minutes with the cuts
         </p>
+        ${renderRequestSongButton()}
       </div>
+
+      ${state.reviewNote ? `<p class="mt-3 text-xl text-lime md:text-xl">${esc(state.reviewNote)}</p>` : ''}
 
       <p class="mt-3 text-base text-white/45 md:text-lg">
         Plays through YouTube: with YouTube Premium there are no ads. Best on a laptop plugged into a speaker.
@@ -2217,14 +2293,15 @@ function renderReview() {
           const cueLabel = t.playFull
             ? 'FULL'
             : `${fmtTime(t.entrySec || 0)}–${fmtTime(t.exitSec || t.durationSec || 180)}`;
+          const cleanArtist = (t.artist || '').replace(/\s*·\s*\d{4}\s*$/, '');
 
           return `
             <li class="flex items-center gap-3 border-b-2 py-3 transition-colors md:gap-5 md:py-3 border-white/10" data-song-idx="${idx}">
-              <button class="flex h-12 w-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-xl text-2xl text-white/35 hover:text-white active:cursor-grabbing md:w-9" data-drag-idx="${idx}" title="Drag to reorder" aria-label="Move ${esc(t.title)}">⋮⋮</button>
+              <button class="flex h-12 w-8 shrink-0 cursor-grab touch-none items-center justify-center rounded-xl text-2xl text-white/35 hover:text-white active:cursor-grabbing md:w-9 select-none" data-drag-idx="${idx}" title="Drag to reorder" aria-label="Move ${esc(t.title)}">⋮⋮</button>
               <span class="w-7 shrink-0 font-display text-2xl text-white/35 md:w-10 md:text-2xl tabular-nums">${idx + 1}</span>
               <div class="min-w-0 flex-1">
                 <div class="font-display text-[28px] uppercase leading-[1.05] max-md:line-clamp-2 md:truncate md:text-3xl md:leading-tight">${esc(t.title)}</div>
-                <div class="truncate text-base text-white/55 md:text-lg">${esc(t.artist)}</div>
+                <div class="truncate text-base text-white/55 md:text-lg">${esc(cleanArtist)}</div>
               </div>
               <div class="hidden shrink-0 items-end gap-1 md:flex" aria-label="Energy ${eVal} of 10">${bars}</div>
               <span class="hidden w-40 shrink-0 text-right font-display text-xl text-white/60 tabular-nums sm:block">${cueLabel}</span>
@@ -2240,23 +2317,10 @@ function renderReview() {
         </button>
       </div>
     </main>
-    ${state.debugModalOpen ? renderDebugModal({
-      plan: state.setPlan,
-      tracks: state.sequencedSet,
-      opusBusy: state.opusBusy,
-      exportBusy: state.exportBusy,
-      exportMsg: state.exportMsg,
-      previewBusyIdx: state.previewBusyIdx,
-      auditBusyIdx: state.auditBusyIdx,
-      batchAuditBusy: state.batchAuditBusy,
-      tapState: state.tapState,
-      ratingsMap: state.ratingsMap,
-    }) : ''}
   `;
 
   bindReviewEvents();
 }
-
 function renderWaveformHtml(track, pos, dur, cutAt, playFull, isLive) {
   const heat = buildFallbackHeat(track);
   const entry = playFull ? 0 : (track.entrySec || 0);
@@ -2642,85 +2706,106 @@ function renderPlaying() {
   const energy = liveSlot?.track?.energy || 6;
   const pulseDur = `${(2.6 - 0.17 * energy).toFixed(2)}s`;
 
+  const vibeLabel = [
+    (state.activeVibeCard || 'HINDI').toUpperCase(),
+    (state.activeVibeCategory?.replace(/^[a-z]+-/, '') || 'DANCE').toUpperCase(),
+    (state.vibe || 'PEAK').toUpperCase(),
+    (state.crowd === 'small' ? '4–6' : state.crowd === 'large' ? '20+' : '10–20')
+  ].filter(Boolean).join(' · ');
+
+  const slotA = snap.liveId === 'A' ? 'live' : (snap.crossfading ? 'out' : 'cue');
+  const slotB = snap.liveId === 'B' ? 'live' : (snap.crossfading ? 'out' : 'cue');
+
   root.innerHTML = `
-    <main class="play-stage" id="play-stage" data-paused="${snap.paused ? 'true' : 'false'}">
-      <div class="pulse-glow" id="pulse-aura" style="--pulse:${pulseDur}"></div>
+    <main data-paused="${snap.paused ? 'true' : void 0}" class="relative flex h-dvh flex-col overflow-clip px-[4vw] pb-[3vh] pt-[3vh]">
+      <div class="pulse-glow pointer-events-none absolute -left-[20vw] top-[10vh] h-[90vh] w-[90vw] rounded-full bg-[radial-gradient(closest-side,rgba(200,255,0,0.10),transparent)]" style="--pulse:${pulseDur}"></div>
 
-      <div class="play-topbar">
-        <span class="wordmark font-display" style="color:#c8ff00">NAUX</span>
+      <!-- Top bar matching 2yak1xb5ht175.js -->
+      <div class="relative z-30 flex items-center gap-[2vw] font-display text-[clamp(26px,2.4vw,40px)] leading-none tracking-wide">
+        <span class="shrink-0 text-lime">NAUX</span>
 
-        <button class="vibe-pill squeeze" id="btn-open-vibe">
-          <span class="truncate">${esc((state.activeVibeCard || 'HINDI').toUpperCase())} · ${(state.activeVibeCategory?.replace(/^[a-z]+-/, '') || 'DANCE').toUpperCase()} · ${(state.vibe || 'PEAK').toUpperCase()} · ${(state.crowd === 'small' ? '4–6' : state.crowd === 'large' ? '20+' : '10–20')}</span>
-          <span class="vibe-cta">CHANGE</span>
+        <button id="btn-open-vibe" class="absolute left-1/2 -translate-x-1/2 hidden max-w-[44vw] items-center gap-3 rounded-full border-2 border-white/20 px-5 py-2 text-[clamp(16px,1.3vw,22px)] uppercase text-white/75 transition-[transform,border-color,color] duration-300 ease-out hover:border-lime hover:text-white md:flex cursor-pointer">
+          <span class="min-w-0 truncate">${esc(vibeLabel)}</span>
+          <span class="shrink-0 text-lime">CHANGE</span>
         </button>
 
-        <div class="play-topbar-right">
-          <button class="clock-pill squeeze ${snap.paused ? 'paused' : ''}" id="btn-clock-pause" title="Pause / Resume (Space)">
-            <span class="clock-icon" style="display:inline-flex;width:0.8em;height:0.8em;align-items:center;justify-content:center" aria-hidden="true">
-              ${snap.paused ? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>' : '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'}
+        <div class="ml-auto flex shrink-0 items-center gap-[2vw]">
+          <button id="btn-clock-pause" class="group flex items-center gap-[0.45em] rounded-full border-2 py-[0.28em] pl-[0.5em] pr-[0.6em] tabular-nums transition cursor-pointer ${snap.paused ? 'border-lime text-lime' : 'border-white/20 text-white/60 hover:border-white/60 hover:text-white'}" title="${snap.paused ? 'Resume (space)' : 'Pause (space)'}">
+            <span class="flex h-[0.8em] w-[0.8em] items-center justify-center" aria-hidden="true">
+              ${snap.paused ? '<svg viewBox="0 0 24 24" class="h-full w-full fill-current"><polygon points="5 3 19 12 5 21 5 3"/></svg>' : '<svg viewBox="0 0 24 24" class="h-full w-full fill-current"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'}
             </span>
-            <span class="clock-time ${snap.paused ? 'clock-blink' : ''}" id="play-clock-text">${fmtTime(livePos)} / ${fmtTime(liveDur)}</span>
+            <span class="${snap.paused ? 'clock-blink' : ''}">${fmtTime(livePos)} / ${fmtTime(liveDur)}</span>
           </button>
 
           ${renderExitBtn(true)}
         </div>
       </div>
 
-      <div class="decks-stage">
-        ${renderDeckCard('A', snap.liveId === 'A' ? 'live' : 'cue', snap.decks.A, snap.deckTelemetry?.A)}
-        ${renderDeckCard('B', snap.liveId === 'B' ? 'live' : 'cue', snap.decks.B, snap.deckTelemetry?.B)}
+      <!-- Mobile Vibe button -->
+      <button id="btn-open-vibe-mobile" class="relative z-10 mt-3 flex items-center gap-2 self-start rounded-full border-2 border-white/20 px-4 py-1.5 font-display text-base uppercase tracking-wide text-white/75 md:hidden cursor-pointer">
+        <span class="truncate">${esc(vibeLabel)}</span>
+        <span class="shrink-0 text-lime">CHANGE</span>
+      </button>
+
+      <!-- Center Deck Area -->
+      <div class="relative z-10 mt-[2.5vh] min-h-0 flex-1 [container-type:size]">
+        ${renderDeckCard('A', slotA, snap.decks.A, snap.deckTelemetry?.A)}
+        ${renderDeckCard('B', slotB, snap.decks.B, snap.deckTelemetry?.B)}
       </div>
 
+      <!-- Paused Overlay -->
       ${snap.paused ? `
-        <button id="btn-paused-resume" class="paused-overlay" aria-label="Tap to resume">
-          <span class="paused-stamp">PAUSED</span>
-          <span class="font-display" style="margin-top:1.5vh;font-size:clamp(22px,2vw,34px);color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.04em">
-            AT ${fmtTime(livePos)} · SPACE OR TAP TO RESUME
+        <button id="btn-paused-resume" class="absolute inset-x-0 top-[12vh] bottom-[38vh] z-20 flex flex-col items-center justify-center max-md:bottom-[30vh] cursor-pointer" aria-label="Resume">
+          <span class="paused-stamp pointer-events-none font-display text-[clamp(84px,16vw,260px)] uppercase leading-none tracking-tight">Paused</span>
+          <span class="mt-[1.5vh] font-display text-[clamp(22px,2vw,34px)] uppercase tracking-wide text-white/60">
+            at ${fmtTime(livePos)} · <span class="max-md:hidden">space or </span>tap to resume
           </span>
         </button>
       ` : ''}
 
-      <div class="agent-bar">
-        <span class="agent-tag">AGENT</span>
-        <span class="agent-msg" id="agent-msg">${esc(snap.agentMessage)}</span>
-        <div class="agent-actions" style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-          <button class="agent-btn remove squeeze cursor-pointer" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>✕ <span class="hidden md:inline">REMOVE NEXT</span></button>
-          <button class="agent-btn accent squeeze cursor-pointer" id="btn-play-next">＋ <span class="hidden md:inline">PLAY NEXT</span></button>
+      <!-- Sweep transition flash -->
+      ${snap.crossfading ? `<div class="sweep pointer-events-none absolute inset-y-0 left-0 z-20 w-[9vw] bg-lime mix-blend-difference"></div>` : ''}
+
+      <!-- AGENT Bar -->
+      <div class="relative z-10 mb-[3vh] flex [@media(max-height:500px)]:hidden items-center gap-5 border-y-2 border-white/15 py-[1.6vh]">
+        <span class="shrink-0 font-display text-[clamp(26px,2.2vw,38px)] leading-none tracking-wide text-lime">AGENT</span>
+        <div class="min-w-0 flex-1 truncate font-sans text-[clamp(16px,1.3vw,22px)] text-white/70" id="agent-msg">
+          ${esc(snap.agentMessage)}
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <button class="rounded-full border-2 border-white/25 px-3 py-1.5 font-display text-base tracking-wide text-white/75 transition hover:border-white hover:text-white disabled:opacity-30 md:px-4 md:text-lg cursor-pointer" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>
+            ✕ <span class="hidden md:inline">REMOVE NEXT</span>
+          </button>
+          <button class="rounded-full border-2 border-lime px-3 py-1.5 font-display text-base tracking-wide text-lime transition hover:bg-lime hover:text-ink md:px-4 md:text-lg cursor-pointer" id="btn-play-next">
+            ＋ <span class="hidden md:inline">PLAY NEXT</span>
+          </button>
         </div>
       </div>
 
-      <div class="bottom-controls">
+      <!-- Bottom Transport Controls -->
+      <div class="relative z-10 flex gap-[2vw]">
         ${snap.paused ? `
-          <button class="mega-btn primary squeeze" id="btn-mega-resume">
-            <span style="display:inline-flex;align-items:center;gap:0.35em">
-              <svg width="0.7em" height="0.7em" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <button id="btn-mega-resume" class="flex-1 h-20 rounded-3xl bg-lime font-display text-4xl text-ink tracking-wide transition active:scale-[0.98] cursor-pointer">
+            <span class="inline-flex items-center gap-[0.35em]">
+              <span class="inline-flex h-[0.62em] w-[0.62em]" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="h-full w-full fill-current"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </span>
               RESUME
             </span>
           </button>
         ` : `
-          <button class="mega-btn primary squeeze" id="btn-mega-skip" ${!liveSlot?.track || snap.crossfading ? 'disabled' : ''}>SKIP</button>
-          <button class="mega-btn secondary squeeze ${liveSlot?.playFull ? 'active' : ''}" id="btn-mega-full" ${!liveSlot?.track || liveSlot?.playFull ? 'disabled' : ''}>
+          <button id="btn-mega-skip" class="flex-1 h-20 rounded-3xl bg-lime font-display text-4xl text-ink tracking-wide transition active:scale-[0.98] cursor-pointer disabled:opacity-40" ${!liveSlot?.track || snap.crossfading ? 'disabled' : ''}>
+            SKIP
+          </button>
+          <button id="btn-mega-full" class="flex-1 h-20 rounded-3xl border-2 font-display text-4xl tracking-wide transition active:scale-[0.98] cursor-pointer ${liveSlot?.playFull ? 'border-lime bg-lime text-ink' : 'border-white/30 text-white hover:border-white'}" ${!liveSlot?.track || liveSlot?.playFull ? 'disabled' : ''}>
             ${liveSlot?.playFull ? 'PLAYING FULL' : 'PLAY FULL'}
           </button>
         `}
       </div>
     </main>
 
-    ${state.drawerOpen ? renderProDrawer() : ''}
     ${state.playNextModalOpen ? renderPlayNextModal() : ''}
     ${state.vibeModalOpen ? renderVibeModal() : ''}
-    ${state.debugModalOpen ? renderDebugModal({
-      plan: state.setPlan,
-      tracks: state.sequencedSet,
-      opusBusy: state.opusBusy,
-      exportBusy: state.exportBusy,
-      exportMsg: state.exportMsg,
-      previewBusyIdx: state.previewBusyIdx,
-      auditBusyIdx: state.auditBusyIdx,
-      batchAuditBusy: state.batchAuditBusy,
-      tapState: state.tapState,
-      ratingsMap: state.ratingsMap,
-    }) : ''}
   `;
 
   bindPlayingEvents();
@@ -2728,7 +2813,6 @@ function renderPlaying() {
   syncLocalVideoDecks(snap, livePos);
   initDeckTitleAutoScaler();
 }
-
 function renderSummary() {
   const played = orchestrator?.playedHistory?.length ? orchestrator.playedHistory : state.sequencedSet;
   const q = state.setPlan?.quality || { tempo_smoothness: 90, bass_clashes: 0, vocal_clashes: 0, energy_flow: 92 };
@@ -2948,14 +3032,12 @@ function bindProDjModalEvents() {
 }
 
 function bindWizardEvents() {
-  bindBrainModalEvents();
-
-  // Top header brand resets to step 0
+  // Top header brand resets to splash
   const brand = document.getElementById('btn-naux-brand');
   if (brand) {
     brand.onclick = () => {
+      state.screen = 'splash';
       state.wizardStep = 0;
-      state.appMode = 'wizard';
       render();
     };
   }
@@ -2963,32 +3045,23 @@ function bindWizardEvents() {
   // Link to song lists
   const btnSongLists = document.getElementById('link-party-lists');
   if (btnSongLists) {
-    btnSongLists.onclick = () => {
+    btnSongLists.onclick = (e) => {
+      e.preventDefault();
       state.appMode = 'yt';
       state.ytViewMode = 'directory';
+      state.screen = 'wizard';
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.pushState({}, '', '/songs');
+      }
       render();
     };
   }
 
-  const btnOpenPro = document.getElementById('btn-open-pro-dj');
-  if (btnOpenPro) {
-    btnOpenPro.onclick = () => {
-      state.proDjModalOpen = true;
-      render();
-    };
-  }
-
-  const btnOpenBrainWiz = document.getElementById('btn-open-brain-wiz');
-  if (btnOpenBrainWiz) {
-    btnOpenBrainWiz.onclick = () => {
-      state.brainModalOpen = true;
-      render();
-    };
-  }
-
+  // Exit button resets to splash
   const btnWizExit = document.getElementById('btn-wiz-exit');
   if (btnWizExit) {
     btnWizExit.onclick = () => {
+      state.screen = 'splash';
       state.wizardStep = 0;
       render();
     };
@@ -3010,17 +3083,43 @@ function bindWizardEvents() {
       if (state.wizardStep < 3) {
         state.wizardStep += 1;
         render();
-      } else {
-        const targetLang = state.selectedLanguages[0] || 'hindi';
-        const catId = state.activeVibeCategory || 'hindi-dance';
-        populateVibeTracksToCrate(targetLang, catId);
-        state.screen = 'review';
-        render();
       }
     };
   }
 
-  // Step 0: Language selection (No songs displayed below!)
+  // Song Request interactions
+  const btnOpenReq = document.getElementById('btn-open-request-song');
+  if (btnOpenReq) {
+    btnOpenReq.onclick = () => {
+      state.requestFormOpen = true;
+      render();
+    };
+  }
+
+  const reqInput = document.getElementById('naux-request-input');
+  if (reqInput) {
+    reqInput.oninput = (e) => {
+      state.requestSongText = e.target.value;
+      const sendBtn = document.getElementById('btn-naux-request-send');
+      if (sendBtn) {
+        sendBtn.disabled = state.requestSongText.trim().length < 2;
+      }
+    };
+    reqInput.onkeydown = (e) => {
+      if (e.key === 'Enter' && state.requestSongText.trim().length >= 2) {
+        sendSongRequest();
+      }
+    };
+  }
+
+  const sendReqBtn = document.getElementById('btn-naux-request-send');
+  if (sendReqBtn) {
+    sendReqBtn.onclick = () => {
+      sendSongRequest();
+    };
+  }
+
+  // Step 0: Language selection
   document.querySelectorAll('[data-wizard-lang]').forEach((btn) => {
     btn.onclick = () => {
       const id = btn.dataset.wizardLang;
@@ -3045,7 +3144,7 @@ function bindWizardEvents() {
     };
   });
 
-  // Step 2: Time of Night / Vibe selection
+  // Step 2: Time of Night / Vibe selection -> Instant advance to Step 3
   document.querySelectorAll('[data-vibe]').forEach((b) => {
     b.onclick = () => {
       state.vibe = b.dataset.vibe;
@@ -3054,22 +3153,20 @@ function bindWizardEvents() {
     };
   });
 
-  // Step 3: Crowd size selection -> Advances to Tonight's set (Review Screen)
+  // Step 3: Crowd size selection -> Building animation -> Tonight's set
   document.querySelectorAll('[data-crowd]').forEach((b) => {
     b.onclick = () => {
       state.crowd = b.dataset.crowd;
-      const targetLang = state.selectedLanguages[0] || 'hindi';
-      const catId = state.activeVibeCategory || 'hindi-dance';
-      populateVibeTracksToCrate(targetLang, catId);
-      state.screen = 'review';
+      buildMultiLanguagePartySet();
+      state.screen = 'building';
       render();
+      setTimeout(() => {
+        state.screen = 'review';
+        render();
+      }, 1200);
     };
   });
-
-  // Pro DJ Modal Handlers
-  bindProDjModalEvents();
 }
-
 function saveTransitionRating(rKey, val, extra = null) {
   if (!rKey) return;
   state.ratingsMap[rKey] = val;
@@ -3376,8 +3473,11 @@ function bindDebugModalEvents() {
 }
 
 function bindReviewEvents() {
-  const revHome = document.getElementById('btn-home');
-  if (revHome) revHome.onclick = goHome;
+  const revHome = document.getElementById('btn-review-home') || document.getElementById('btn-home');
+  if (revHome) revHome.onclick = () => {
+    state.screen = 'splash';
+    render();
+  };
   const revBack = document.getElementById('btn-review-back');
   if (revBack) revBack.onclick = () => {
     state.screen = 'wizard';
@@ -3385,17 +3485,42 @@ function bindReviewEvents() {
     render();
   };
   const revExit = document.getElementById('btn-review-exit');
-  if (revExit) revExit.onclick = goHome;
-  bindExitHandler(false);
-  const openDbg = document.getElementById('btn-open-debug');
-  if (openDbg) openDbg.onclick = () => { state.debugModalOpen = true; render(); };
-  const revDbg = document.getElementById('btn-review-debug');
-  if (revDbg) revDbg.onclick = () => { state.debugModalOpen = true; render(); };
-  const revAuditAll = document.getElementById('btn-review-audit-all');
-  if (revAuditAll) revAuditAll.onclick = batchAuditAllTransitions;
-  const revExp = document.getElementById('btn-review-export');
-  if (revExp) revExp.onclick = runOfflineWavExport;
-  bindDebugModalEvents();
+  if (revExit) revExit.onclick = () => {
+    state.screen = 'splash';
+    render();
+  };
+
+  // Song Request interactions in review screen
+  const btnOpenReq = document.getElementById('btn-open-request-song');
+  if (btnOpenReq) {
+    btnOpenReq.onclick = () => {
+      state.requestFormOpen = true;
+      render();
+    };
+  }
+
+  const reqInput = document.getElementById('naux-request-input');
+  if (reqInput) {
+    reqInput.oninput = (e) => {
+      state.requestSongText = e.target.value;
+      const sendBtn = document.getElementById('btn-naux-request-send');
+      if (sendBtn) {
+        sendBtn.disabled = state.requestSongText.trim().length < 2;
+      }
+    };
+    reqInput.onkeydown = (e) => {
+      if (e.key === 'Enter' && state.requestSongText.trim().length >= 2) {
+        sendSongRequest();
+      }
+    };
+  }
+
+  const sendReqBtn = document.getElementById('btn-naux-request-send');
+  if (sendReqBtn) {
+    sendReqBtn.onclick = () => {
+      sendSongRequest();
+    };
+  }
 
   const syncPlanOrder = () => {
     const analyses = state.sequencedSet.map((t) => normalizeSongAnalysis(t));
@@ -3434,8 +3559,8 @@ function bindReviewEvents() {
       ev.preventDefault();
       let curIdx = Number(handle.dataset.dragIdx);
       const listEl = document.getElementById('review-list');
-      const rows = () => [...listEl.querySelectorAll('.review-row')];
-      rows()[curIdx]?.classList.add('dragging');
+      const rows = () => [...listEl.querySelectorAll('li')];
+      rows()[curIdx]?.classList.add('border-lime', 'bg-lime/10');
 
       const onMove = (mEv) => {
         const y = mEv.clientY;
@@ -3456,7 +3581,6 @@ function bindReviewEvents() {
           state.sequencedSet.splice(targetIdx, 0, moved);
           curIdx = targetIdx;
           render();
-          document.querySelector(`[data-song-idx="${curIdx}"]`)?.classList.add('dragging');
         }
       };
 
@@ -3474,9 +3598,9 @@ function bindReviewEvents() {
     };
   });
 
-  document.getElementById('btn-approve-play').onclick = approveAndPlay;
+  const approveBtn = document.getElementById('btn-approve-play');
+  if (approveBtn) approveBtn.onclick = approveAndPlay;
 }
-
 function bindLiveWaveformScrub() {
   const wf = document.getElementById('live-waveform') || document.querySelector('.deck[data-slot="live"] .waveform-bars');
   if (!wf) return;
@@ -4103,95 +4227,11 @@ function renderTracksIfCatalogActive() {
 }
 
 function renderMiniPlayer() {
-  let miniEl = document.getElementById('nova-yt-mini-player');
-  if (!miniEl) {
-    miniEl = document.createElement('div');
-    miniEl.id = 'nova-yt-mini-player';
-    miniEl.className = 'yt-mini-player';
-    document.body.appendChild(miniEl);
+  const miniEl = document.getElementById('nova-yt-mini-player');
+  if (miniEl) {
+    miniEl.style.display = 'none';
   }
-
-  const p = getYouTubePlayer();
-  const ps = p.getPlaybackState();
-  const track = ps.currentTrack;
-
-  if (!track) {
-    miniEl.classList.add('hidden');
-    return;
-  }
-  miniEl.classList.remove('hidden');
-
-  const dur = ps.duration || track.durationSec || 180;
-  const cur = ps.currentTime || 0;
-  const pct = Math.max(0, Math.min(100, dur > 0 ? (cur / dur) * 100 : 0));
-
-  const hookStart = Number(track.hookStartSec ?? Math.round(dur * 0.25));
-  const hookDur = Number(track.hookDurationSec ?? 35);
-  const hookStartPct = Math.max(0, Math.min(100, (hookStart / dur) * 100));
-  const hookWidthPct = Math.max(0, Math.min(100 - hookStartPct, (hookDur / dur) * 100));
-
-  miniEl.innerHTML = `
-    <div class="yt-mini-grid">
-      <!-- Left: Artwork & Track info -->
-      <div class="yt-mini-track">
-        <img class="yt-mini-thumb" src="${esc(track.artwork || DEFAULT_ARTWORK)}" alt="" onerror="handleImgError(this)" />
-        <div class="yt-mini-info">
-          <div class="yt-mini-title" title="${esc(track.title)}">${esc(track.title)}</div>
-          <div class="yt-mini-artist" title="${esc(track.artist)}">${esc(track.artist)}</div>
-          <span class="yt-deck-pill">DECK ${esc(ps.activeDeckId)} ${ps.isCrossfading ? '· BLENDING' : ''}</span>
-        </div>
-      </div>
-
-      <!-- Center: Controls & Scrubber -->
-      <div class="yt-mini-center">
-        <div class="yt-transport">
-          <button id="btn-yt-mini-shuffle" class="yt-transport-btn squeeze ${ps.shuffle ? 'active' : ''}" title="Shuffle (${ps.shuffle ? 'ON' : 'OFF'})">
-            🔀
-          </button>
-          <button id="btn-yt-mini-prev" class="yt-transport-btn squeeze" title="Previous track">
-            ⏮
-          </button>
-          <button id="btn-yt-mini-play" class="yt-play-pause-btn squeeze" title="${ps.isPlaying ? 'Pause' : 'Play'}">
-            ${ps.isPlaying ? '❚❚' : '▶'}
-          </button>
-          <button id="btn-yt-mini-next" class="yt-transport-btn squeeze" title="Next track">
-            ⏭
-          </button>
-          <button id="btn-yt-mini-repeat" class="yt-transport-btn squeeze ${ps.repeat !== 'off' ? 'active' : ''}" title="Repeat mode (${ps.repeat.toUpperCase()})">
-            🔁 <span style="font-size:8px;font-family:var(--font-mono)">${ps.repeat === 'one' ? '1' : ps.repeat === 'all' ? 'ALL' : ''}</span>
-          </button>
-        </div>
-
-        <div class="yt-timeline-row">
-          <span class="yt-time-label font-mono-num" id="yt-mini-cur-time">${fmtTime(cur)}</span>
-          <div class="yt-scrub-track" id="yt-mini-scrub-track">
-            <div class="yt-scrub-fill" id="yt-mini-scrub-fill" style="width:${pct}%"></div>
-            ${ps.bestPart ? `<div class="yt-scrub-hook-zone" style="left:${hookStartPct}%;width:${hookWidthPct}%" title="Hook highlight zone"></div>` : ''}
-          </div>
-          <span class="yt-time-label font-mono-num" id="yt-mini-total-time" style="text-align:right">${fmtTime(dur)}</span>
-        </div>
-      </div>
-
-      <!-- Right: Toggles & Queue -->
-      <div class="yt-mini-right">
-        <button id="btn-yt-mini-best-part" class="yt-pill-toggle squeeze ${ps.bestPart ? 'active' : ''}" title="Toggle Best-part chorus highlight mode">
-          ⚡ ${ps.bestPart ? 'BEST PART' : 'FULL SONG'}
-        </button>
-        <div class="yt-slider-wrap" style="padding:4px 8px">
-          <span style="font-size:9px">BLEND:</span>
-          <input id="input-yt-mini-crossfade" type="range" min="0" max="8" step="0.5" value="${ps.crossfadeSec}" style="width:60px" />
-          <span id="yt-mini-crossfade-val" class="font-mono-num" style="font-size:9px">${ps.crossfadeSec.toFixed(1)}s</span>
-        </div>
-        <button id="btn-yt-mini-queue" class="yt-queue-trigger-btn squeeze">
-          QUEUE <span class="yt-queue-badge">${ps.queue.length}</span>
-        </button>
-      </div>
-    </div>
-  `;
-
-  renderQueueDrawer();
 }
-
 function updateMiniPlayerTime(cur, dur, track) {
   const curEl = document.getElementById('yt-mini-cur-time');
   const durEl = document.getElementById('yt-mini-total-time');
@@ -4390,6 +4430,7 @@ function attachGlobalYtListeners() {
 
 function render() {
   if (state.screen === 'splash') return renderSplash();
+  if (state.screen === 'building') return renderBuilding();
   if (state.screen === 'playing') {
     renderPlaying();
   } else if (state.screen === 'summary') {
