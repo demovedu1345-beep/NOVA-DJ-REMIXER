@@ -2,34 +2,34 @@ import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
 
 const MASTER_COUNTS = {
-  counts: {
-    "hindi": 798,
+  "counts": {
+    "hindi": 1687,
+    "hindi:diwali": 696,
     "hindi:dance": 358,
-    "hindi:retro": 165,
     "hindi:romantic": 256,
-    "hindi:sufi": 76,
-    "hindi:hiphop": 46,
-    "punjabi": 606,
+    "hindi:retro": 165,
+    "hindi:sufi": 111,
+    "hindi:hiphop": 101,
+    "punjabi": 1044,
     "punjabi:party": 454,
     "punjabi:wedding": 201,
-    "punjabi:sad": 83,
+    "punjabi:sad": 105,
     "punjabi:gym": 284,
-    "english": 143,
-    "english:hiphop": 46,
+    "english": 419,
     "english:pop": 107,
-    "english:love": 22,
-    "english:edm": 34,
-    "tamil-telugu": 14,
-    "tamil-telugu:kuthu": 14,
-    "tamil-telugu:melody": 0,
-    "tamil-telugu:mass": 13,
-    "haryanvi-bhojpuri": 11,
-    "haryanvi-bhojpuri:party": 6,
-    "haryanvi-bhojpuri:desi-beats": 11,
-    "gujarati": 46,
-    "gujarati:garba": 46
+    "english:edm": 101,
+    "english:hiphop": 107,
+    "english:love": 104,
+    "tamil-telugu": 204,
+    "tamil-telugu:kuthu": 101,
+    "tamil-telugu:mass": 103,
+    "haryanvi-bhojpuri": 210,
+    "haryanvi-bhojpuri:party": 105,
+    "haryanvi-bhojpuri:desi-beats": 105,
+    "gujarati": 104,
+    "gujarati:garba": 104
   },
-  unsure: 484
+  "unsure": 484
 };
 
 function slugToSubtype(slug) {
