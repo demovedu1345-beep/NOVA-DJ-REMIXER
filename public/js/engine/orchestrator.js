@@ -270,7 +270,7 @@ export class NovaOrchestrator {
         slot.duration = track.durationSec || 180;
         slot.cutAt = slot.playFull ? slot.duration - 2 : (track.exitSec || Math.max(30, slot.duration - 16));
         this.playedHistory.push(track);
-        this.#setAgent(`YT VIDEO · ${track.title.toUpperCase()} · VOLUME FADE ONLY (NO DSP)`);
+        this.#setAgent(track.playFull ? 'Playing in full' : 'Dropping straight into the hook');
       } catch (err) {
         this.#setAgent(`Skipped YT track ${track.title}: ${err.message}`);
         const fallback = this.#popNext();
@@ -666,7 +666,7 @@ export class NovaOrchestrator {
           ytOnly: true,
           harmonic: { relation: 'YT IFrame Volume Fade Only (no EQ/stems/beatmatch)' },
         };
-        this.#setAgent(`YT VOLUME FADE -> ${inSlot.track.title.toUpperCase()}`);
+        this.#setAgent(`Mixing into ${inSlot.track.title}`);
         this.#emit();
         if (inSlot.engine === 'yt') {
           await this.ytEngine.playPreloaded(inId);

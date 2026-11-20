@@ -19,6 +19,7 @@ const MIME = {
   '.jpg': 'image/jpeg',
   '.wav': 'audio/wav',
   '.wasm': 'application/wasm',
+  '.woff2': 'font/woff2',
 };
 
 const server = http.createServer(async (req, res) => {
@@ -28,12 +29,13 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/')) {
       const slug = pathname.replace(/^\/api\//, '').replace(/\/+$/, '').replace(/\.js$/, '');
-      if (!slug || slug.startsWith('_') || slug.includes('..') || slug.includes('/')) {
+      if (!slug || slug.startsWith('_') || slug.includes('..')) {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'Not found' }));
         return;
       }
-      const modPath = path.join(apiDir, `${slug}.js`);
+      const parts = slug.split('/').filter(Boolean);
+      const modPath = path.join(apiDir, ...parts) + '.js';
       if (!fs.existsSync(modPath)) {
         res.statusCode = 404;
         res.end(JSON.stringify({ error: 'API route not found' }));

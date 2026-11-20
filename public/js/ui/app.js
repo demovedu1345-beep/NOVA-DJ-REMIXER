@@ -2706,6 +2706,13 @@ function renderPlaying() {
   const energy = liveSlot?.track?.energy || 6;
   const pulseDur = `${(2.6 - 0.17 * energy).toFixed(2)}s`;
 
+  let cleanAgentMsg = snap.agentMessage || '';
+  if (cleanAgentMsg.includes('VOLUME FADE') || cleanAgentMsg.includes('NO DSP') || cleanAgentMsg.includes('YT VIDEO')) {
+    cleanAgentMsg = cueSlot?.track ? `Mixing into ${cueSlot.track.title} soon` : 'Dropping straight into the hook';
+  } else if (!cleanAgentMsg) {
+    cleanAgentMsg = cueSlot?.track ? `Mixing into ${cueSlot.track.title} soon` : 'Letting this one run, holding the energy';
+  }
+
   const vibeLabel = [
     (state.activeVibeCard || 'HINDI').toUpperCase(),
     (state.activeVibeCategory?.replace(/^[a-z]+-/, '') || 'DANCE').toUpperCase(),
@@ -2770,7 +2777,7 @@ function renderPlaying() {
       <div class="relative z-10 mb-[3vh] flex [@media(max-height:500px)]:hidden items-center gap-5 border-y-2 border-white/15 py-[1.6vh]">
         <span class="shrink-0 font-display text-[clamp(26px,2.2vw,38px)] leading-none tracking-wide text-lime">AGENT</span>
         <div class="min-w-0 flex-1 truncate font-sans text-[clamp(16px,1.3vw,22px)] text-white/70" id="agent-msg">
-          ${esc(snap.agentMessage)}
+          ${esc(cleanAgentMsg)}
         </div>
         <div class="flex shrink-0 items-center gap-2">
           <button class="rounded-full border-2 border-white/25 px-3 py-1.5 font-display text-base tracking-wide text-white/75 transition hover:border-white hover:text-white disabled:opacity-30 md:px-4 md:text-lg cursor-pointer" id="btn-remove-next" ${!cueSlot?.track || snap.crossfading ? 'disabled' : ''}>
