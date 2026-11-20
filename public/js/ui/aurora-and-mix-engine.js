@@ -627,6 +627,11 @@
     }
   ];
 
+  // Aliases for 8 Harmonic Mood Palettes matching RGB Aurora Border Patterns
+  const MOOD_PALETTES = AURORA_PATTERNS;
+  window.MOOD_PALETTES = MOOD_PALETTES;
+  window.AURORA_PATTERNS = AURORA_PATTERNS;
+
   // Pre-parse and pre-calculate all palette colors & OKLCH stops once at initialization (Zero GC Churn)
   const PRECOMPUTED_PATTERNS = AURORA_PATTERNS.map((pal) => {
     const c1 = parseColor(pal.soft.c1);
@@ -638,19 +643,28 @@
     });
     return {
       ...pal,
-      parsedSoft: { c1, c2 },
+      parsedSoft: {
+        c1: new Float32Array(c1),
+        c2: new Float32Array(c2)
+      },
       curtainBuffer: curtainBuf
     };
   });
+  const PRECOMPUTED_PALETTES = PRECOMPUTED_PATTERNS;
+  const PALETTE_BY_ID = Object.fromEntries(AURORA_PATTERNS.map((p, idx) => [p.id, idx]));
+  window.__AUDIFY_PALETTES = PRECOMPUTED_PALETTES;
 
   let currentPaletteIdx = 0;
   let targetPaletteIdx = 0;
   let paletteTransition = 1.0;
+  const PALETTE_TRANSITION_DURATION = 1.2;
+  let paletteTransitionElapsed = PALETTE_TRANSITION_DURATION;
   let activePatternIdx = 0;
 
   // Active effect mode: 'auto' | 'soft' | 'curtain' | 'fusion'
   let auroraMode = localStorage.getItem('audify_aurora_mode') || 'auto';
   let activeEffect = 'soft'; // Currently running effect in auto mode
+  const AUTO_EFFECT_CYCLE = ['soft', 'curtain', 'fusion'];
 
   // -----------------------------------------------------------------------
   // 5. Perimeter RGB Aurora Border, Shockwave & Toast Injection
@@ -963,14 +977,44 @@
   }
 
   // -----------------------------------------------------------------------
-  // 6. Interactive State, Beat Pulses & Mouse Dynamics
+  // 6. Interactive State, Beat Pulses & Motion Choreography
   // -----------------------------------------------------------------------
   let beatPulse = 1.0;
   let flowVelocity = 1.0;
+  let flowSurgeTime = 0.0;
   const mouse = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5, presence: 0 };
   const pointer = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5, inside: false };
   const curtainState = { px: 0, py: 0, reach: 0, clock: 0 };
-  const pulses = [];
+
+  // Pulse pool for zero GC churn in render loop
+  const PULSE_POOL_SIZE = MAX_PULSES;
+  const pulsePool = [];
+  for (let i = 0; i < PULSE_POOL_SIZE; i++) {
+    pulsePool.push({ x: 0, y: 0, age: 999.0, active: false });
+  }
+
+  function addPulse(x, y) {
+    let oldestIdx = 0;
+    let maxAge = -1;
+    let slot = -1;
+    for (let i = 0; i < PULSE_POOL_SIZE; i++) {
+      if (!pulsePool[i].active) {
+        slot = i;
+        break;
+      }
+      if (pulsePool[i].age > maxAge) {
+        maxAge = pulsePool[i].age;
+        oldestIdx = i;
+      }
+    }
+    if (slot === -1) slot = oldestIdx;
+    const p = pulsePool[slot];
+    p.x = x;
+    p.y = y;
+    p.age = 0.0;
+    p.active = true;
+  }
+
   const pulseData = new Float32Array(MAX_PULSES * 4);
   const paletteBuffer = new Float32Array(MAX_STOPS * 3);
 
@@ -983,14 +1027,12 @@
   window.triggerAudifyBeatPulse = function (intensity = 1.8) {
     beatPulse = Math.max(beatPulse, intensity);
 
-    // Inject SoftAurora wave pulse along band
+    // Inject SoftAurora wave pulse along band (zero allocation via pool)
     const aspect = canvas.width / Math.max(1, canvas.height);
-    pulses.push({
-      x: (0.2 + 0.6 * Math.random()) * aspect,
-      y: 0.5 + (Math.random() - 0.5) * 0.15,
-      age: 0
-    });
-    if (pulses.length > MAX_PULSES) pulses.shift();
+    addPulse(
+      (0.2 + 0.6 * Math.random()) * aspect,
+      0.5 + (Math.random() - 0.5) * 0.15
+    );
   };
 
   // Helper to trigger full-screen shockwave and flash
@@ -1039,53 +1081,210 @@
     root.style.setProperty('--audify-laser-speed', pattern.laserSpeed);
   }
 
-  // Song Transition Notification
+  // Programmatic Palette/Pattern Selector
+  window.setAudifyPalette = function (idOrIdx) {
+    let targetIdx = -1;
+    if (typeof idOrIdx === 'number') {
+      targetIdx = Math.max(0, Math.min(AURORA_PATTERNS.length - 1, idOrIdx));
+    } else if (typeof idOrIdx === 'string' && PALETTE_BY_ID[idOrIdx] !== undefined) {
+      targetIdx = PALETTE_BY_ID[idOrIdx];
+    }
+    if (targetIdx !== -1 && targetIdx !== targetPaletteIdx) {
+      activePatternIdx = targetIdx;
+      targetPaletteIdx = targetIdx;
+      paletteTransitionElapsed = 0.0;
+      paletteTransition = 0.0;
+      updateBorderCssVariables(AURORA_PATTERNS[targetIdx]);
+      window.triggerAudifyBeatPulse(2.4);
+    }
+  };
+
+  // Song Transition Notification with High-Precision Deduplication & Motion Choreography
+  let lastSongChangeTimestamp = 0;
+  let lastSongChangeTitle = '';
+
   window.onAudifySongChange = function (songInfo = {}) {
+    const rawTitle = typeof songInfo === 'string' ? songInfo : (songInfo?.title || '');
+    const cleanTitle = (rawTitle || '').trim();
+    const now = performance.now();
+
+    // Prevent double-triggering when multiple hooks (UI click, PlayerEngine startFade, MutationObserver)
+    // fire within 1500ms of each other during the same track handoff
+    const isRecent = (now - lastSongChangeTimestamp) < 1500;
+    if (isRecent) {
+      // If we now received an actual track title (not placeholder 'Next Song'), update HUD badge title smoothly
+      if (cleanTitle && cleanTitle !== 'Next Song' && cleanTitle !== 'Starting Set' && cleanTitle !== 'Preview Next Pattern' && cleanTitle !== lastSongChangeTitle) {
+        lastSongChangeTitle = cleanTitle;
+        const badgeTitle = document.getElementById('audify-badge-title-el');
+        if (badgeTitle) badgeTitle.textContent = cleanTitle;
+      }
+      return;
+    }
+
+    lastSongChangeTimestamp = now;
+    if (cleanTitle && cleanTitle !== 'Next Song' && cleanTitle !== 'Starting Set' && cleanTitle !== 'Preview Next Pattern') {
+      lastSongChangeTitle = cleanTitle;
+    }
+
     trackCounter++;
-    const songTitle = songInfo.title || ('Track #' + trackCounter);
-    console.log('[Audify Aurora Engine] Song transition:', songTitle);
+    const songTitle = cleanTitle || ('Track #' + trackCounter);
+    console.log('[Audify Aurora Engine] Song transition choreography triggered:', songTitle);
 
     // Advance to next pattern
     activePatternIdx = (activePatternIdx + 1) % AURORA_PATTERNS.length;
     targetPaletteIdx = activePatternIdx;
-    paletteTransition = 0.0;
 
     const pattern = AURORA_PATTERNS[activePatternIdx];
     updateBorderCssVariables(pattern);
 
-    // Surge shader dynamics
-    flow += 12.0; // Dynamic wave surge
+    // 1. Flow parameter sudden velocity kick (+8.0) and accelerated delta for 1.5s
+    flow += 8.0;
+    flowSurgeTime = 1.5;
     flowVelocity = 3.5;
+
+    // 2. BeatPulse surges to 3.2
     window.triggerAudifyBeatPulse(3.2);
 
-    // Alternate effect on song change if in auto mode
+    // 3. Smooth palette transition with 1.2s ease-out curve
+    paletteTransitionElapsed = 0.0;
+    paletteTransition = 0.0;
+
+    // 4. Alternate effect in Auto mode ('soft' <-> 'curtain' <-> 'fusion')
     if (auroraMode === 'auto') {
-      activeEffect = trackCounter % 2 === 0 ? 'soft' : 'curtain';
+      activeEffect = AUTO_EFFECT_CYCLE[trackCounter % AUTO_EFFECT_CYCLE.length];
       const label = document.getElementById('audify-aurora-label');
       if (label) label.textContent = getAuroraModeLabel(auroraMode);
     }
 
     // Trigger full-screen visual effects
     triggerSongChangeExplosion(pattern, songTitle);
+
+    // Dispatch synchronized event for RGB Aurora borders and UI listeners
+    try {
+      window.dispatchEvent(new CustomEvent('audify:palette-change', {
+        detail: {
+          palette: PRECOMPUTED_PATTERNS[targetPaletteIdx],
+          paletteId: PRECOMPUTED_PATTERNS[targetPaletteIdx].id,
+          activeEffect,
+          trackTitle: songTitle
+        }
+      }));
+    } catch (_) {}
   };
 
-  // Manual cycling of pattern
-  window.audifyNextAuroraPattern = function () {
-    window.onAudifySongChange({ title: 'Preview Next Pattern' });
+  // Manual cycling of pattern anytime (Users / UI / Hotkeys)
+  window.audifyNextAuroraPattern = function (options = {}) {
+    activePatternIdx = (activePatternIdx + 1) % AURORA_PATTERNS.length;
+    targetPaletteIdx = activePatternIdx;
+
+    const pattern = AURORA_PATTERNS[activePatternIdx];
+    updateBorderCssVariables(pattern);
+
+    flow += 8.0;
+    flowSurgeTime = 1.5;
+    flowVelocity = 3.2;
+    paletteTransitionElapsed = 0.0;
+    paletteTransition = 0.0;
+
+    window.triggerAudifyBeatPulse(2.6);
+
+    const activeTitle = lastSongChangeTitle || ('Track #' + trackCounter);
+    triggerSongChangeExplosion(pattern, activeTitle);
+
+    try {
+      window.dispatchEvent(new CustomEvent('audify:palette-change', {
+        detail: {
+          palette: PRECOMPUTED_PATTERNS[targetPaletteIdx],
+          paletteId: PRECOMPUTED_PATTERNS[targetPaletteIdx].id,
+          activeEffect,
+          trackTitle: activeTitle
+        }
+      }));
+    } catch (_) {}
+
+    console.log(`[Audify Aurora] Manual pattern cycled: ${pattern.name} (${activePatternIdx + 1}/${AURORA_PATTERNS.length})`);
+    return pattern;
   };
 
-  // Track observer to automatically catch song changes
+  // High-Performance Track Title Observer (Zero Polling Lag, Zero Layout Reflow)
   let lastObservedTitle = '';
-  setInterval(() => {
-    const titleEl = document.querySelector('[data-testid="track-title"], .track-title, .now-playing-title, h1, h2, h3');
-    const titleText = (titleEl ? titleEl.textContent : '').trim();
-    if (titleText && titleText !== lastObservedTitle && titleText.length > 3) {
+  let titleObserverScheduled = false;
+
+  function checkTitleElement() {
+    titleObserverScheduled = false;
+    const titleEl = document.querySelector(
+      '.title-land, [data-testid="track-title"], [data-testid="now-playing-title"], .track-title, .now-playing-title, .song-title, main h2, main h1, h2, h1, h3'
+    );
+    if (!titleEl) return;
+    const titleText = (titleEl.textContent || '').trim();
+    if (!titleText || titleText === 'End of set' || titleText.length < 2) return;
+
+    if (titleText !== lastObservedTitle) {
       if (lastObservedTitle !== '') {
-        window.onAudifySongChange({ title: titleText });
+        console.log('[Audify Title Observer] Detected song change via DOM mutation:', titleText);
+        window.onAudifySongChange({ title: titleText, source: 'mutation-observer' });
       }
       lastObservedTitle = titleText;
     }
-  }, 800);
+  }
+
+  function scheduleTitleCheck() {
+    if (titleObserverScheduled) return;
+    titleObserverScheduled = true;
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(checkTitleElement);
+    } else {
+      setTimeout(checkTitleElement, 16);
+    }
+  }
+
+  // Set up MutationObserver on document.body
+  try {
+    const titleObserver = new MutationObserver((mutations) => {
+      for (let i = 0; i < mutations.length; i++) {
+        const m = mutations[i];
+        if (m.type === 'characterData') {
+          scheduleTitleCheck();
+          return;
+        }
+        if (m.type === 'childList') {
+          const target = m.target;
+          if (target && target.nodeType === 1) {
+            const el = target;
+            if (el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' ||
+                el.classList?.contains('title-land') ||
+                el.classList?.contains('track-title') ||
+                el.getAttribute?.('data-testid')?.includes('title')) {
+              scheduleTitleCheck();
+              return;
+            }
+          }
+          if (m.addedNodes.length > 0) {
+            scheduleTitleCheck();
+            return;
+          }
+        }
+      }
+    });
+
+    const targetNode = document.body || document.documentElement;
+    if (targetNode) {
+      titleObserver.observe(targetNode, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        titleObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+      });
+    }
+  } catch (err) {
+    console.warn('[Audify Title Observer] MutationObserver initialization error, using fallback polling:', err);
+  }
+
+  // Backup fallback interval for off-DOM or iframe updates
+  setInterval(scheduleTitleCheck, 1000);
 
   // Resize handler
   function resize() {
@@ -1107,12 +1306,10 @@
 
   window.addEventListener('pointerdown', (e) => {
     const aspect = canvas.width / Math.max(1, canvas.height);
-    pulses.push({
-      x: (e.clientX / window.innerWidth) * aspect,
-      y: 1 - e.clientY / window.innerHeight,
-      age: 0
-    });
-    if (pulses.length > MAX_PULSES) pulses.shift();
+    addPulse(
+      (e.clientX / window.innerWidth) * aspect,
+      1 - e.clientY / window.innerHeight
+    );
   }, { passive: true });
 
   document.documentElement.addEventListener('pointerleave', () => {
@@ -1146,43 +1343,63 @@
     lastTime = now;
 
     // Smooth beat decay & flow velocity
-    beatPulse += (1.0 - beatPulse) * Math.min(1, dt * 5.0);
-    flowVelocity += (1.0 - flowVelocity) * Math.min(1, dt * 2.5);
+    beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 5.0);
+    flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 2.5);
 
-    if (paletteTransition < 1.0) {
-      paletteTransition = Math.min(1.0, paletteTransition + dt * 1.8);
-      if (paletteTransition >= 1.0) currentPaletteIdx = targetPaletteIdx;
+    // Palette transition: 0.0 -> 1.0 over 1.2s using ease-out cubic curve (1 - (1-t)^3)
+    if (paletteTransitionElapsed < PALETTE_TRANSITION_DURATION) {
+      paletteTransitionElapsed = Math.min(PALETTE_TRANSITION_DURATION, paletteTransitionElapsed + dt);
+      const t = paletteTransitionElapsed / PALETTE_TRANSITION_DURATION;
+      const invT = 1.0 - t;
+      paletteTransition = 1.0 - (invT * invT * invT);
+      if (paletteTransitionElapsed >= PALETTE_TRANSITION_DURATION) {
+        paletteTransition = 1.0;
+        currentPaletteIdx = targetPaletteIdx;
+      }
     }
 
-    // Advance clocks
-    flow += dt * 0.6 * flowVelocity * (0.8 + (beatPulse - 1) * 0.4);
-    hue += dt * 0.15;
-    curtainState.clock += dt * 0.55 * flowVelocity * (0.8 + (beatPulse - 1) * 0.35);
+    // Accelerated delta calculation for 1.5s post-song-change surge
+    let velocityMultiplier = 1.0;
+    if (flowSurgeTime > 0.0) {
+      flowSurgeTime = Math.max(0.0, flowSurgeTime - dt);
+      const surgeRatio = flowSurgeTime / 1.5;
+      velocityMultiplier = 1.0 + surgeRatio * 3.5;
+    }
+
+    // Advance clocks with accelerated velocity
+    const effectiveFlowVelocity = flowVelocity * velocityMultiplier;
+    flow += dt * 0.7 * effectiveFlowVelocity * (0.8 + (beatPulse - 1.0) * 0.4);
+    hue += dt * 0.25;
+    curtainState.clock += dt * 0.65 * effectiveFlowVelocity * (0.8 + (beatPulse - 1.0) * 0.35);
 
     // Mouse easing
-    const mouseLerp = Math.min(1, dt * 3.5);
+    const mouseLerp = Math.min(1.0, dt * 3.5);
     mouse.targetX = pointer.x;
     mouse.targetY = pointer.y;
     mouse.x += (mouse.targetX - mouse.x) * mouseLerp;
     mouse.y += (mouse.targetY - mouse.y) * mouseLerp;
-    mouse.presence += ((pointer.inside ? 1 : 0) - mouse.presence) * mouseLerp;
+    mouse.presence += ((pointer.inside ? 1.0 : 0.0) - mouse.presence) * mouseLerp;
 
     curtainState.px += (pointer.x - 0.5 - curtainState.px) * mouseLerp;
     curtainState.py += (pointer.y - 0.5 - curtainState.py) * mouseLerp;
-    curtainState.reach += ((pointer.inside ? 1 : 0) - curtainState.reach) * mouseLerp;
+    curtainState.reach += ((pointer.inside ? 1.0 : 0.0) - curtainState.reach) * mouseLerp;
 
-    // Update pulses
-    for (let i = pulses.length - 1; i >= 0; i--) {
-      pulses[i].age += dt;
-      if (pulses[i].age >= 2.6) pulses.splice(i, 1);
-    }
+    // Update pulses pool (zero GC churn)
     pulseData.fill(0);
-    pulses.forEach((p, idx) => {
-      pulseData[idx * 4] = p.x;
-      pulseData[idx * 4 + 1] = p.y;
-      pulseData[idx * 4 + 2] = smoother(p.age / 0.18) * (1 - smoother((p.age - 0.18) / 2.42));
-      pulseData[idx * 4 + 3] = p.age;
-    });
+    for (let i = 0; i < PULSE_POOL_SIZE; i++) {
+      const p = pulsePool[i];
+      if (!p.active) continue;
+      p.age += dt;
+      if (p.age >= 2.6) {
+        p.active = false;
+        continue;
+      }
+      const offset = i * 4;
+      pulseData[offset] = p.x;
+      pulseData[offset + 1] = p.y;
+      pulseData[offset + 2] = smoother(p.age / 0.18) * (1.0 - smoother((p.age - 0.18) / 2.42));
+      pulseData[offset + 3] = p.age;
+    }
 
     const activePal = PRECOMPUTED_PATTERNS[currentPaletteIdx];
     const targetPal = PRECOMPUTED_PATTERNS[targetPaletteIdx];
@@ -1487,29 +1704,52 @@
   }
 
   function getAuroraModeLabel(mode) {
+    if (mode === 'auto') {
+      const effectName = activeEffect === 'soft' ? 'SOFT' : activeEffect === 'curtain' ? 'CURTAIN' : 'FUSION';
+      return `🔀 AUTO (${effectName})`;
+    }
     const map = {
-      auto: '✨ DYNAMIC RGB AUTO',
       soft: '✨ SOFT AURORA',
       curtain: '🌠 CURTAIN RIBBONS',
       fusion: '🎆 HYBRID FUSION'
     };
-    return map[mode] || 'AURORA';
+    return map[mode] || '🔀 AUTO-SYNC';
   }
 
-  // Hook into Skip/Next clicks for transition effects
+  // Hook into all UI click triggers: NEXT, SKIP, .skip-btn, .next-btn, [data-action="skip"], PLAY SET
   document.addEventListener('click', (e) => {
     getAudioCtx();
-    const btn = e.target.closest('button, [role="button"], a');
+    const target = e.target;
+    if (!target) return;
+
+    // Check matching element or ancestor
+    const btn = target.closest('button, [role="button"], a, input[type="button"], input[type="submit"], .skip-btn, .next-btn, [data-action="skip"], [data-action="next"], [data-testid="skip-button"], [data-testid="next-button"]');
     if (!btn) return;
-    const text = (btn.textContent || '').toUpperCase();
-    if (text.includes('SKIP') || text.includes('NEXT') || text.includes('PLAY SET')) {
+
+    const text = (btn.textContent || btn.value || '').toUpperCase().trim();
+    const isSkipBtn = btn.matches('.skip-btn, .next-btn, [data-action="skip"], [data-action="next"], [data-testid="skip-button"], [data-testid="next-button"]') ||
+      text.includes('SKIP') ||
+      text.includes('NEXT') ||
+      text === 'PLAY SET' ||
+      text.startsWith('PLAY SET') ||
+      text.includes('START SET') ||
+      text.includes('PLAY NEXT');
+
+    if (isSkipBtn) {
       window.triggerAudifyBeatPulse(2.8);
-      window.onAudifySongChange({ title: 'Next Song' });
-      if (SOUND_FX[activeMixStyle]) {
-        SOUND_FX[activeMixStyle]();
+      
+      const isPlaySet = text.includes('PLAY SET') || text.includes('START SET');
+      window.onAudifySongChange({ title: isPlaySet ? 'Starting Set' : 'Next Song', trigger: 'ui-click' });
+
+      if (SOUND_FX && activeMixStyle && SOUND_FX[activeMixStyle]) {
+        try {
+          SOUND_FX[activeMixStyle]();
+        } catch (err) {
+          console.error('[Audify SoundFX] Click error:', err);
+        }
       }
     }
-  });
+  }, true);
 
   // -----------------------------------------------------------------------
   // 9. Top Navigation Pills (AURORA & MIX Controls)
