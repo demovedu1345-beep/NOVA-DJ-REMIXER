@@ -1,6 +1,7 @@
 // =========================================================================
 // Audify WebGL2 Dual-Aurora Engine (React Bits SoftAurora + Aurora)
-// & Professional Mix Action FX Controller with Audio-Reactive Beat Sync
+// + Full Viewport Perimeter RGB Laser Border Motion Engine
+// + Audio-Reactive Beat Sync & Full-Screen Song-Change Explosion System
 // =========================================================================
 
 (function initAudifyAuroraAndMixEngine() {
@@ -8,20 +9,20 @@
   window.__audify_aurora_initialized = true;
 
   // -----------------------------------------------------------------------
-  // 1. Shaders & Shaders Pipeline (React Bits SoftAurora & Aurora)
+  // 1. WebGL2 Shaders (React Bits SoftAurora 3D Perlin & Curtain Ribbons)
   // -----------------------------------------------------------------------
   const MAX_PULSES = 4;
   const MAX_STOPS = 5;
   const MAX_LAYERS = 3;
 
-  // Vertex shader for SoftAurora (uses gl_VertexID fullscreen triangle)
+  // Vertex shader for SoftAurora (gl_VertexID fullscreen triangle)
   const SOFT_VERTEX = `#version 300 es
   const vec2 corners[3] = vec2[3](vec2(-1.0, -1.0), vec2(3.0, -1.0), vec2(-1.0, 3.0));
   void main() {
     gl_Position = vec4(corners[gl_VertexID], 0.0, 1.0);
   }`;
 
-  // Fragment shader for SoftAurora (React Bits 3D Perlin Noise + Pulses)
+  // Fragment shader for SoftAurora (React Bits 3D Perlin Noise + Wave Pulses)
   const SOFT_FRAGMENT = `#version 300 es
   precision highp float;
   uniform vec2 uResolution;
@@ -298,121 +299,95 @@
       float rise = hem - y;
       float low = -soft - uGlow * 0.14;
       float high = 0.26 + soft * 0.6;
-      float body = pow(smootherstep(low, high, rise), 1.5 + uGlow * 0.6);
-      float lobes = 0.86 + 0.14 * snoise(vec2(X * 0.9 * uScale - pace * 0.025 + seed, y * 0.3 + pace * 0.04));
-      float alpha = body * lobes * (layer < 0.5 ? 1.0 : 0.32 / layer);
-      alpha = clamp(alpha * (1.0 + reach * 0.25 * smootherstep(0.9, 0.0, abs(y - hem))), 0.0, 1.0);
 
-      vec3 tint = ramp(u + 0.05 * sin(pace * 0.08 + layer * 2.3) + layer * 0.1 + max(rise, 0.0) * 0.05);
-      glow = 1.0 - (1.0 - glow) * (1.0 - tint * alpha);
-      cover = 1.0 - (1.0 - cover) * (1.0 - alpha);
+      float alpha = smootherstep(low, high, rise);
+      float shape = smootherstep(high, low, rise);
+      float tone = clamp(u + layer * 0.18 + warp * 0.1, 0.0, 1.0);
+      vec3 col = ramp(tone);
+      glow += col * shape * (0.8 + 0.3 * (1.0 - layer / float(uLayers)));
+      cover = max(cover, alpha);
     }
 
-    float fade = smootherstep(0.0, 0.7, uReveal) * uOpacity;
-    float strength = clamp(uBrightness, 0.0, 2.0);
-    glow *= fade * min(strength, 1.0);
-    cover *= fade * min(strength, 1.0);
-    glow = 1.0 - pow(1.0 - glow, vec3(max(strength, 1.0)));
-    float dither = (hash(frag) - 0.5) / 255.0;
-
-    outColor = vec4(glow + dither, clamp(cover + dither, 0.0, 1.0));
+    float grain = (hash(frag + vec2(t * 11.3, -t * 7.1)) - 0.5) * 0.035;
+    vec3 result = glow * uBrightness + grain;
+    float outAlpha = clamp(cover * uOpacity, 0.0, 1.0);
+    outColor = vec4(clamp(result, 0.0, 1.0) * outAlpha, outAlpha);
   }`;
 
   // -----------------------------------------------------------------------
-  // 2. Color Space & Shader Utility Helpers
+  // 2. High-Performance Math & Color Utilities
   // -----------------------------------------------------------------------
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-  const smoother = t => {
-    const x = clamp(t, 0, 1);
-    return x * x * x * (x * (x * 6 - 15) + 10);
-  };
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+  function smoother(t) {
+    t = clamp(t, 0, 1);
+    return t * t * t * (t * (t * 6 - 15) + 10);
+  }
 
-  const parseColor = value => {
-    const text = String(value || '').trim();
-    const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text);
-    if (hex) {
-      const full = hex[1].length === 3 ? hex[1].replace(/./g, d => d + d) : hex[1];
-      return [0, 2, 4].map(idx => parseInt(full.slice(idx, idx + 2), 16) / 255);
+  function parseColor(c) {
+    if (typeof c === 'string') {
+      const match = c.match(/#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})/i);
+      if (match) {
+        return [
+          parseInt(match[1], 16) / 255,
+          parseInt(match[2], 16) / 255,
+          parseInt(match[3], 16) / 255
+        ];
+      }
     }
-    const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(text);
-    if (rgb) return [rgb[1], rgb[2], rgb[3]].map(c => clamp(parseFloat(c) / 255, 0, 1));
     return [1, 1, 1];
-  };
+  }
 
-  const toOklch = rgb => {
-    const [r, g, b] = rgb.map(c => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+  function toOklch(rgb) {
+    const r = rgb[0] > 0.04045 ? Math.pow((rgb[0] + 0.055) / 1.055, 2.4) : rgb[0] / 12.92;
+    const g = rgb[1] > 0.04045 ? Math.pow((rgb[1] + 0.055) / 1.055, 2.4) : rgb[1] / 12.92;
+    const b = rgb[2] > 0.04045 ? Math.pow((rgb[2] + 0.055) / 1.055, 2.4) : rgb[2] / 12.92;
+
     const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
     const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
     const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-    const lab = [
-      0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-      1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-      0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
-    ];
-    return [lab[0], Math.hypot(lab[1], lab[2]), Math.atan2(lab[2], lab[1])];
-  };
 
-  const unwrapHues = stops => {
-    const known = stops.findIndex(stop => stop[1] > 0.02);
-    const anchor = known === -1 ? 0 : stops[known][2];
-    let previous = anchor;
-    return stops.map(stop => {
-      let hue = stop[1] > 0.02 ? stop[2] : previous;
-      while (hue - previous > Math.PI) hue -= Math.PI * 2;
-      while (hue - previous < -Math.PI) hue += Math.PI * 2;
-      previous = hue;
-      return [stop[0], stop[1], hue];
-    });
-  };
+    const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+    const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+    const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
 
-  function compileShader(gl, type, source) {
-    const s = gl.createShader(type);
-    if (!s) return null;
-    gl.shaderSource(s, source);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      console.warn('GLSL Compile error:', gl.getShaderInfoLog(s));
-      gl.deleteShader(s);
-      return null;
-    }
-    return s;
+    const C = Math.sqrt(A * A + B * B);
+    let h = Math.atan2(B, A);
+    if (h < 0) h += 2 * Math.PI;
+    return [L, C, h];
   }
 
-  function linkProgram(gl, vsSource, fsSource, attribLocation = null) {
-    const vs = compileShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fs = compileShader(gl, gl.FRAGMENT_SHADER, fsSource);
-    if (!vs || !fs) return null;
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    if (attribLocation) {
-      gl.bindAttribLocation(prog, attribLocation.index, attribLocation.name);
+  function unwrapHues(stops) {
+    const out = [];
+    let prev = stops[0][2];
+    for (let i = 0; i < stops.length; i++) {
+      let h = stops[i][2];
+      while (h - prev > Math.PI) h -= 2 * Math.PI;
+      while (h - prev < -Math.PI) h += 2 * Math.PI;
+      out.push([stops[i][0], stops[i][1], h]);
+      prev = h;
     }
-    gl.linkProgram(prog);
-    gl.deleteShader(vs);
-    gl.deleteShader(fs);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      console.warn('GLSL Link error:', gl.getProgramInfoLog(prog));
-      gl.deleteProgram(prog);
-      return null;
-    }
-    const uniforms = {};
-    const count = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
-    for (let i = 0; i < count; i++) {
-      const info = gl.getActiveUniform(prog, i);
-      if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(prog, info.name);
-    }
-    return { program: prog, uniforms };
+    return out;
   }
 
   // -----------------------------------------------------------------------
-  // 3. Canvas Setup & WebGL2 Context Initialization
+  // 3. WebGL2 Context & Canvas Attachment (Stacking Context: z-index 0)
   // -----------------------------------------------------------------------
   let canvas = document.getElementById('audify-aurora-canvas');
   if (!canvas) {
     canvas = document.createElement('canvas');
     canvas.id = 'audify-aurora-canvas';
-    document.body.prepend(canvas);
+  }
+
+  function ensureCanvasAttached() {
+    if (!canvas.isConnected && document.body) {
+      document.body.prepend(canvas);
+    }
+  }
+  ensureCanvasAttached();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureCanvasAttached);
   }
   canvas.style.cssText = `
     position: fixed;
@@ -422,79 +397,238 @@
     height: 100vh;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.92;
+    opacity: 0.94;
     mix-blend-mode: screen;
     transition: opacity 0.4s ease;
   `;
 
   const gl = canvas.getContext('webgl2', {
     alpha: true,
-    premultipliedAlpha: true,
-    antialias: false,
     depth: false,
     stencil: false,
-    powerPreference: 'high-performance'
+    antialias: false,
+    powerPreference: 'high-performance',
+    preserveDrawingBuffer: false
   });
 
   if (!gl) {
-    console.warn('WebGL2 not available; fallback to standard renderer.');
+    console.warn('[Audify Aurora] WebGL2 not supported on this browser.');
     return;
   }
 
-  // Compile both shader programs
-  const softShader = linkProgram(gl, SOFT_VERTEX, SOFT_FRAGMENT);
-  const curtainShader = linkProgram(gl, CURTAIN_VERTEX, CURTAIN_FRAGMENT, { index: 0, name: 'aPosition' });
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // VAOs and Buffers
-  const softVao = gl.createVertexArray();
+  // Shader compilation helper
+  function createShader(gl, type, source) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, source);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error('[Audify Aurora Shader Error]', gl.getShaderInfoLog(s));
+      gl.deleteShader(s);
+      return null;
+    }
+    return s;
+  }
 
-  const curtainVao = gl.createVertexArray();
-  const curtainBuffer = gl.createBuffer();
-  gl.bindVertexArray(curtainVao);
-  gl.bindBuffer(gl.ARRAY_BUFFER, curtainBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(0);
-  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-  gl.bindVertexArray(null);
+  function createProgram(gl, vsSource, fsSource) {
+    const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    if (!vs || !fs) return null;
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.error('[Audify Aurora Program Error]', gl.getProgramInfoLog(prog));
+      gl.deleteProgram(prog);
+      return null;
+    }
+    return prog;
+  }
+
+  // SoftAurora Program
+  const softProgram = createProgram(gl, SOFT_VERTEX, SOFT_FRAGMENT);
+  let softShader = null;
+  let softVao = null;
+  if (softProgram) {
+    softVao = gl.createVertexArray();
+    softShader = {
+      program: softProgram,
+      uniforms: {
+        uResolution: gl.getUniformLocation(softProgram, 'uResolution'),
+        uFlow: gl.getUniformLocation(softProgram, 'uFlow'),
+        uHue: gl.getUniformLocation(softProgram, 'uHue'),
+        uScale: gl.getUniformLocation(softProgram, 'uScale'),
+        uBrightness: gl.getUniformLocation(softProgram, 'uBrightness'),
+        uColor1: gl.getUniformLocation(softProgram, 'uColor1'),
+        uColor2: gl.getUniformLocation(softProgram, 'uColor2'),
+        uNoiseFreq: gl.getUniformLocation(softProgram, 'uNoiseFreq'),
+        uNoiseAmp: gl.getUniformLocation(softProgram, 'uNoiseAmp'),
+        uBandHeight: gl.getUniformLocation(softProgram, 'uBandHeight'),
+        uBandSpread: gl.getUniformLocation(softProgram, 'uBandSpread'),
+        uOctaveDecay: gl.getUniformLocation(softProgram, 'uOctaveDecay'),
+        uLayerOffset: gl.getUniformLocation(softProgram, 'uLayerOffset'),
+        uShift: gl.getUniformLocation(softProgram, 'uShift'),
+        uCursor: gl.getUniformLocation(softProgram, 'uCursor'),
+        uPulses: gl.getUniformLocation(softProgram, 'uPulses'),
+        uSpectrum: gl.getUniformLocation(softProgram, 'uSpectrum'),
+        uTilt: gl.getUniformLocation(softProgram, 'uTilt'),
+        uIntro: gl.getUniformLocation(softProgram, 'uIntro'),
+        uLightMode: gl.getUniformLocation(softProgram, 'uLightMode'),
+        uOpacity: gl.getUniformLocation(softProgram, 'uOpacity')
+      }
+    };
+  }
+
+  // Curtain Aurora Program
+  const curtainProgram = createProgram(gl, CURTAIN_VERTEX, CURTAIN_FRAGMENT);
+  let curtainShader = null;
+  let curtainVao = null;
+  if (curtainProgram) {
+    curtainVao = gl.createVertexArray();
+    gl.bindVertexArray(curtainVao);
+
+    const quadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 3, -1, -1, 3]),
+      gl.STATIC_DRAW
+    );
+
+    const aPos = gl.getAttribLocation(curtainProgram, 'aPosition');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    curtainShader = {
+      program: curtainProgram,
+      uniforms: {
+        uResolution: gl.getUniformLocation(curtainProgram, 'uResolution'),
+        uTime: gl.getUniformLocation(curtainProgram, 'uTime'),
+        uStops: gl.getUniformLocation(curtainProgram, 'uStops'),
+        uStopCount: gl.getUniformLocation(curtainProgram, 'uStopCount'),
+        uAmplitude: gl.getUniformLocation(curtainProgram, 'uAmplitude'),
+        uBlend: gl.getUniformLocation(curtainProgram, 'uBlend'),
+        uHeight: gl.getUniformLocation(curtainProgram, 'uHeight'),
+        uScale: gl.getUniformLocation(curtainProgram, 'uScale'),
+        uGlow: gl.getUniformLocation(curtainProgram, 'uGlow'),
+        uBrightness: gl.getUniformLocation(curtainProgram, 'uBrightness'),
+        uLayers: gl.getUniformLocation(curtainProgram, 'uLayers'),
+        uFlip: gl.getUniformLocation(curtainProgram, 'uFlip'),
+        uPointer: gl.getUniformLocation(curtainProgram, 'uPointer'),
+        uReveal: gl.getUniformLocation(curtainProgram, 'uReveal'),
+        uOpacity: gl.getUniformLocation(curtainProgram, 'uOpacity'),
+        uLightMode: gl.getUniformLocation(curtainProgram, 'uLightMode')
+      }
+    };
+  }
 
   // -----------------------------------------------------------------------
-  // 4. Audio-Reactive Song Palettes & Genre Color Harmonies
+  // 4. The 8 Distinctive RGB Aurora Motion Patterns & Mood Palettes
   // -----------------------------------------------------------------------
-  const MOOD_PALETTES = [
+  const AURORA_PATTERNS = [
     {
-      id: 'neon-cyber',
-      name: 'Cyberpunk Neon (Dance & EDM)',
-      soft: { c1: '#00f5ff', c2: '#e100ff', spectrum: 1.0, bandHeight: 0.52 },
-      curtain: ['#5227FF', '#00f5ff', '#ff007a', '#7cff67', '#5227FF']
+      id: 'prismatic-rgb',
+      name: 'PRISMATIC RGB WAVE',
+      tag: 'REACT.DEV SPECTRUM',
+      icon: '🌈',
+      soft: { c1: '#ff0055', c2: '#00e5ff', spectrum: 1.0, bandHeight: 0.52 },
+      curtain: ['#ff0033', '#00ff66', '#0066ff', '#e100ff', '#ff0033'],
+      borderGradient: 'linear-gradient(90deg, #ff0055, #ffaa00, #00ff66, #00f0ff, #0066ff, #e100ff, #ff0055)',
+      ambientGlow: 'rgba(0, 240, 255, 0.45)',
+      laserSpeed: '2.4s',
+      mode: 'conic-sweep'
     },
     {
-      id: 'punjabi-gold',
-      name: 'Bhangra Flame (Punjabi & Dhol)',
-      soft: { c1: '#ffd000', c2: '#00ff87', spectrum: 0.9, bandHeight: 0.48 },
-      curtain: ['#ff8800', '#ffd000', '#00ff87', '#ff0055', '#ff8800']
+      id: 'cyber-laser',
+      name: 'CYBERPUNK NEON SWEEP',
+      tag: 'TOKYO TRON DRIFT',
+      icon: '⚡',
+      soft: { c1: '#00f5ff', c2: '#e100ff', spectrum: 0.95, bandHeight: 0.50 },
+      curtain: ['#5227ff', '#00f5ff', '#ff007a', '#7cff67', '#5227ff'],
+      borderGradient: 'linear-gradient(90deg, #00f5ff, #ffffff, #e100ff, #5227ff, #00f5ff)',
+      ambientGlow: 'rgba(225, 0, 255, 0.5)',
+      laserSpeed: '1.8s',
+      mode: 'dual-counter'
     },
     {
-      id: 'sufi-velvet',
-      name: 'Ethereal Velvet (Sufi & Romantic)',
-      soft: { c1: '#ff6584', c2: '#5227ff', spectrum: 0.85, bandHeight: 0.55 },
-      curtain: ['#2e0854', '#5227ff', '#ff6584', '#2af598', '#7928ca']
+      id: 'borealis-matrix',
+      name: 'EMERALD BOREALIS',
+      tag: 'NORDIC NIGHT GLOW',
+      icon: '🌲',
+      soft: { c1: '#00ff87', c2: '#00e5ff', spectrum: 0.85, bandHeight: 0.55 },
+      curtain: ['#00ff87', '#00e5ff', '#4338ca', '#2af598', '#00ff87'],
+      borderGradient: 'linear-gradient(90deg, #00ff87, #00e5ff, #38bdf8, #4338ca, #00ff87)',
+      ambientGlow: 'rgba(0, 255, 135, 0.45)',
+      laserSpeed: '3.0s',
+      mode: 'wave-oscillate'
     },
     {
-      id: 'hiphop-crimson',
-      name: '808 Bass Heat (Desi Hip-Hop & Rap)',
-      soft: { c1: '#ff003c', c2: '#ff8800', spectrum: 0.8, bandHeight: 0.45 },
-      curtain: ['#ff003c', '#ff5500', '#ffe600', '#111111', '#ff003c']
+      id: 'solar-flare',
+      name: '808 SOLAR PLASMA',
+      tag: 'HIGH-BASS FLAME',
+      icon: '🔥',
+      soft: { c1: '#ffd000', c2: '#ff0055', spectrum: 0.9, bandHeight: 0.48 },
+      curtain: ['#ff8800', '#ffd000', '#ff0055', '#ff3300', '#ff8800'],
+      borderGradient: 'linear-gradient(90deg, #ffd000, #ff6b00, #ff0055, #ff0033, #ffd000)',
+      ambientGlow: 'rgba(255, 136, 0, 0.55)',
+      laserSpeed: '1.6s',
+      mode: 'perimeter-pulse'
     },
     {
-      id: 'south-solar',
-      name: 'High-Voltage Mass (Tamil & Telugu Kuthu)',
-      soft: { c1: '#ff0055', c2: '#00e5ff', spectrum: 1.0, bandHeight: 0.5 },
-      curtain: ['#ff0055', '#ffaa00', '#00e5ff', '#7cff67', '#ff0055']
+      id: 'ultraviolet-hyper',
+      name: 'ULTRAVIOLET HYPERDRIVE',
+      tag: 'COSMIC VOID PULSE',
+      icon: '🌌',
+      soft: { c1: '#7928ca', c2: '#ff0080', spectrum: 0.9, bandHeight: 0.53 },
+      curtain: ['#7928ca', '#ff0080', '#00dfd8', '#2e0854', '#7928ca'],
+      borderGradient: 'linear-gradient(90deg, #7928ca, #ff0080, #ffffff, #00dfd8, #7928ca)',
+      ambientGlow: 'rgba(121, 40, 202, 0.55)',
+      laserSpeed: '2.0s',
+      mode: 'conic-sweep'
+    },
+    {
+      id: 'acid-velocity',
+      name: 'ACID LIME VELOCITY',
+      tag: 'AUDIFY SIGNATURE OVERDRIVE',
+      icon: '💥',
+      soft: { c1: '#c8ff00', c2: '#00ffff', spectrum: 0.95, bandHeight: 0.46 },
+      curtain: ['#c8ff00', '#00ffff', '#9d00ff', '#10b981', '#c8ff00'],
+      borderGradient: 'linear-gradient(90deg, #c8ff00, #00ffff, #ffffff, #9d00ff, #c8ff00)',
+      ambientGlow: 'rgba(200, 255, 0, 0.55)',
+      laserSpeed: '1.4s',
+      mode: 'dual-counter'
+    },
+    {
+      id: 'optical-prism',
+      name: 'OPTICAL DIFFRACTION PRISM',
+      tag: 'PURE RGB CHROMATIC',
+      icon: '💎',
+      soft: { c1: '#ff0000', c2: '#00ff00', spectrum: 1.0, bandHeight: 0.5 },
+      curtain: ['#ff0000', '#00ff00', '#0000ff', '#ffffff', '#ff0000'],
+      borderGradient: 'linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
+      ambientGlow: 'rgba(255, 255, 255, 0.5)',
+      laserSpeed: '2.2s',
+      mode: 'corner-strobing'
+    },
+    {
+      id: 'synthwave-dusk',
+      name: 'MIAMI SYNTHWAVE DUSK',
+      tag: 'RETRO 80S HORIZON',
+      icon: '🌅',
+      soft: { c1: '#ff7e5f', c2: '#feb47b', spectrum: 0.85, bandHeight: 0.44 },
+      curtain: ['#b92b27', '#ff7e5f', '#feb47b', '#1565c0', '#b92b27'],
+      borderGradient: 'linear-gradient(90deg, #ff7e5f, #feb47b, #ff007a, #b92b27, #ff7e5f)',
+      ambientGlow: 'rgba(255, 126, 95, 0.5)',
+      laserSpeed: '2.8s',
+      mode: 'wave-oscillate'
     }
   ];
 
   // Pre-parse and pre-calculate all palette colors & OKLCH stops once at initialization (Zero GC Churn)
-  const PRECOMPUTED_PALETTES = MOOD_PALETTES.map((pal) => {
+  const PRECOMPUTED_PATTERNS = AURORA_PATTERNS.map((pal) => {
     const c1 = parseColor(pal.soft.c1);
     const c2 = parseColor(pal.soft.c2);
     const curtainStops = pal.curtain.map(parseColor);
@@ -512,31 +646,341 @@
   let currentPaletteIdx = 0;
   let targetPaletteIdx = 0;
   let paletteTransition = 1.0;
+  let activePatternIdx = 0;
 
   // Active effect mode: 'auto' | 'soft' | 'curtain' | 'fusion'
   let auroraMode = localStorage.getItem('audify_aurora_mode') || 'auto';
   let activeEffect = 'soft'; // Currently running effect in auto mode
 
   // -----------------------------------------------------------------------
-  // 5. Interactive State, Beat Pulses & Mouse Dynamics
+  // 5. Perimeter RGB Aurora Border, Shockwave & Toast Injection
   // -----------------------------------------------------------------------
+  function ensureBorderStyles() {
+    if (document.getElementById('audify-rgb-border-styles')) return;
+    const styleEl = document.createElement('style');
+    styleEl.id = 'audify-rgb-border-styles';
+    styleEl.textContent = `
+      :root {
+        --audify-border-gradient: ${AURORA_PATTERNS[0].borderGradient};
+        --audify-border-glow: ${AURORA_PATTERNS[0].ambientGlow};
+        --audify-laser-speed: ${AURORA_PATTERNS[0].laserSpeed};
+      }
+
+      /* Viewport Perimeter RGB Border Container */
+      #audify-rgb-aurora-border {
+        position: fixed !important;
+        inset: 0 !important;
+        pointer-events: none !important;
+        z-index: 10 !important;
+        overflow: hidden !important;
+      }
+
+      /* 4 Perimeter Laser Beams */
+      .audify-laser-beam {
+        position: absolute !important;
+        pointer-events: none !important;
+        opacity: 0.95 !important;
+        will-change: transform, opacity !important;
+      }
+
+      .audify-laser-top {
+        top: 0 !important;
+        left: 0 !important;
+        width: 200% !important;
+        height: 3px !important;
+        background: var(--audify-border-gradient) !important;
+        box-shadow: 0 0 16px var(--audify-border-glow), 0 0 32px var(--audify-border-glow) !important;
+        animation: audifyLaserSlideH var(--audify-laser-speed) linear infinite !important;
+      }
+
+      .audify-laser-bottom {
+        bottom: 0 !important;
+        left: -100% !important;
+        width: 200% !important;
+        height: 3px !important;
+        background: var(--audify-border-gradient) !important;
+        box-shadow: 0 0 16px var(--audify-border-glow), 0 0 32px var(--audify-border-glow) !important;
+        animation: audifyLaserSlideHReverse var(--audify-laser-speed) linear infinite !important;
+      }
+
+      .audify-laser-left {
+        top: -100% !important;
+        left: 0 !important;
+        width: 3px !important;
+        height: 200% !important;
+        background: var(--audify-border-gradient) !important;
+        box-shadow: 0 0 16px var(--audify-border-glow), 0 0 32px var(--audify-border-glow) !important;
+        animation: audifyLaserSlideVReverse var(--audify-laser-speed) linear infinite !important;
+      }
+
+      .audify-laser-right {
+        top: 0 !important;
+        right: 0 !important;
+        width: 3px !important;
+        height: 200% !important;
+        background: var(--audify-border-gradient) !important;
+        box-shadow: 0 0 16px var(--audify-border-glow), 0 0 32px var(--audify-border-glow) !important;
+        animation: audifyLaserSlideV var(--audify-laser-speed) linear infinite !important;
+      }
+
+      /* Ambient Inward Glow */
+      .audify-border-ambient {
+        position: absolute !important;
+        inset: 0 !important;
+        box-shadow: inset 0 0 45px var(--audify-border-glow), inset 0 0 90px rgba(0, 0, 0, 0.45) !important;
+        transition: box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        pointer-events: none !important;
+      }
+
+      /* 4 Glowing Corner Flares */
+      .audify-corner-flare {
+        position: absolute !important;
+        width: 18px !important;
+        height: 18px !important;
+        pointer-events: none !important;
+        filter: drop-shadow(0 0 10px var(--audify-border-glow)) !important;
+      }
+      .audify-corner-tl { top: 0 !important; left: 0 !important; border-top: 3px solid #ffffff; border-left: 3px solid #ffffff; }
+      .audify-corner-tr { top: 0 !important; right: 0 !important; border-top: 3px solid #ffffff; border-right: 3px solid #ffffff; }
+      .audify-corner-br { bottom: 0 !important; right: 0 !important; border-bottom: 3px solid #ffffff; border-right: 3px solid #ffffff; }
+      .audify-corner-bl { bottom: 0 !important; left: 0 !important; border-bottom: 3px solid #ffffff; border-left: 3px solid #ffffff; }
+
+      @keyframes audifyLaserSlideH {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-50%); }
+      }
+      @keyframes audifyLaserSlideHReverse {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(50%); }
+      }
+      @keyframes audifyLaserSlideV {
+        0% { transform: translateY(0%); }
+        100% { transform: translateY(-50%); }
+      }
+      @keyframes audifyLaserSlideVReverse {
+        0% { transform: translateY(0%); }
+        100% { transform: translateY(50%); }
+      }
+
+      /* Full-Screen Song Change Explosion Shockwave */
+      #audify-shockwave-ring {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        width: 100vmax !important;
+        height: 100vmax !important;
+        margin-top: -50vmax !important;
+        margin-left: -50vmax !important;
+        border-radius: 50% !important;
+        border: 4px solid var(--audify-border-glow) !important;
+        box-shadow: 0 0 50px var(--audify-border-glow), inset 0 0 50px var(--audify-border-glow) !important;
+        pointer-events: none !important;
+        z-index: 12 !important;
+        opacity: 0 !important;
+        transform: scale(0.05) !important;
+      }
+
+      #audify-shockwave-ring.audify-shockwave-active {
+        animation: audifyShockwaveExpand 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      }
+
+      @keyframes audifyShockwaveExpand {
+        0% {
+          opacity: 0.95;
+          transform: scale(0.05);
+          filter: blur(0px);
+        }
+        50% {
+          opacity: 0.6;
+          filter: blur(3px);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.6);
+          filter: blur(16px);
+        }
+      }
+
+      /* Full-Screen Chromatic Aura Flash */
+      #audify-chromatic-flash {
+        position: fixed !important;
+        inset: 0 !important;
+        background: var(--audify-border-glow) !important;
+        mix-blend-mode: screen !important;
+        pointer-events: none !important;
+        z-index: 11 !important;
+        opacity: 0 !important;
+      }
+
+      #audify-chromatic-flash.audify-flash-active {
+        animation: audifyFlashFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      }
+
+      @keyframes audifyFlashFade {
+        0% { opacity: 0.65; }
+        100% { opacity: 0; }
+      }
+
+      /* Floating Song Change HUD Toast Badge */
+      #audify-songchange-badge {
+        position: fixed !important;
+        top: 24px !important;
+        left: 50% !important;
+        transform: translateX(-50%) translateY(-30px) scale(0.92) !important;
+        z-index: 9999 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 10px 20px !important;
+        background: rgba(8, 9, 12, 0.92) !important;
+        backdrop-filter: blur(28px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+        border-radius: 9999px !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 24px var(--audify-border-glow), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+        max-width: min(520px, calc(100vw - 32px)) !important;
+      }
+
+      #audify-songchange-badge.audify-badge-show {
+        opacity: 1 !important;
+        transform: translateX(-50%) translateY(0) scale(1) !important;
+      }
+
+      .audify-badge-icon {
+        font-size: 20px !important;
+        line-height: 1 !important;
+        animation: audifyBadgePulse 1.2s infinite ease-in-out !important;
+      }
+
+      @keyframes audifyBadgePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+      }
+
+      .audify-badge-text {
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+      }
+
+      .audify-badge-kicker {
+        font-family: var(--font-anton), 'Anton', sans-serif !important;
+        font-size: 10px !important;
+        letter-spacing: 0.12em !important;
+        text-transform: uppercase !important;
+        color: #c8ff00 !important;
+        line-height: 1 !important;
+      }
+
+      .audify-badge-title {
+        font-family: var(--font-anton), 'Anton', sans-serif !important;
+        font-size: 14px !important;
+        letter-spacing: 0.04em !important;
+        text-transform: uppercase !important;
+        color: #ffffff !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
+      }
+
+      .audify-badge-pattern {
+        font-size: 10px !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+        line-height: 1 !important;
+      }
+
+      /* Reactive Card Borders */
+      main button[class*="rounded-"],
+      main a[class*="rounded-"] {
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      main button[class*="rounded-"]:hover,
+      main a[class*="rounded-"]:hover {
+        box-shadow: 0 0 18px var(--audify-border-glow), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
+  function ensureBorderAttached() {
+    ensureBorderStyles();
+    if (!document.getElementById('audify-rgb-aurora-border')) {
+      const borderEl = document.createElement('div');
+      borderEl.id = 'audify-rgb-aurora-border';
+      borderEl.innerHTML = `
+        <div class="audify-laser-beam audify-laser-top"></div>
+        <div class="audify-laser-beam audify-laser-right"></div>
+        <div class="audify-laser-beam audify-laser-bottom"></div>
+        <div class="audify-laser-beam audify-laser-left"></div>
+        <div class="audify-border-ambient"></div>
+        <div class="audify-corner-flare audify-corner-tl"></div>
+        <div class="audify-corner-flare audify-corner-tr"></div>
+        <div class="audify-corner-flare audify-corner-br"></div>
+        <div class="audify-corner-flare audify-corner-bl"></div>
+      `;
+      document.body.appendChild(borderEl);
+    }
+
+    if (!document.getElementById('audify-shockwave-ring')) {
+      const shockwave = document.createElement('div');
+      shockwave.id = 'audify-shockwave-ring';
+      document.body.appendChild(shockwave);
+    }
+
+    if (!document.getElementById('audify-chromatic-flash')) {
+      const flash = document.createElement('div');
+      flash.id = 'audify-chromatic-flash';
+      document.body.appendChild(flash);
+    }
+
+    if (!document.getElementById('audify-songchange-badge')) {
+      const badge = document.createElement('div');
+      badge.id = 'audify-songchange-badge';
+      badge.innerHTML = `
+        <span class="audify-badge-icon">🌈</span>
+        <div class="audify-badge-text">
+          <div class="audify-badge-kicker">NOW PLAYING · AURORA RGB SYNC</div>
+          <div class="audify-badge-title" id="audify-badge-title-el">TAIWAN REMIX · LIVE</div>
+          <div class="audify-badge-pattern" id="audify-badge-pattern-el">AURORA: PRISMATIC RGB WAVE</div>
+        </div>
+      `;
+      document.body.appendChild(badge);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureBorderAttached);
+  } else {
+    ensureBorderAttached();
+  }
+
+  // -----------------------------------------------------------------------
+  // 6. Interactive State, Beat Pulses & Mouse Dynamics
+  // -----------------------------------------------------------------------
+  let beatPulse = 1.0;
+  let flowVelocity = 1.0;
+  const mouse = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5, presence: 0 };
+  const pointer = { x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5, inside: false };
+  const curtainState = { px: 0, py: 0, reach: 0, clock: 0 };
   const pulses = [];
   const pulseData = new Float32Array(MAX_PULSES * 4);
   const paletteBuffer = new Float32Array(MAX_STOPS * 3);
 
-  const pointer = { x: 0.5, y: 0.5, inside: false };
-  const mouse = { x: 0.5, y: 0.5, presence: 0 };
-  const curtainState = { clock: 0, px: 0, py: 0.5, reach: 0, reveal: 1 };
-
-  let beatPulse = 1.0;
-  let isPlaying = false;
   let flow = 0;
   let hue = 0;
   let lastTime = performance.now();
   let trackCounter = 0;
 
   // Global Beat Pulse Trigger
-  window.triggerAudifyBeatPulse = function (intensity = 1.6) {
+  window.triggerAudifyBeatPulse = function (intensity = 1.8) {
     beatPulse = Math.max(beatPulse, intensity);
 
     // Inject SoftAurora wave pulse along band
@@ -549,10 +993,70 @@
     if (pulses.length > MAX_PULSES) pulses.shift();
   };
 
+  // Helper to trigger full-screen shockwave and flash
+  function triggerSongChangeExplosion(pattern, songTitle) {
+    ensureBorderAttached();
+    const shockwave = document.getElementById('audify-shockwave-ring');
+    const flash = document.getElementById('audify-chromatic-flash');
+    const badge = document.getElementById('audify-songchange-badge');
+
+    if (shockwave) {
+      shockwave.classList.remove('audify-shockwave-active');
+      void shockwave.offsetWidth;
+      shockwave.classList.add('audify-shockwave-active');
+    }
+
+    if (flash) {
+      flash.classList.remove('audify-flash-active');
+      void flash.offsetWidth;
+      flash.classList.add('audify-flash-active');
+    }
+
+    if (badge) {
+      const titleEl = document.getElementById('audify-badge-title-el');
+      const patternEl = document.getElementById('audify-badge-pattern-el');
+      const iconEl = badge.querySelector('.audify-badge-icon');
+      if (titleEl) titleEl.textContent = songTitle || ('TRACK #' + trackCounter);
+      if (patternEl) patternEl.textContent = 'AURORA: ' + pattern.name;
+      if (iconEl) iconEl.textContent = pattern.icon;
+
+      badge.classList.remove('audify-badge-show');
+      void badge.offsetWidth;
+      badge.classList.add('audify-badge-show');
+
+      if (window.__audify_badge_timer) clearTimeout(window.__audify_badge_timer);
+      window.__audify_badge_timer = setTimeout(() => {
+        badge.classList.remove('audify-badge-show');
+      }, 3000);
+    }
+  }
+
+  // Update CSS Variables for Active Pattern
+  function updateBorderCssVariables(pattern) {
+    const root = document.documentElement;
+    root.style.setProperty('--audify-border-gradient', pattern.borderGradient);
+    root.style.setProperty('--audify-border-glow', pattern.ambientGlow);
+    root.style.setProperty('--audify-laser-speed', pattern.laserSpeed);
+  }
+
   // Song Transition Notification
   window.onAudifySongChange = function (songInfo = {}) {
     trackCounter++;
-    console.log('[Audify Aurora Engine] Song transition:', songInfo.title || 'Track #' + trackCounter);
+    const songTitle = songInfo.title || ('Track #' + trackCounter);
+    console.log('[Audify Aurora Engine] Song transition:', songTitle);
+
+    // Advance to next pattern
+    activePatternIdx = (activePatternIdx + 1) % AURORA_PATTERNS.length;
+    targetPaletteIdx = activePatternIdx;
+    paletteTransition = 0.0;
+
+    const pattern = AURORA_PATTERNS[activePatternIdx];
+    updateBorderCssVariables(pattern);
+
+    // Surge shader dynamics
+    flow += 12.0; // Dynamic wave surge
+    flowVelocity = 3.5;
+    window.triggerAudifyBeatPulse(3.2);
 
     // Alternate effect on song change if in auto mode
     if (auroraMode === 'auto') {
@@ -561,16 +1065,19 @@
       if (label) label.textContent = getAuroraModeLabel(auroraMode);
     }
 
-    // Shift mood palette
-    targetPaletteIdx = (currentPaletteIdx + 1) % MOOD_PALETTES.length;
-    paletteTransition = 0.0;
-    window.triggerAudifyBeatPulse(2.4);
+    // Trigger full-screen visual effects
+    triggerSongChangeExplosion(pattern, songTitle);
+  };
+
+  // Manual cycling of pattern
+  window.audifyNextAuroraPattern = function () {
+    window.onAudifySongChange({ title: 'Preview Next Pattern' });
   };
 
   // Track observer to automatically catch song changes
   let lastObservedTitle = '';
   setInterval(() => {
-    const titleEl = document.querySelector('[data-testid="track-title"], .track-title, h1, h2, h3');
+    const titleEl = document.querySelector('[data-testid="track-title"], .track-title, .now-playing-title, h1, h2, h3');
     const titleText = (titleEl ? titleEl.textContent : '').trim();
     if (titleText && titleText !== lastObservedTitle && titleText.length > 3) {
       if (lastObservedTitle !== '') {
@@ -578,7 +1085,7 @@
       }
       lastObservedTitle = titleText;
     }
-  }, 1000);
+  }, 800);
 
   // Resize handler
   function resize() {
@@ -613,7 +1120,7 @@
   });
 
   // -----------------------------------------------------------------------
-  // 6. Main WebGL2 Render Loop (Dual Shaders Orchestration)
+  // 7. Main WebGL2 Render Loop (Dual Shaders Orchestration)
   // -----------------------------------------------------------------------
   let isContextLost = false;
   canvas.addEventListener('webglcontextlost', (e) => {
@@ -628,6 +1135,7 @@
 
   function render(now) {
     requestAnimationFrame(render);
+    if (!canvas.isConnected) ensureCanvasAttached();
     if (isContextLost || (gl.isContextLost && gl.isContextLost())) return;
     if (document.hidden) {
       lastTime = now;
@@ -637,27 +1145,31 @@
     const dt = clamp((now - lastTime) / 1000 || 0, 0, 0.05);
     lastTime = now;
 
-    // Smooth beat decay
+    // Smooth beat decay & flow velocity
     beatPulse += (1.0 - beatPulse) * Math.min(1, dt * 5.0);
+    flowVelocity += (1.0 - flowVelocity) * Math.min(1, dt * 2.5);
+
     if (paletteTransition < 1.0) {
-      paletteTransition = Math.min(1.0, paletteTransition + dt * 1.5);
+      paletteTransition = Math.min(1.0, paletteTransition + dt * 1.8);
       if (paletteTransition >= 1.0) currentPaletteIdx = targetPaletteIdx;
     }
 
-    const pace = isPlaying ? 1.3 : 0.45;
-    flow += dt * 0.7 * pace * (1 + (beatPulse - 1) * 0.5);
-    hue += dt * 0.4 * pace;
-    curtainState.clock += dt * 0.85 * pace;
+    // Advance clocks
+    flow += dt * 0.6 * flowVelocity * (0.8 + (beatPulse - 1) * 0.4);
+    hue += dt * 0.15;
+    curtainState.clock += dt * 0.55 * flowVelocity * (0.8 + (beatPulse - 1) * 0.35);
 
-    // Follow mouse
-    const follow = 1 - Math.exp(-dt / 0.35);
-    mouse.x += ((pointer.inside ? pointer.x : 0.5) - mouse.x) * follow;
-    mouse.y += ((pointer.inside ? pointer.y : 0.5) - mouse.y) * follow;
-    mouse.presence += ((pointer.inside ? 1 : 0) - mouse.presence) * (1 - Math.exp(-dt / 0.5));
+    // Mouse easing
+    const mouseLerp = Math.min(1, dt * 3.5);
+    mouse.targetX = pointer.x;
+    mouse.targetY = pointer.y;
+    mouse.x += (mouse.targetX - mouse.x) * mouseLerp;
+    mouse.y += (mouse.targetY - mouse.y) * mouseLerp;
+    mouse.presence += ((pointer.inside ? 1 : 0) - mouse.presence) * mouseLerp;
 
-    curtainState.px += (((pointer.x - 0.5) * (canvas.width / canvas.height)) - curtainState.px) * follow;
-    curtainState.py += (pointer.y - curtainState.py) * follow;
-    curtainState.reach += ((pointer.inside ? 1 : 0) - curtainState.reach) * (1 - Math.exp(-dt / 0.8));
+    curtainState.px += (pointer.x - 0.5 - curtainState.px) * mouseLerp;
+    curtainState.py += (pointer.y - 0.5 - curtainState.py) * mouseLerp;
+    curtainState.reach += ((pointer.inside ? 1 : 0) - curtainState.reach) * mouseLerp;
 
     // Update pulses
     for (let i = pulses.length - 1; i >= 0; i--) {
@@ -672,8 +1184,8 @@
       pulseData[idx * 4 + 3] = p.age;
     });
 
-    const activePal = PRECOMPUTED_PALETTES[currentPaletteIdx];
-    const targetPal = PRECOMPUTED_PALETTES[targetPaletteIdx];
+    const activePal = PRECOMPUTED_PATTERNS[currentPaletteIdx];
+    const targetPal = PRECOMPUTED_PATTERNS[targetPaletteIdx];
     const aspect = canvas.width / canvas.height;
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -706,7 +1218,7 @@
       gl.uniform1f(u.uFlow, flow);
       gl.uniform1f(u.uHue, hue);
       gl.uniform1f(u.uScale, 1.45);
-      gl.uniform1f(u.uBrightness, 1.15 * (1 + (beatPulse - 1) * 0.55));
+      gl.uniform1f(u.uBrightness, 1.25 * (1 + (beatPulse - 1) * 0.55));
       gl.uniform3f(u.uColor1, c1R, c1G, c1Bval);
       gl.uniform3f(u.uColor2, c2R, c2G, c2Bval);
       gl.uniform1f(u.uNoiseFreq, 2.4);
@@ -765,13 +1277,26 @@
   requestAnimationFrame(render);
 
   // -----------------------------------------------------------------------
-  // 7. Serato-Grade Audio FX Synthesizer (Drum Roll, S-Blend, Sweep, Echo, 808)
+  // 8. Serato-Grade Audio FX Synthesizer with Master Brickwall Limiter
   // -----------------------------------------------------------------------
   let audioCtx = null;
+  let masterLimiter = null;
+
   function getAudioCtx() {
     if (!audioCtx) {
       const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtxClass) audioCtx = new AudioCtxClass();
+      if (AudioCtxClass) {
+        audioCtx = new AudioCtxClass();
+        try {
+          masterLimiter = audioCtx.createDynamicsCompressor();
+          masterLimiter.threshold.setValueAtTime(-1.0, audioCtx.currentTime);
+          masterLimiter.knee.setValueAtTime(0.0, audioCtx.currentTime);
+          masterLimiter.ratio.setValueAtTime(20.0, audioCtx.currentTime);
+          masterLimiter.attack.setValueAtTime(0.002, audioCtx.currentTime);
+          masterLimiter.release.setValueAtTime(0.10, audioCtx.currentTime);
+          masterLimiter.connect(audioCtx.destination);
+        } catch {}
+      }
     }
     if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume();
@@ -779,13 +1304,19 @@
     return audioCtx;
   }
 
+  function getFxOut(ctx) {
+    return masterLimiter || ctx.destination;
+  }
+
   const SOUND_FX = {
     drum_roll() {
       const ctx = getAudioCtx();
       if (!ctx) return;
+      const dest = getFxOut(ctx);
       const now = ctx.currentTime;
       const count = 18;
       const step = 0.07;
+
       for (let i = 0; i < count; i++) {
         const t = now + i * step;
         const progress = i / count;
@@ -793,50 +1324,49 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(140 + 260 * progress, t);
-        osc.frequency.exponentialRampToValueAtTime(70, t + 0.05);
+        osc.frequency.setValueAtTime(120 + progress * 160, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.05);
 
-        gain.gain.setValueAtTime(0.01, t);
-        gain.gain.linearRampToValueAtTime(0.35 + 0.5 * progress, t + 0.005);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+        gain.gain.setValueAtTime(0.05 + progress * 0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
 
-        const bSize = Math.max(1, Math.round(ctx.sampleRate * 0.05));
-        const b = ctx.createBuffer(1, bSize, ctx.sampleRate);
-        const data = b.getChannelData(0);
-        for (let j = 0; j < bSize; j++) data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (bSize * 0.3));
         const noise = ctx.createBufferSource();
-        noise.buffer = b;
+        const buffer = ctx.createBuffer(1, Math.round(ctx.sampleRate * 0.05), ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let j = 0; j < data.length; j++) data[j] = Math.random() * 2 - 1;
+        noise.buffer = buffer;
+
         const nGain = ctx.createGain();
-        nGain.gain.setValueAtTime(0.1 + 0.4 * progress, t);
+        nGain.gain.setValueAtTime(0.04 + progress * 0.22, t);
         nGain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(dest);
         noise.connect(nGain);
-        nGain.connect(ctx.destination);
+        nGain.connect(dest);
 
         osc.start(t);
         osc.stop(t + 0.06);
         noise.start(t);
         noise.stop(t + 0.05);
       }
-      setTimeout(() => SOUND_FX.sub_drop(), 1250);
     },
 
     blend() {
       const ctx = getAudioCtx();
       if (!ctx) return;
+      const dest = getFxOut(ctx);
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 0.4);
-      gain.gain.setValueAtTime(0.01, now);
+      osc.frequency.setValueAtTime(80, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.35);
+      gain.gain.setValueAtTime(0.001, now);
       gain.gain.linearRampToValueAtTime(0.3, now + 0.2);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
       osc.start(now);
       osc.stop(now + 0.5);
     },
@@ -844,31 +1374,32 @@
     filter_sweep() {
       const ctx = getAudioCtx();
       if (!ctx) return;
+      const dest = getFxOut(ctx);
       const now = ctx.currentTime;
       const dur = 1.4;
       const bSize = Math.max(1, Math.round(ctx.sampleRate * dur));
-      const b = ctx.createBuffer(1, bSize, ctx.sampleRate);
-      const data = b.getChannelData(0);
-      for (let j = 0; j < bSize; j++) {
-        const p = j / bSize;
-        data[j] = (Math.random() * 2 - 1) * Math.pow(p, 1.8);
-      }
+      const buffer = ctx.createBuffer(1, bSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+
       const src = ctx.createBufferSource();
-      src.buffer = b;
+      src.buffer = buffer;
+
       const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.Q.value = 4.0;
-      filter.frequency.setValueAtTime(250, now);
-      filter.frequency.exponentialRampToValueAtTime(8000, now + dur);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(200, now);
+      filter.frequency.exponentialRampToValueAtTime(7000, now + dur * 0.7);
+      filter.frequency.exponentialRampToValueAtTime(400, now + dur);
+      filter.Q.value = 6;
 
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.linearRampToValueAtTime(0.7, now + dur - 0.1);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.linearRampToValueAtTime(0.28, now + dur * 0.7);
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
       src.connect(filter);
       filter.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
       src.start(now);
       src.stop(now + dur);
     },
@@ -876,27 +1407,29 @@
     echo_drop() {
       const ctx = getAudioCtx();
       if (!ctx) return;
+      const dest = getFxOut(ctx);
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(110, now + 0.4);
-
       const delay = ctx.createDelay();
-      delay.delayTime.value = 0.18;
       const feedback = ctx.createGain();
-      feedback.gain.value = 0.65;
 
-      gain.gain.setValueAtTime(0.7, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+      delay.delayTime.value = 0.18;
+      feedback.gain.value = 0.55;
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
       osc.connect(gain);
       gain.connect(delay);
       delay.connect(feedback);
       feedback.connect(delay);
-      delay.connect(ctx.destination);
-      gain.connect(ctx.destination);
+      delay.connect(dest);
+      gain.connect(dest);
 
       osc.start(now);
       osc.stop(now + 0.35);
@@ -905,233 +1438,432 @@
     sub_drop() {
       const ctx = getAudioCtx();
       if (!ctx) return;
+      const dest = getFxOut(ctx);
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(110, now);
-      osc.frequency.exponentialRampToValueAtTime(32, now + 0.65);
 
-      gain.gain.setValueAtTime(0.9, now);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.7);
+
+      gain.gain.setValueAtTime(0.42, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(dest);
       osc.start(now);
       osc.stop(now + 0.8);
     }
   };
 
-  let activeMixStyle = localStorage.getItem('audify_mix_action') || 'drum_roll';
+  let activeMixStyle = localStorage.getItem('audify_mix_style') || 'drum_roll';
 
   window.setAudifyMixStyle = function (style) {
-    activeMixStyle = style;
-    localStorage.setItem('audify_mix_action', style);
-    const label = document.getElementById('audify-mix-label');
-    if (label) label.textContent = getMixStyleLabel(style);
+    if (SOUND_FX[style]) {
+      activeMixStyle = style;
+      localStorage.setItem('audify_mix_style', style);
+      const label = document.getElementById('audify-mix-label');
+      if (label) label.textContent = getMixStyleLabel(style);
+    }
   };
-
-  function getMixStyleLabel(style) {
-    if (style === 'drum_roll') return '🥁 DRUM ROLL';
-    if (style === 'blend') return '🎚 CLUB BLEND';
-    if (style === 'filter_sweep') return '🌊 FILTER SWEEP';
-    if (style === 'echo_drop') return '🔊 ECHO DROP';
-    if (style === 'sub_drop') return '💥 SUB IMPACT';
-    return '🥁 DRUM ROLL';
-  }
 
   window.setAudifyAuroraMode = function (mode) {
     auroraMode = mode;
     localStorage.setItem('audify_aurora_mode', mode);
     const label = document.getElementById('audify-aurora-label');
     if (label) label.textContent = getAuroraModeLabel(mode);
-    window.triggerAudifyBeatPulse(2.0);
   };
 
-  function getAuroraModeLabel(mode) {
-    if (mode === 'auto') return '🔀 AUTO-SYNC';
-    if (mode === 'soft') return '✨ SOFT AURORA';
-    if (mode === 'curtain') return '🌠 CURTAIN RIBBONS';
-    if (mode === 'fusion') return '🎆 HYBRID FUSION';
-    return '🔀 AUTO-SYNC';
+  function getMixStyleLabel(style) {
+    const map = {
+      drum_roll: '🥁 DRUM ROLL',
+      blend: '🎚 CLUB S-BLEND',
+      filter_sweep: '🌊 FILTER SWEEP',
+      echo_drop: '🔊 ECHO OUT',
+      sub_drop: '💥 808 SUB'
+    };
+    return map[style] || 'MIX FX';
   }
 
-  // Hook into Skip clicks for transition effects
+  function getAuroraModeLabel(mode) {
+    const map = {
+      auto: '✨ DYNAMIC RGB AUTO',
+      soft: '✨ SOFT AURORA',
+      curtain: '🌠 CURTAIN RIBBONS',
+      fusion: '🎆 HYBRID FUSION'
+    };
+    return map[mode] || 'AURORA';
+  }
+
+  // Hook into Skip/Next clicks for transition effects
   document.addEventListener('click', (e) => {
     getAudioCtx();
-    const btn = e.target.closest('button, [role="button"]');
+    const btn = e.target.closest('button, [role="button"], a');
     if (!btn) return;
-    const text = (btn.textContent || '').trim().toUpperCase();
-    if (text.includes('SKIP') || text.includes('NEXT')) {
-      window.triggerAudifyBeatPulse(2.5);
+    const text = (btn.textContent || '').toUpperCase();
+    if (text.includes('SKIP') || text.includes('NEXT') || text.includes('PLAY SET')) {
+      window.triggerAudifyBeatPulse(2.8);
       window.onAudifySongChange({ title: 'Next Song' });
       if (SOUND_FX[activeMixStyle]) {
         SOUND_FX[activeMixStyle]();
       }
     }
-  }, true);
-
-  // Detect play state to keep aurora breathing (Zero layout reflow)
-  setInterval(() => {
-    const isPaused = Boolean(document.querySelector('.paused-stamp, #btn-paused-resume, [data-paused="true"]'));
-    const hasPlayClock = Boolean(document.getElementById('btn-clock-pause'));
-    const isAudioPlaying = Boolean(window.__nova_orchestrator && !window.__nova_orchestrator.getSnapshot()?.paused);
-    isPlaying = isAudioPlaying || (hasPlayClock && !isPaused);
-    if (isPlaying) {
-      window.triggerAudifyBeatPulse(1.15);
-    }
-  }, 500);
+  });
 
   // -----------------------------------------------------------------------
-  // 8. Inject UI Controls: Aurora Mode & Mix Action Pills
+  // 9. Top Navigation Pills (AURORA & MIX Controls)
   // -----------------------------------------------------------------------
-  function injectPlayerControls() {
-    // 1. Inject Controls Pill in header
-    if (!document.getElementById('audify-control-pills-container')) {
-      const navHeader = document.querySelector('header, nav, .flex.justify-between');
-      if (navHeader) {
-        const pillGroup = document.createElement('div');
-        pillGroup.id = 'audify-control-pills-container';
-        pillGroup.style.cssText = `
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          margin-left: 12px;
-          position: relative;
-          z-index: 40;
-        `;
-        pillGroup.innerHTML = `
-          <!-- Aurora Mode Selector -->
-          <div style="position:relative">
-            <button id="audify-aurora-btn" class="squeeze" style="
-              display:flex;
-              align-items:center;
-              gap:6px;
-              background:rgba(225,0,255,0.12);
-              border:1.5px solid #e100ff;
-              color:#fff;
-              padding:7px 14px;
-              border-radius:9999px;
-              font-family:var(--font-anton), 'Anton', sans-serif;
-              font-size:13px;
-              letter-spacing:0.04em;
-              cursor:pointer;
-              transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-              box-shadow: 0 0 16px rgba(225,0,255,0.25);
-            ">
-              <span style="color:#e100ff">AURORA:</span>
-              <span id="audify-aurora-label">${getAuroraModeLabel(auroraMode)}</span>
-              <span style="font-size:10px;opacity:0.8">▼</span>
-            </button>
-            <div id="audify-aurora-dropdown" style="
-              display:none;
-              position:absolute;
-              top:115%;
-              left:0;
-              min-width:210px;
-              background:#0a0a0c;
-              border:1.5px solid rgba(225,0,255,0.3);
-              border-radius:14px;
-              padding:6px;
-              box-shadow:0 18px 48px rgba(0,0,0,0.85);
-              backdrop-filter:blur(20px);
-              z-index:999;
-            ">
-              <div class="audify-aurora-opt" data-mode="auto" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🔀 DYNAMIC AUTO-SYNC</div>
-              <div class="audify-aurora-opt" data-mode="soft" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">✨ SOFT AURORA (3D Perlin)</div>
-              <div class="audify-aurora-opt" data-mode="curtain" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🌠 CURTAIN RIBBONS (OKLab)</div>
-              <div class="audify-aurora-opt" data-mode="fusion" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🎆 HYBRID FUSION</div>
-            </div>
-          </div>
-
-          <!-- Mix Action Pill -->
-          <div style="position:relative">
-            <button id="audify-mix-btn" class="squeeze" style="
-              display:flex;
-              align-items:center;
-              gap:6px;
-              background:rgba(200,255,0,0.12);
-              border:1.5px solid #c8ff00;
-              color:#c8ff00;
-              padding:7px 14px;
-              border-radius:9999px;
-              font-family:var(--font-anton), 'Anton', sans-serif;
-              font-size:13px;
-              letter-spacing:0.04em;
-              cursor:pointer;
-              transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-              box-shadow: 0 0 16px rgba(200,255,0,0.2);
-            ">
-              <span style="font-size:14px">MIX:</span>
-              <span id="audify-mix-label">${getMixStyleLabel(activeMixStyle)}</span>
-              <span style="font-size:10px;opacity:0.8">▼</span>
-            </button>
-            <div id="audify-mix-dropdown" style="
-              display:none;
-              position:absolute;
-              top:115%;
-              left:0;
-              min-width:180px;
-              background:#0a0a0c;
-              border:1.5px solid rgba(255,255,255,0.15);
-              border-radius:14px;
-              padding:6px;
-              box-shadow:0 18px 48px rgba(0,0,0,0.85);
-              backdrop-filter:blur(20px);
-              z-index:999;
-            ">
-              <div class="audify-mix-opt" data-style="drum_roll" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🥁 DRUM ROLL BUILD</div>
-              <div class="audify-mix-opt" data-style="blend" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🎚 CLUB S-BLEND</div>
-              <div class="audify-mix-opt" data-style="filter_sweep" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🌊 FILTER SWEEP</div>
-              <div class="audify-mix-opt" data-style="echo_drop" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">🔊 ECHO OUT DROP</div>
-              <div class="audify-mix-opt" data-style="sub_drop" style="padding:8px 12px;border-radius:8px;font-family:var(--font-anton), 'Anton', sans-serif;font-size:13px;color:#fff;cursor:pointer;transition:background 0.15s">💥 808 SUB IMPACT</div>
-            </div>
-          </div>
-        `;
-        navHeader.appendChild(pillGroup);
-
-        // Mix Dropdown events
-        const mixBtn = document.getElementById('audify-mix-btn');
-        const mixDd = document.getElementById('audify-mix-dropdown');
-        mixBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          mixDd.style.display = mixDd.style.display === 'block' ? 'none' : 'block';
-          if (auroraDd) auroraDd.style.display = 'none';
-        });
-
-        pillGroup.querySelectorAll('.audify-mix-opt').forEach((opt) => {
-          opt.addEventListener('mouseenter', () => (opt.style.background = 'rgba(200,255,0,0.15)'));
-          opt.addEventListener('mouseleave', () => (opt.style.background = 'transparent'));
-          opt.addEventListener('click', () => {
-            window.setAudifyMixStyle(opt.dataset.style);
-            mixDd.style.display = 'none';
-            SOUND_FX[opt.dataset.style]?.();
-          });
-        });
-
-        // Aurora Dropdown events
-        const auroraBtn = document.getElementById('audify-aurora-btn');
-        const auroraDd = document.getElementById('audify-aurora-dropdown');
-        auroraBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          auroraDd.style.display = auroraDd.style.display === 'block' ? 'none' : 'block';
-          if (mixDd) mixDd.style.display = 'none';
-        });
-
-        pillGroup.querySelectorAll('.audify-aurora-opt').forEach((opt) => {
-          opt.addEventListener('mouseenter', () => (opt.style.background = 'rgba(225,0,255,0.18)'));
-          opt.addEventListener('mouseleave', () => (opt.style.background = 'transparent'));
-          opt.addEventListener('click', () => {
-            window.setAudifyAuroraMode(opt.dataset.mode);
-            auroraDd.style.display = 'none';
-          });
-        });
-
-        document.addEventListener('click', () => {
-          if (mixDd) mixDd.style.display = 'none';
-          if (auroraDd) auroraDd.style.display = 'none';
-        });
+  function ensurePillStyles() {
+    if (document.getElementById('audify-header-pills-style')) return;
+    const styleEl = document.createElement('style');
+    styleEl.id = 'audify-header-pills-style';
+    styleEl.textContent = `
+      main > .flex.items-center.justify-between,
+      main > .relative.z-30.flex {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
       }
+
+      button[aria-label*="Audify"],
+      main > .flex.justify-between > button:first-child,
+      main > .relative.z-30.flex > span.text-lime {
+        flex-shrink: 0 !important;
+      }
+
+      main > .flex.justify-between > .flex.items-center.gap-5,
+      main > .relative.z-30.flex > .ml-auto {
+        flex-shrink: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+      }
+
+      #audify-control-pills-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+        margin-right: 14px !important;
+        position: relative !important;
+        z-index: 50 !important;
+        flex-shrink: 0 !important;
+      }
+
+      .squeeze {
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                    color 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        will-change: transform;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .squeeze:active:not(:disabled) {
+        transform: scale(0.95, 0.93) translateY(1px) !important;
+      }
+
+      .audify-pill-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        height: 38px !important;
+        padding: 0 14px !important;
+        border-radius: 9999px !important;
+        font-family: var(--font-anton), 'Anton', 'Syne', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 400 !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+        line-height: 1 !important;
+        cursor: pointer !important;
+        outline: none !important;
+        background: rgba(14, 16, 21, 0.85) !important;
+        backdrop-filter: blur(18px) saturate(160%) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+      }
+
+      #audify-aurora-btn {
+        border: 1.5px solid rgba(225, 0, 255, 0.45) !important;
+        color: #ffffff !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 0 14px rgba(225, 0, 255, 0.2) !important;
+      }
+      #audify-aurora-btn:hover,
+      #audify-aurora-btn[aria-expanded="true"] {
+        border-color: #e100ff !important;
+        background: rgba(225, 0, 255, 0.18) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 22px rgba(225, 0, 255, 0.4) !important;
+      }
+
+      #audify-mix-btn {
+        border: 1.5px solid rgba(200, 255, 0, 0.45) !important;
+        color: #c8ff00 !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 0 14px rgba(200, 255, 0, 0.2) !important;
+      }
+      #audify-mix-btn:hover,
+      #audify-mix-btn[aria-expanded="true"] {
+        border-color: #c8ff00 !important;
+        background: rgba(200, 255, 0, 0.18) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 22px rgba(200, 255, 0, 0.4) !important;
+      }
+
+      .audify-pill-tag-aurora {
+        color: #e100ff !important;
+        font-size: 13px !important;
+      }
+      .audify-pill-tag-mix {
+        color: #c8ff00 !important;
+        font-size: 13px !important;
+      }
+      .audify-pill-chevron {
+        font-size: 9px !important;
+        opacity: 0.75 !important;
+        margin-left: 2px !important;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      .audify-pill-btn[aria-expanded="true"] .audify-pill-chevron {
+        transform: rotate(180deg) !important;
+      }
+
+      .audify-dropdown-menu {
+        display: none;
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        right: 0 !important;
+        left: auto !important;
+        min-width: 240px !important;
+        max-width: min(320px, calc(100vw - 24px)) !important;
+        background: rgba(10, 10, 14, 0.92) !important;
+        border-radius: 16px !important;
+        padding: 6px !important;
+        z-index: 999 !important;
+        backdrop-filter: blur(28px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+        transform-origin: top right !important;
+        animation: audifyDropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+      }
+
+      #audify-aurora-dropdown {
+        border: 1.5px solid rgba(225, 0, 255, 0.35) !important;
+        box-shadow: 0 22px 56px rgba(0, 0, 0, 0.85), 0 0 24px rgba(225, 0, 255, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+      }
+
+      #audify-mix-dropdown {
+        border: 1.5px solid rgba(200, 255, 0, 0.35) !important;
+        box-shadow: 0 22px 56px rgba(0, 0, 0, 0.85), 0 0 24px rgba(200, 255, 0, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+      }
+
+      @keyframes audifyDropdownFadeIn {
+        from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+      }
+
+      .audify-dropdown-opt {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        padding: 9px 12px !important;
+        border-radius: 10px !important;
+        font-family: var(--font-anton), 'Anton', 'Syne', sans-serif !important;
+        font-size: 13px !important;
+        letter-spacing: 0.04em !important;
+        color: #ffffff !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        white-space: nowrap !important;
+      }
+
+      .audify-aurora-opt:hover {
+        background: rgba(225, 0, 255, 0.18) !important;
+        color: #ffffff !important;
+        transform: translateX(2px) !important;
+      }
+
+      .audify-mix-opt:hover {
+        background: rgba(200, 255, 0, 0.18) !important;
+        color: #c8ff00 !important;
+        transform: translateX(2px) !important;
+      }
+
+      @media (max-width: 768px) {
+        #audify-control-pills-container { gap: 6px !important; margin-right: 8px !important; }
+        .audify-pill-btn { height: 34px !important; padding: 0 10px !important; font-size: 12px !important; }
+        .audify-dropdown-menu { min-width: 200px !important; }
+      }
+
+      @media (max-width: 520px) {
+        .audify-pill-tag-aurora, .audify-pill-tag-mix { display: none !important; }
+        .audify-pill-btn { height: 32px !important; padding: 0 8px !important; font-size: 11px !important; }
+        #audify-control-pills-container { margin-right: 6px !important; gap: 4px !important; }
+      }
+    `;
+    document.head.appendChild(styleEl);
+  }
+
+  function wirePillControls(pillGroup) {
+    const auroraBtn = pillGroup.querySelector('#audify-aurora-btn');
+    const auroraDd = pillGroup.querySelector('#audify-aurora-dropdown');
+    const mixBtn = pillGroup.querySelector('#audify-mix-btn');
+    const mixDd = pillGroup.querySelector('#audify-mix-dropdown');
+
+    function closeAllDropdowns() {
+      if (auroraDd) auroraDd.style.display = 'none';
+      if (mixDd) mixDd.style.display = 'none';
+      if (auroraBtn) auroraBtn.setAttribute('aria-expanded', 'false');
+      if (mixBtn) mixBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function alignDropdown(dd) {
+      dd.style.right = '0';
+      dd.style.left = 'auto';
+      const rect = dd.getBoundingClientRect();
+      if (rect.left < 8) {
+        const shift = 8 - rect.left;
+        dd.style.right = `-${shift}px`;
+      }
+      if (rect.right > window.innerWidth - 8) {
+        const overflow = rect.right - (window.innerWidth - 8);
+        dd.style.right = `${overflow}px`;
+      }
+    }
+
+    auroraBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isClosed = auroraDd.style.display !== 'block';
+      closeAllDropdowns();
+      if (isClosed) {
+        auroraDd.style.display = 'block';
+        auroraBtn.setAttribute('aria-expanded', 'true');
+        alignDropdown(auroraDd);
+      }
+    });
+
+    mixBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isClosed = mixDd.style.display !== 'block';
+      closeAllDropdowns();
+      if (isClosed) {
+        mixDd.style.display = 'block';
+        mixBtn.setAttribute('aria-expanded', 'true');
+        alignDropdown(mixDd);
+      }
+    });
+
+    pillGroup.querySelectorAll('.audify-aurora-opt').forEach((opt) => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.setAudifyAuroraMode(opt.dataset.mode);
+        closeAllDropdowns();
+      });
+    });
+
+    pillGroup.querySelectorAll('.audify-mix-opt').forEach((opt) => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const style = opt.dataset.style;
+        window.setAudifyMixStyle(style);
+        closeAllDropdowns();
+        getAudioCtx();
+        if (SOUND_FX[style]) SOUND_FX[style]();
+      });
+    });
+
+    if (!window.__audify_global_dropdown_listener) {
+      window.__audify_global_dropdown_listener = true;
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#audify-control-pills-container')) {
+          closeAllDropdowns();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAllDropdowns();
+        if (e.key === 'p' || e.key === 'P') {
+          // Press 'p' to preview next aurora motion pattern!
+          window.audifyNextAuroraPattern();
+        }
+      });
+      window.addEventListener('resize', () => {
+        const curAurora = document.getElementById('audify-aurora-dropdown');
+        const curMix = document.getElementById('audify-mix-dropdown');
+        if (curAurora && curAurora.style.display === 'block') alignDropdown(curAurora);
+        if (curMix && curMix.style.display === 'block') alignDropdown(curMix);
+      });
+    }
+  }
+
+  function injectPlayerControls() {
+    ensurePillStyles();
+    ensureBorderAttached();
+
+    const headers = document.querySelectorAll('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > div.flex');
+    let targetHeader = null;
+    let targetRightCluster = null;
+
+    for (const h of headers) {
+      if (h.closest('#audify-languages-section')) continue;
+      const hasBrand = h.textContent.includes('Audify') || h.querySelector('button[aria-label*="Audify"], .text-lime');
+      if (hasBrand) {
+        targetHeader = h;
+        const rightCluster = h.querySelector('.flex.items-center.gap-5, .ml-auto');
+        if (rightCluster) targetRightCluster = rightCluster;
+        break;
+      }
+    }
+
+    if (!targetHeader) return;
+
+    let pillGroup = document.getElementById('audify-control-pills-container');
+    const isNew = !pillGroup;
+    if (isNew) {
+      pillGroup = document.createElement('div');
+      pillGroup.id = 'audify-control-pills-container';
+      pillGroup.innerHTML = `
+        <!-- Aurora Mode Selector -->
+        <div style="position:relative;display:inline-block">
+          <button id="audify-aurora-btn" class="audify-pill-btn squeeze" aria-haspopup="true" aria-expanded="false" title="Switch Aurora Mode">
+            <span class="audify-pill-tag-aurora">AURORA:</span>
+            <span id="audify-aurora-label">${getAuroraModeLabel(auroraMode)}</span>
+            <span class="audify-pill-chevron">▼</span>
+          </button>
+          <div id="audify-aurora-dropdown" class="audify-dropdown-menu">
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="auto"><span>🔀 DYNAMIC AUTO-SYNC</span></div>
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="soft"><span>✨ SOFT AURORA (3D Perlin)</span></div>
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="curtain"><span>🌠 CURTAIN RIBBONS (OKLab)</span></div>
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="fusion"><span>🎆 HYBRID FUSION</span></div>
+          </div>
+        </div>
+
+        <!-- Mix Action Pill -->
+        <div style="position:relative;display:inline-block">
+          <button id="audify-mix-btn" class="audify-pill-btn squeeze" aria-haspopup="true" aria-expanded="false" title="Switch Transition FX">
+            <span class="audify-pill-tag-mix">MIX:</span>
+            <span id="audify-mix-label">${getMixStyleLabel(activeMixStyle)}</span>
+            <span class="audify-pill-chevron">▼</span>
+          </button>
+          <div id="audify-mix-dropdown" class="audify-dropdown-menu">
+            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="drum_roll"><span>🥁 DRUM ROLL BUILD</span></div>
+            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="blend"><span>🎚 CLUB S-BLEND</span></div>
+            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="filter_sweep"><span>🌊 FILTER SWEEP</span></div>
+            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="echo_drop"><span>🔊 ECHO OUT DROP</span></div>
+            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="sub_drop"><span>💥 808 SUB IMPACT</span></div>
+          </div>
+        </div>
+      `;
+      wirePillControls(pillGroup);
+    }
+
+    if (targetRightCluster && targetRightCluster.parentElement === targetHeader) {
+      if (pillGroup.nextElementSibling !== targetRightCluster) {
+        targetHeader.insertBefore(pillGroup, targetRightCluster);
+      }
+    } else if (!targetHeader.contains(pillGroup)) {
+      targetHeader.appendChild(pillGroup);
     }
   }
 

@@ -64,6 +64,9 @@ const server = http.createServer(async (req, res) => {
     if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
       filePath = path.join(filePath, 'index.html');
     }
+    if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
+      filePath = filePath + '.html';
+    }
     if (!fs.existsSync(filePath)) {
       filePath = path.join(publicDir, 'index.html');
     }
