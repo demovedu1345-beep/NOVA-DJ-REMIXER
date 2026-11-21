@@ -2075,7 +2075,7 @@ function renderWizard() {
         <p class="mt-12 text-lg text-white/40">
           Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
         </p>
-        <p class="mt-4 text-lg text-white/50">Made with love by Vedant</p>
+        <p class="mt-4 text-lg text-white/50">Made with ❤️ By Vedant</p>
       </section>
     `;
   } else if (step === 1) {
