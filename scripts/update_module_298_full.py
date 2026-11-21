@@ -6,6 +6,7 @@ with all 25 Hindi categories, 25 English categories, and the Artists category!
 
 import os
 import json
+import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 chunk_path = os.path.join(ROOT, 'public/naux/static/immutable/chunks/3cq6guoi7hqi2.js')
@@ -14,10 +15,10 @@ with open(chunk_path, 'r', encoding='utf-8') as f:
     text = f.read()
 
 idx1 = text.find('298,e=>{')
-idx2 = text.find('],"MIN_LANGUAGE_SONGS",0,10,', idx1)
+idx2 = text.find(',"MIN_LANGUAGE_SONGS",0,10,', idx1)
 
 if idx1 == -1 or idx2 == -1:
-    raise ValueError("Could not find Module 298 boundaries in 3cq6guoi7hqi2.js")
+    raise ValueError(f"Could not find Module 298 boundaries in 3cq6guoi7hqi2.js (idx1={idx1}, idx2={idx2})")
 
 hindi_subtypes = [
     {"id": "artists", "label": "⭐ Artists (All Singers)"},
@@ -103,3 +104,11 @@ with open(chunk_path, 'w', encoding='utf-8') as f:
     f.write(new_text)
 
 print("Updated Module 298 in 3cq6guoi7hqi2.js with all 25 Hindi + 25 English categories & Artists!")
+
+# Check syntax with node
+res = subprocess.run(['node', '--check', chunk_path], capture_output=True, text=True)
+if res.returncode == 0:
+    print("SUCCESS: 3cq6guoi7hqi2.js syntax is 100% valid!")
+else:
+    print("FAILED: syntax error:")
+    print(res.stderr[:500])
