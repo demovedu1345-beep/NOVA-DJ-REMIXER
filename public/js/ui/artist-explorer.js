@@ -515,8 +515,7 @@
   // Inject Header "ARTISTS" Navigation Pill
   // -------------------------------------------------------------
   function injectArtistHeaderNav() {
-    const header = document.querySelector('header');
-    if (!header || document.getElementById('audify-artist-header-pill')) return;
+    if (document.getElementById('audify-artist-header-pill')) return;
 
     const navPill = document.createElement('button');
     navPill.id = 'audify-artist-header-pill';
@@ -525,7 +524,16 @@
     navPill.title = 'Browse Top Artists & Hitmakers';
     navPill.addEventListener('click', () => openExplorer(currentLang));
 
-    const rightCluster = header.querySelector('.flex.items-center.gap-2, .flex.items-center.gap-3');
+    const controlPills = document.getElementById('audify-control-pills-container');
+    if (controlPills) {
+      controlPills.prepend(navPill);
+      return;
+    }
+
+    const header = document.querySelector('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > .flex.items-center.justify-between');
+    if (!header) return;
+
+    const rightCluster = header.querySelector('.flex.items-center.gap-2, .flex.items-center.gap-3, .flex.items-center.gap-5');
     if (rightCluster) {
       rightCluster.prepend(navPill);
     } else {
