@@ -10,7 +10,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function runComprehensiveAudit() {
   console.log('========================================================================');
-  console.log('  AUDIFY RGB AURORA & PERFORMANCE AUDIT SUITE (60 FPS & 8 PATTERNS)   ');
+  console.log('  AUDIFY RGB AURORA & PERFORMANCE AUDIT SUITE (60 FPS & 10 PATTERNS)  ');
   console.log('========================================================================\n');
 
   const chrome = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', [
@@ -169,7 +169,7 @@ async function runComprehensiveAudit() {
       assert.equal(r.shockwaveTriggered, true, `Shockwave triggered for pattern ${r.id}`);
       assert.equal(r.flashTriggered, true, `Flash triggered for pattern ${r.id}`);
     });
-    assert.equal(patternAudit.totalPatterns, 8, 'All 8 patterns exist and verified');
+    assert.equal(patternAudit.totalPatterns, 10, 'All 10 patterns exist and verified');
 
     console.log('\n[4/4] Memory Leaks, Unbounded Timers & Exceptions Audit...');
     const healthAudit = await evalJs(`(() => {

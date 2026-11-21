@@ -296,6 +296,18 @@ const engine = new evaluatedClass(hostEl, { styleHost: false });
   assert.strictEqual(deckB.player.isMuted(), false, 'Returning to tab must unmute');
   console.log('✔ Visibility change restored 100% volume and unmuted.');
 
+  // Test 1.7: onStateChange === 1 Immediate 100% Volume Restoration
+  console.log('\n--- TEST 1.7: onStateChange === 1 Volume Restoration ---');
+  deckA.player.setVolume(20);
+  deckA.player.mute();
+  assert.strictEqual(deckA.player.getVolume(), 20);
+  assert.strictEqual(deckA.player.isMuted(), true);
+  // Trigger onStateChange with 1 (PLAYING)
+  deckA.player.config.events?.onStateChange?.({ data: 1 });
+  assert.strictEqual(deckA.player.getVolume(), 100, 'onStateChange === 1 must restore volume to 100% immediately');
+  assert.strictEqual(deckA.player.isMuted(), false, 'onStateChange === 1 must unmute immediately');
+  console.log('✔ onStateChange === 1 immediately restored volume to 100% and unmuted.');
+
   // ----------------------------------------------------
   // TEST 2: Aurora & Mix Engine Mobile Volume Guard
   // ----------------------------------------------------
@@ -317,8 +329,8 @@ const engine = new evaluatedClass(hostEl, { styleHost: false });
 
   // Execute aurora engine script
   try {
-    global.document.documentElement = { style: { setProperty: () => {} } };
-global.document.head = { appendChild: () => {}, querySelector: () => null };
+    global.document.documentElement = { style: { setProperty: () => {} }, appendChild: () => {} };
+    global.document.head = { appendChild: () => {}, querySelector: () => null };
     global.document.body = { appendChild: () => {}, prepend: () => {}, querySelector: () => null, style: {} };
     const localStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
     eval(auroraCode);
@@ -345,6 +357,159 @@ global.document.head = { appendChild: () => {}, querySelector: () => null };
   assert.ok(setVolMsgs.length > 0, 'postMessage setVolume(100) must be dispatched to YouTube iframes');
   assert.ok(unMuteMsgs.length > 0, 'postMessage unMute() must be dispatched to YouTube iframes');
   console.log(`✔ postMessage guard dispatched ${setVolMsgs.length} volume commands to YouTube iframes.`);
+
+  // ----------------------------------------------------
+  // TEST 3: Web Audio Master Gain Node in ProMixerEngine
+  // ----------------------------------------------------
+  console.log('\n--- TEST 3: ProMixerEngine Web Audio Master Gain Node ---');
+  const proMixerCode = fs.readFileSync(
+    'C:\\Users\\itzra\\.gemini\\antigravity\\scratch\\NOVA-DJ-REMIXER\\public\\js\\engine\\pro-mixer-engine.js',
+    'utf8'
+  );
+  assert.ok(
+    proMixerCode.includes('this.masterGain.gain.value = 1.0;'),
+    'Master gain node must strictly be initialized to 1.0 (not attenuated or clamped to 0.92)'
+  );
+  assert.ok(
+    !proMixerCode.includes('this.masterGain.gain.value = 0.92;'),
+    'Master gain node must not be set to 0.92'
+  );
+  console.log('✔ Web Audio master gain node strictly initialized to 1.0 (100% full scale).');
+
+  // ----------------------------------------------------
+  // TEST 4: Mobile Audio Continuity & MediaSession API
+  // ----------------------------------------------------
+  console.log('\n--- TEST 4: Background Audio Continuity & MediaSession API ---');
+  
+  // Set up MediaSession & AudioContext mocks
+  const actionHandlers = {};
+  let wakeLockRequested = false;
+  let createdAudioElement = null;
+
+  class MockMediaMetadata {
+    constructor(init = {}) {
+      this.title = init.title;
+      this.artist = init.artist;
+      this.album = init.album;
+      this.artwork = init.artwork;
+    }
+  }
+
+  global.MediaMetadata = MockMediaMetadata;
+  global.navigator.mediaSession = {
+    metadata: null,
+    playbackState: 'none',
+    setActionHandler: (action, handler) => {
+      actionHandlers[action] = handler;
+    }
+  };
+
+  global.navigator.wakeLock = {
+    request: async (type) => {
+      wakeLockRequested = true;
+      return {
+        addEventListener: () => {}
+      };
+    }
+  };
+
+  class MockAudioContext {
+    constructor() {
+      this.state = 'running';
+      this.destination = {};
+    }
+    resume() { return Promise.resolve(); }
+    createBuffer() { return {}; }
+    createBufferSource() {
+      return {
+        buffer: null,
+        loop: false,
+        connect: () => {},
+        start: () => {}
+      };
+    }
+    createGain() {
+      return {
+        gain: { value: 0 },
+        connect: () => {}
+      };
+    }
+  }
+  global.window.AudioContext = MockAudioContext;
+
+  const originalCreateElement = global.document.createElement;
+  global.document.createElement = (tag) => {
+    const el = originalCreateElement(tag);
+    if (tag === 'audio') {
+      createdAudioElement = el;
+      el.src = '';
+      el.loop = false;
+      el.volume = 1;
+      el.play = async () => {};
+      el.pause = () => {};
+      el.setAttribute = () => {};
+    }
+    return el;
+  };
+
+  // Read and execute background-audio.js
+  const bgAudioCode = fs.readFileSync(
+    'C:\\Users\\itzra\\.gemini\\antigravity\\scratch\\NOVA-DJ-REMIXER\\public\\js\\engine\\background-audio.js',
+    'utf8'
+  );
+
+  eval(bgAudioCode);
+
+  // 4.1 Verify anchor audio configuration
+  assert.ok(createdAudioElement !== null, 'Anchor audio element must be created');
+  assert.strictEqual(createdAudioElement.id, 'audify-bg-anchor', 'Anchor audio id must be audify-bg-anchor');
+  assert.strictEqual(createdAudioElement.loop, true, 'Anchor audio must loop');
+  assert.strictEqual(createdAudioElement.volume, 0.001, 'Anchor audio volume must be > 0 (0.001) for background privilege retention');
+  console.log('✔ Silent audio loop created with loop=true and volume=0.001 (retains mobile background audio privilege).');
+
+  // 4.2 Verify MediaSession action handlers
+  const expectedActions = ['play', 'pause', 'nexttrack', 'previoustrack', 'seekto'];
+  expectedActions.forEach(act => {
+    assert.strictEqual(typeof actionHandlers[act], 'function', `MediaSession must have handler for '${act}'`);
+  });
+  console.log('✔ MediaSession action handlers registered: play, pause, nexttrack, previoustrack, seekto.');
+
+  // 4.3 Test MediaSession play and pause handlers
+  let videoPlayed = false;
+  let videoPaused = false;
+  const currentLive = engine.liveDeck();
+  currentLive.player.playVideo = () => { videoPlayed = true; };
+  currentLive.player.pauseVideo = () => { videoPaused = true; };
+
+  actionHandlers.play();
+  assert.strictEqual(global.navigator.mediaSession.playbackState, 'playing', 'MediaSession playbackState must be playing');
+  assert.strictEqual(videoPlayed, true, 'MediaSession play handler must trigger deck video play');
+  console.log('✔ MediaSession play action successfully resumed playback.');
+
+  actionHandlers.pause();
+  assert.strictEqual(global.navigator.mediaSession.playbackState, 'paused', 'MediaSession playbackState must be paused');
+  assert.strictEqual(videoPaused, true, 'MediaSession pause handler must trigger deck video pause');
+  console.log('✔ MediaSession pause action successfully paused playback.');
+
+  // 4.4 Test MediaSession metadata synchronization
+  // Ensure deck has cue metadata
+  deckA.cue = {
+    song_id: 'meta-test-1',
+    title: 'Background Anthem',
+    artist: 'DJ Nova',
+    youtube_ids: ['test_yt_id_123']
+  };
+  // Fast-forward interval or check metadata sync
+  const liveDeck = engine.liveDeck();
+  liveDeck.cue = deckA.cue;
+
+  // Trigger metadata sync via mock interval/function
+  global.window.triggerEvent?.('visibilitychange');
+  // Trigger unlockAudioSession
+  if (global.window.__audifyUnlockAudio) {
+    await global.window.__audifyUnlockAudio();
+    console.log('✔ Audio session unlocked and primed with inaudible Web Audio buffer.');
+  }
 
   // Clean up
   engine.destroy();

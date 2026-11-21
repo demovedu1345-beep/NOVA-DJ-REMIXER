@@ -624,10 +624,34 @@
       ambientGlow: 'rgba(255, 126, 95, 0.5)',
       laserSpeed: '2.8s',
       mode: 'wave-oscillate'
+    },
+    {
+      id: 'quantum-pulse',
+      name: 'QUANTUM PULSE VELOCITY',
+      tag: 'DEEP SUB-ATOMIC CHOP',
+      icon: '⚛️',
+      soft: { c1: '#00ffcc', c2: '#ff00aa', spectrum: 1.0, bandHeight: 0.51 },
+      curtain: ['#00ffcc', '#7000ff', '#ff00aa', '#00f0ff', '#00ffcc'],
+      borderGradient: 'linear-gradient(90deg, #00ffcc, #7000ff, #ff00aa, #ffffff, #00f0ff, #00ffcc)',
+      ambientGlow: 'rgba(0, 255, 204, 0.55)',
+      laserSpeed: '1.7s',
+      mode: 'perimeter-pulse'
+    },
+    {
+      id: 'tokyo-drift',
+      name: 'TOKYO DRIFT NEON',
+      tag: 'SHIBUYA UNDERGROUND BASS',
+      icon: '🏎️',
+      soft: { c1: '#ff0055', c2: '#ffea00', spectrum: 0.95, bandHeight: 0.49 },
+      curtain: ['#ff0055', '#ff9900', '#ffea00', '#00e5ff', '#ff0055'],
+      borderGradient: 'linear-gradient(90deg, #ff0055, #ff6600, #ffea00, #00e5ff, #ffffff, #ff0055)',
+      ambientGlow: 'rgba(255, 0, 85, 0.55)',
+      laserSpeed: '1.5s',
+      mode: 'dual-counter'
     }
   ];
 
-  // Aliases for 8 Harmonic Mood Palettes matching RGB Aurora Border Patterns
+  // Aliases for 10 Harmonic Mood Palettes matching RGB Aurora Border Patterns
   const MOOD_PALETTES = AURORA_PATTERNS;
   window.MOOD_PALETTES = MOOD_PALETTES;
   window.AURORA_PATTERNS = AURORA_PATTERNS;
@@ -1099,6 +1123,15 @@
     }
   };
 
+  window.__audify_set_theme = function (themeId) {
+    if (themeId === 'auto') {
+      if (typeof window.setAudifyAuroraMode === 'function') window.setAudifyAuroraMode('auto');
+    } else if (typeof window.setAudifyPalette === 'function') {
+      window.setAudifyPalette(themeId);
+    }
+  };
+  window.__audify_trigger_beat_pulse = window.triggerAudifyBeatPulse;
+
   // ========================================================
   // Mobile Volume Drop Protector & YouTube Audio Engine Guard
   // ========================================================
@@ -1284,6 +1317,31 @@
     } catch (_) {}
   };
 
+  // Serato-Grade Beat Shockwave & Dynamic Palette Transition Trigger
+  function triggerAudifySongTransition(nextTrack) {
+    let trackInfo = {};
+    if (typeof nextTrack === 'string') {
+      trackInfo = { title: nextTrack, force: true };
+    } else if (nextTrack && typeof nextTrack === 'object') {
+      trackInfo = { ...nextTrack, force: true };
+    } else {
+      trackInfo = { title: 'Next Track', force: true };
+    }
+
+    // Force song change choreography and palette swap
+    window.onAudifySongChange(trackInfo);
+
+    // Synchronize with RGB Aurora Border if separate module is mounted
+    if (window.__audifyBorderInstance?.onSongChange) {
+      try {
+        window.__audifyBorderInstance.onSongChange(trackInfo);
+      } catch (_) {}
+    }
+
+    return AURORA_PATTERNS[activePatternIdx];
+  }
+  window.triggerAudifySongTransition = triggerAudifySongTransition;
+
   // Manual cycling of pattern anytime (Users / UI / Hotkeys)
   window.audifyNextAuroraPattern = function (options = {}) {
     activePatternIdx = (activePatternIdx + 1) % AURORA_PATTERNS.length;
@@ -1436,6 +1494,8 @@
   // 7. Main WebGL2 Render Loop (Dual Shaders Orchestration)
   // -----------------------------------------------------------------------
   let isContextLost = false;
+  let borderContainerEl = null;
+  let lastBorderGlowPx = -1;
   canvas.addEventListener('webglcontextlost', (e) => {
     e.preventDefault();
     isContextLost = true;
@@ -1461,6 +1521,28 @@
     // Smooth beat decay & flow velocity
     beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 5.0);
     flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 2.5);
+
+    // Real-Time Master DJ Beat Analyzer & Energy Modulation
+    const beatData = window.__audify_beat_analyzer ? window.__audify_beat_analyzer.update(dt, now) : null;
+    if (beatData && beatData.beatEnergy > 0) {
+      const kickImpulse = (beatData.rawKick || 0) * 0.4;
+      beatPulse = Math.max(beatPulse, 1.0 + (beatData.beatEnergy + kickImpulse) * 1.5);
+    }
+
+    // Modulate CSS box-shadow of #audify-rgb-aurora-border using beatPulse (Zero-GC caching)
+    if (!borderContainerEl) {
+      borderContainerEl = document.getElementById('audify-rgb-aurora-border');
+    }
+    if (borderContainerEl) {
+      const glowPx = Math.round(18 + (beatPulse - 1.0) * 32);
+      if (glowPx !== lastBorderGlowPx) {
+        lastBorderGlowPx = glowPx;
+        borderContainerEl.style.boxShadow = `inset 0 0 ${glowPx}px var(--audify-border-glow), inset 0 0 ${glowPx * 2}px rgba(0, 0, 0, 0.45)`;
+      }
+    }
+    if (window.__audifyBorderInstance?.onRenderFrame) {
+      window.__audifyBorderInstance.onRenderFrame(beatPulse);
+    }
 
     // Palette transition: 0.0 -> 1.0 over 1.2s using ease-out cubic curve (1 - (1-t)^3)
     if (paletteTransitionElapsed < PALETTE_TRANSITION_DURATION) {
@@ -1551,13 +1633,13 @@
       gl.uniform1f(u.uFlow, flow);
       gl.uniform1f(u.uHue, hue);
       gl.uniform1f(u.uScale, 1.45);
-      gl.uniform1f(u.uBrightness, 1.25 * (1 + (beatPulse - 1) * 0.55));
+      gl.uniform1f(u.uBrightness, 1.25 * (1.0 + (beatPulse - 1.0) * 0.65));
       gl.uniform3f(u.uColor1, c1R, c1G, c1Bval);
       gl.uniform3f(u.uColor2, c2R, c2G, c2Bval);
       gl.uniform1f(u.uNoiseFreq, 2.4);
-      gl.uniform1f(u.uNoiseAmp, 1.05);
+      gl.uniform1f(u.uNoiseAmp, 1.05 + (beatPulse - 1.0) * 0.55);
       gl.uniform1f(u.uBandHeight, activePal.soft.bandHeight || 0.5);
-      gl.uniform1f(u.uBandSpread, 1.0 + (beatPulse - 1) * 0.4);
+      gl.uniform1f(u.uBandSpread, 1.0 + (beatPulse - 1.0) * 0.6);
       gl.uniform1f(u.uOctaveDecay, 0.12);
       gl.uniform1f(u.uLayerOffset, 0.25);
       gl.uniform2f(u.uShift, (mouse.x - 0.5) * 0.25, (mouse.y - 0.5) * 0.25);
@@ -1592,12 +1674,12 @@
       gl.uniform2f(u.uResolution, canvas.width, canvas.height);
       gl.uniform1f(u.uTime, curtainState.clock);
       gl.uniform1i(u.uStopCount, activePal.curtain.length);
-      gl.uniform1f(u.uAmplitude, 1.25 + (beatPulse - 1) * 0.7);
+      gl.uniform1f(u.uAmplitude, 1.25 + (beatPulse - 1.0) * 0.75);
       gl.uniform1f(u.uBlend, 0.55);
       gl.uniform1f(u.uHeight, 0.52);
       gl.uniform1f(u.uScale, 1.2);
-      gl.uniform1f(u.uGlow, 0.9 + (beatPulse - 1) * 0.5);
-      gl.uniform1f(u.uBrightness, 1.35 * (1 + (beatPulse - 1) * 0.45));
+      gl.uniform1f(u.uGlow, 0.9 + (beatPulse - 1.0) * 0.6);
+      gl.uniform1f(u.uBrightness, 1.35 * (1.0 + (beatPulse - 1.0) * 0.55));
       gl.uniform1i(u.uLayers, 3);
       gl.uniform1f(u.uFlip, 0.0);
       gl.uniform3f(u.uPointer, curtainState.px, curtainState.py, curtainState.reach);
@@ -1969,6 +2051,19 @@
         box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 22px rgba(200, 255, 0, 0.4) !important;
       }
 
+      #audify-eq-btn {
+        border: 1.5px solid rgba(212, 255, 0, 0.45) !important;
+        color: #D4FF00 !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 0 14px rgba(212, 255, 0, 0.2) !important;
+      }
+      #audify-eq-btn:hover,
+      #audify-eq-btn:active,
+      #audify-eq-btn.active {
+        border-color: #D4FF00 !important;
+        background: rgba(212, 255, 0, 0.18) !important;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 22px rgba(212, 255, 0, 0.4) !important;
+      }
+
       .audify-pill-tag-aurora {
         color: #e100ff !important;
         font-size: 13px !important;
@@ -2131,6 +2226,16 @@
       });
     });
 
+    const eqBtn = pillGroup.querySelector('#audify-eq-btn');
+    if (eqBtn && !eqBtn.__audify_wired) {
+      eqBtn.__audify_wired = true;
+      eqBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllDropdowns();
+        window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
+      });
+    }
+
     if (!window.__audify_global_dropdown_listener) {
       window.__audify_global_dropdown_listener = true;
       document.addEventListener('click', (e) => {
@@ -2209,8 +2314,35 @@
             <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="sub_drop"><span>💥 808 SUB IMPACT</span></div>
           </div>
         </div>
+
+        <!-- Master FX / EQ Pill Button -->
+        <div style="position:relative;display:inline-block">
+          <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
+            <span>🎚️ FX / EQ</span>
+          </button>
+        </div>
       `;
       wirePillControls(pillGroup);
+    } else {
+      if (!pillGroup.querySelector('#audify-eq-btn')) {
+        const eqWrapper = document.createElement('div');
+        eqWrapper.style.position = 'relative';
+        eqWrapper.style.display = 'inline-block';
+        eqWrapper.innerHTML = `
+          <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
+            <span>🎚️ FX / EQ</span>
+          </button>
+        `;
+        pillGroup.appendChild(eqWrapper);
+        const eqBtn = eqWrapper.querySelector('#audify-eq-btn');
+        if (eqBtn && !eqBtn.__audify_wired) {
+          eqBtn.__audify_wired = true;
+          eqBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
+          });
+        }
+      }
     }
 
     if (!targetHeader) {

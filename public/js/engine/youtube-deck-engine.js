@@ -113,6 +113,13 @@ export class YouTubeDeckEngine {
     if (!deck.track) return;
     // 1 = PLAYING, 0 = ENDED
     if (stateCode === 1) {
+      // Whenever a track starts playing (stateCode === 1), immediately restore volume to 100% and unmute
+      if (deck.role === 'live' || this.activeDeckId === deck.id) {
+        try {
+          deck.player.unMute?.();
+          deck.player.setVolume?.(100);
+        } catch {}
+      }
       try {
         const realDur = deck.player.getDuration?.();
         if (realDur && realDur > 10 && (!deck.track.durationSec || Math.abs(deck.track.durationSec - realDur) > 8)) {
@@ -132,13 +139,18 @@ export class YouTubeDeckEngine {
         this.cb.onDeckReady?.(deck.id, deck.track);
       } else if (deck.status === 'loading' && deck.role === 'live') {
         clearTimeout(deck.timer);
+        try {
+          deck.player.unMute?.();
+          deck.player.setVolume?.(100);
+        } catch {}
         deck.status = 'live';
         this.#resolveCueWaiters(deck.id, true);
         this.cb.onDeckLive?.(deck.id, deck.track);
       } else if (deck.status === 'waiting-fade') {
         clearTimeout(deck.timer);
         try {
-          deck.player.unMute();
+          deck.player.unMute?.();
+          deck.player.setVolume?.(100);
         } catch {}
         deck.status = 'live';
         deck.role = 'live';

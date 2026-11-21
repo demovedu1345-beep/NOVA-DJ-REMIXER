@@ -16,6 +16,10 @@
   let isUnlocked = false;
   let wakeLock = null;
 
+  function getEngine() {
+    return window.__nauxEngine || window.__novaOrchestrator || null;
+  }
+
   function createAnchorAudio() {
     if (anchorAudio) return anchorAudio;
     anchorAudio = document.createElement('audio');
@@ -29,7 +33,10 @@
     // Crucial: volume must be > 0 so iOS / Android doesn't suspend it as muted media
     anchorAudio.volume = 0.001;
     anchorAudio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.001;pointer-events:none;bottom:-999px;';
-    document.body.appendChild(anchorAudio);
+    const parent = document.body || document.documentElement;
+    if (parent) {
+      parent.appendChild(anchorAudio);
+    }
     return anchorAudio;
   }
 
@@ -65,8 +72,12 @@
     }
   }
 
+  window.__audifyUnlockAudio = unlockAudioSession;
+
   ['touchstart', 'touchend', 'pointerdown', 'click', 'keydown'].forEach(evt => {
-    window.addEventListener(evt, unlockAudioSession, { once: true, passive: true });
+    window.addEventListener(evt, () => {
+      if (!isUnlocked) unlockAudioSession();
+    }, { passive: true });
   });
 
   // 3. Screen WakeLock API
@@ -89,9 +100,11 @@
 
     try {
       navigator.mediaSession.setActionHandler('play', () => {
-        const engine = window.__nauxEngine;
+        const engine = getEngine();
         if (engine && typeof engine.resume === 'function') {
           engine.resume();
+        } else if (engine && typeof engine.togglePause === 'function' && engine.paused) {
+          engine.togglePause();
         } else {
           const deck = engine?.liveDeck?.();
           if (deck?.player?.playVideo) {
@@ -105,9 +118,11 @@
       });
 
       navigator.mediaSession.setActionHandler('pause', () => {
-        const engine = window.__nauxEngine;
+        const engine = getEngine();
         if (engine && typeof engine.pause === 'function') {
           engine.pause();
+        } else if (engine && typeof engine.togglePause === 'function' && !engine.paused) {
+          engine.togglePause();
         } else {
           const deck = engine?.liveDeck?.();
           if (deck?.player?.pauseVideo) {
@@ -121,7 +136,7 @@
       });
 
       navigator.mediaSession.setActionHandler('nexttrack', () => {
-        const engine = window.__nauxEngine;
+        const engine = getEngine();
         if (engine && typeof engine.skip === 'function') {
           engine.skip();
         } else {
@@ -131,18 +146,29 @@
       });
 
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        const engine = window.__nauxEngine;
-        const deck = engine?.liveDeck?.();
-        if (deck?.player?.seekTo) {
-          deck.player.seekTo(0, true);
+        const engine = getEngine();
+        if (engine && typeof engine.seekLive === 'function') {
+          engine.seekLive(0);
+        } else {
+          const deck = engine?.liveDeck?.();
+          if (deck?.player?.seekTo) {
+            deck.player.seekTo(0, true);
+          }
         }
       });
 
       navigator.mediaSession.setActionHandler('seekto', (details) => {
-        const engine = window.__nauxEngine;
-        const deck = engine?.liveDeck?.();
-        if (deck?.player?.seekTo && details.seekTime) {
-          deck.player.seekTo(details.seekTime, true);
+        const engine = getEngine();
+        const seekTime = details.seekTime;
+        if (seekTime !== undefined && seekTime !== null) {
+          if (engine && typeof engine.seekLive === 'function') {
+            engine.seekLive(seekTime);
+          } else {
+            const deck = engine?.liveDeck?.();
+            if (deck?.player?.seekTo) {
+              deck.player.seekTo(seekTime, true);
+            }
+          }
         }
       });
     } catch (e) {
@@ -154,19 +180,20 @@
 
   function syncMediaSessionMetadata() {
     if (!('mediaSession' in navigator)) return;
-    const engine = window.__nauxEngine;
+    const engine = getEngine();
     if (!engine) return;
 
     const live = engine.liveDeck ? engine.liveDeck() : null;
-    const cue = live?.cue;
+    const cue = live?.cue || live?.track;
     if (!cue) return;
 
-    if (cue.song_id === lastTrackId) return;
-    lastTrackId = cue.song_id;
+    const trackId = cue.song_id || cue.id || cue.title;
+    if (trackId === lastTrackId) return;
+    lastTrackId = trackId;
 
     const title = cue.title || 'Audify AI Set';
     const artist = cue.artist || 'Audify Resident DJ';
-    const ytId = (cue.youtube_ids && cue.youtube_ids[0]) || '';
+    const ytId = (cue.youtube_ids && cue.youtube_ids[0]) || cue.videoId || '';
     const artwork = ytId
       ? [
           { src: `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' },
@@ -190,7 +217,7 @@
 
   // 5. Visibility Change Guardian (Mobile Screen Off / App Switch)
   document.addEventListener('visibilitychange', () => {
-    const engine = window.__nauxEngine;
+    const engine = getEngine();
     if (!engine) return;
     if (engine.paused) {
       if (anchorAudio && !anchorAudio.paused) anchorAudio.pause();

@@ -97,7 +97,8 @@ export class ProMixerEngine {
       this.masterFilter.Q.value = 0.7;
 
       this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.value = 0.92;
+      // Ensure master gain is strictly 1.0 (100%) - never attenuated or clamped
+      this.masterGain.gain.value = 1.0;
 
       // Club-grade master glue compressor + fast brickwall lookahead safety limiter
       this.compressor = this.ctx.createDynamicsCompressor();

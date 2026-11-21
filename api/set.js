@@ -4,16 +4,16 @@ import { ARTISTS_DB, getArtistProfile } from './_lib/artists-db.js';
 
 function computeMasterCounts() {
   const counts = {
-    "language": 3118,
-    "language:punjabi": 1097,
-    "language:marathi": 200,
-    "language:gujarati": 221,
-    "language:tamil-telugu": 400,
-    "language:kannada": 200,
-    "language:marwadi": 200,
-    "language:odia": 200,
-    "language:bhojpuri-haryanvi": 400,
-    "language:haryanvi-bhojpuri": 400,
+    "language": 0,
+    "language:punjabi": 0,
+    "language:marathi": 0,
+    "language:gujarati": 0,
+    "language:tamil-telugu": 0,
+    "language:kannada": 0,
+    "language:marwadi": 0,
+    "language:odia": 0,
+    "language:bhojpuri-haryanvi": 0,
+    "language:haryanvi-bhojpuri": 0,
     "hindi": 0,
     "english": 0,
     "artists": 500,
@@ -35,8 +35,20 @@ function computeMasterCounts() {
       counts[`english:${sub}`] = c;
       counts[sub] = c;
     } else {
+      counts.language += c;
       counts[`language:${sub}`] = c;
       counts[sub] = c;
+      if (k.startsWith('punjabi')) counts['language:punjabi'] += c;
+      else if (k.startsWith('tamil-telugu')) counts['language:tamil-telugu'] += c;
+      else if (k.startsWith('haryanvi-bhojpuri')) {
+        counts['language:haryanvi-bhojpuri'] += c;
+        counts['language:bhojpuri-haryanvi'] += c;
+      }
+      else if (k.startsWith('gujarati')) counts['language:gujarati'] += c;
+      else if (k.startsWith('marathi')) counts['language:marathi'] += c;
+      else if (k.startsWith('marwadi')) counts['language:marwadi'] += c;
+      else if (k.startsWith('kannada')) counts['language:kannada'] += c;
+      else if (k.startsWith('odia')) counts['language:odia'] += c;
     }
   }
   return { counts, unsure: 484 };

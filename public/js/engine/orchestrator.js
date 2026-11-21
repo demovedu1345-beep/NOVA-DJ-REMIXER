@@ -144,6 +144,13 @@ export class NovaOrchestrator {
     this.recordedEventKeys = new Set();
     this.autoDjFxEnabled = true;
     this.phraseFillDoneTrackIds = new Set();
+
+    if (typeof window !== 'undefined') {
+      window.__novaOrchestrator = this;
+      if (!window.__nauxEngine) {
+        window.__nauxEngine = this;
+      }
+    }
   }
 
   #isDspTrack(track) {
@@ -609,6 +616,12 @@ export class NovaOrchestrator {
     if (inSlot?.track) {
       if (inSlot.engine === 'dsp') {
         this.proMixer.masterBpm = (inSlot.track.bpm || 120) * (this.proMixer.decks[inId]?.rate || 1);
+        try {
+          this.proMixer.decks[inId]?.strip?.deckVolume?.gain?.setValueAtTime(1.0, this.proMixer.ctx?.currentTime || 0);
+          if (this.proMixer.masterGain) {
+            this.proMixer.masterGain.gain.setValueAtTime(1.0, this.proMixer.ctx?.currentTime || 0);
+          }
+        } catch (_) {}
       } else {
         inSlot.ytVol = 1;
         this.ytEngine?.setVolume(inId, 1);
@@ -816,6 +829,34 @@ export class NovaOrchestrator {
       else await this.proMixer.resumeDeck(this.liveDeckId);
     }
     this.#emit();
+  }
+
+  async pause() {
+    if (!this.running || this.finished || this.paused) return;
+    this.paused = true;
+    const isYt = this.decks[this.liveDeckId]?.engine === 'yt';
+    if (isYt) this.ytEngine?.pause(this.liveDeckId);
+    else await this.proMixer.pauseDeck(this.liveDeckId);
+    this.#emit();
+  }
+
+  async resume() {
+    if (!this.running || this.finished || !this.paused) return;
+    this.paused = false;
+    const isYt = this.decks[this.liveDeckId]?.engine === 'yt';
+    if (isYt) this.ytEngine?.resume(this.liveDeckId);
+    else await this.proMixer.resumeDeck(this.liveDeckId);
+    this.#emit();
+  }
+
+  liveDeck() {
+    const slot = this.decks[this.liveDeckId];
+    if (!slot) return null;
+    return {
+      ...slot,
+      cue: slot.track,
+      player: slot.engine === 'yt' ? this.ytEngine?.decks?.[this.liveDeckId]?.player : null,
+    };
   }
 
   async seekLive(targetSec) {

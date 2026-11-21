@@ -118,6 +118,11 @@
       // Start in PlayerEngine and force view transition to 'playing'
       const startPlayback = () => {
         let started = false;
+        if (window.__nauxEngine) {
+          window.__nauxEngine.started = false;
+          window.__nauxEngine.finished = false;
+          window.__nauxEngine.endingSet = false;
+        }
         if (typeof window.__startSetWithCues === 'function') {
           window.__startSetWithCues(cues);
           started = true;
