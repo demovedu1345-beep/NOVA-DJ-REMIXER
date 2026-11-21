@@ -72,6 +72,7 @@ const server = http.createServer(async (req, res) => {
     }
     const ext = path.extname(filePath).toLowerCase();
     res.setHeader('Content-Type', MIME[ext] || 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     fs.createReadStream(filePath).pipe(res);
   } catch (err) {
     console.error('Dev server error:', err);

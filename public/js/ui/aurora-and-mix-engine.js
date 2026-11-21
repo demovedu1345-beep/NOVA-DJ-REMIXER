@@ -1796,6 +1796,7 @@
     if (SOUND_FX[style]) {
       activeMixStyle = style;
       localStorage.setItem('audify_mix_style', style);
+      localStorage.setItem('audify_mix_action', style);
       const label = document.getElementById('audify-mix-label');
       if (label) label.textContent = getMixStyleLabel(style);
     }
