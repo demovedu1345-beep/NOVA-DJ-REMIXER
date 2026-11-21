@@ -1,5 +1,7 @@
 import { getQueryParams, handlePreflight, sendJson } from './_lib/http.js';
 import { searchCachedTracks } from './_lib/db.js';
+import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
+import { ARTISTS_DB } from './_lib/artists-db.js';
 
 async function fetchWithTimeout(url, ms = 4500) {
   const controller = new AbortController();
@@ -239,6 +241,60 @@ export default async function handler(req, res) {
   const offset = (page - 1) * limit;
   const provider = String(query.provider || 'all').toLowerCase();
   const effectiveQ = q || genre || 'Electronic';
+  const qLower = effectiveQ.toLowerCase();
+
+  // High-priority local Curated Songs & Artists search
+  const localCurated = [];
+  let matchedArtist = null;
+
+  for (const lang of ['hindi', 'english']) {
+    for (const art of Object.values(ARTISTS_DB[lang] || {})) {
+      if ((art.name || '').toLowerCase().includes(qLower) || (art.altNames || []).some(alt => alt.toLowerCase().includes(qLower))) {
+        matchedArtist = { id: art.id, name: art.name, image: art.image, bio: art.bio, subcategories: art.subcategories };
+        for (const s of (art.songs || []).slice(0, 20)) {
+          localCurated.push({
+            id: s.id || `curated-${s.videoId}`,
+            source: 'curated',
+            provider: 'YouTube Verified',
+            playback: 'youtube-cue',
+            mixReady: true,
+            title: s.title,
+            artist: s.artist,
+            durationSec: s.durationSec || 210,
+            duration: s.durationSec || 210,
+            entrySec: s.entrySec || 35,
+            exitSec: s.exitSec || 75,
+            videoId: s.videoId,
+            year: s.year || '2024'
+          });
+        }
+        break;
+      }
+    }
+    if (matchedArtist) break;
+  }
+
+  for (const cat of Object.values(CURATED_CATEGORIES_DB)) {
+    if ((cat.slug || '').toLowerCase().includes(qLower) || (cat.name || '').toLowerCase().includes(qLower)) {
+      for (const s of (cat.songs || []).slice(0, 20)) {
+        localCurated.push({
+          id: s.id || `curated-${s.videoId}`,
+          source: 'curated',
+          provider: 'YouTube Verified',
+          playback: 'youtube-cue',
+          mixReady: true,
+          title: s.title,
+          artist: s.artist,
+          durationSec: s.durationSec || 210,
+          duration: s.durationSec || 210,
+          entrySec: s.entrySec || 35,
+          exitSec: s.exitSec || 75,
+          videoId: s.videoId,
+          year: s.year || '2024'
+        });
+      }
+    }
+  }
 
   const tasks = [];
   if (provider === 'all' || provider === 'audius' || provider === 'trending') {
@@ -263,7 +319,7 @@ export default async function handler(req, res) {
 
   const [audius, openverse, itunes, cached] = await Promise.all(tasks);
   const seen = new Set();
-  const merged = [...audius, ...itunes, ...cached, ...openverse].filter((item) => {
+  const merged = [...localCurated, ...audius, ...itunes, ...cached, ...openverse].filter((item) => {
     const key = `${item.title}|${item.artist}`.toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
@@ -275,6 +331,7 @@ export default async function handler(req, res) {
     200,
     {
       ok: true,
+      artist: matchedArtist,
       query: effectiveQ,
       genre,
       page,

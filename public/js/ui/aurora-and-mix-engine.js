@@ -1099,11 +1099,120 @@
     }
   };
 
+  // ========================================================
+  // Mobile Volume Drop Protector & YouTube Audio Engine Guard
+  // ========================================================
+  const isMobileEnvironment = () => {
+    if (typeof window === 'undefined') return false;
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768 ||
+      (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
+  };
+
+  let mobileVolumeGuardTimer = null;
+
+  function enforceMobileMaxVolume() {
+    try {
+      // 1. Direct PlayerEngine inspection if exposed
+      if (window.__nauxEngine) {
+        const eng = window.__nauxEngine;
+        eng.keepLiveAudible?.();
+        const live = eng.liveDeck?.();
+        if (live?.player) {
+          live.player.unMute?.();
+          live.player.setVolume?.(100);
+        }
+        if (eng.awaitingStart && eng.decks?.[eng.awaitingStart]?.player) {
+          const incoming = eng.decks[eng.awaitingStart].player;
+          incoming.unMute?.();
+          incoming.setVolume?.(100);
+        }
+      }
+
+      // 2. Window.YT player lookup
+      if (window.YT && typeof window.YT.get === 'function') {
+        ['naux-deck-A', 'naux-deck-B'].forEach(id => {
+          try {
+            const p = window.YT.get(id);
+            if (p && typeof p.setVolume === 'function') {
+              p.unMute?.();
+              p.setVolume?.(100);
+            }
+          } catch (_) {}
+        });
+      }
+
+      // 3. YouTube iframe postMessage commands
+      const iframes = document.querySelectorAll(
+        'iframe[id^="naux-deck"], .naux-players iframe, iframe[src*="youtube.com"]'
+      );
+      iframes.forEach(iframe => {
+        try {
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: 'command', func: 'unMute', args: [] }),
+              '*'
+            );
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: 'command', func: 'setVolume', args: [100] }),
+              '*'
+            );
+          }
+        } catch (_) {}
+      });
+
+      // 4. Any HTMLMediaElements (audio/video)
+      const mediaEls = document.querySelectorAll('audio, video');
+      mediaEls.forEach(el => {
+        try {
+          el.muted = false;
+          el.volume = 1.0;
+        } catch (_) {}
+      });
+    } catch (err) {
+      // Fail-safe silent catch
+    }
+  }
+
+  function launchMobileVolumeGuard(durationMs = 3000, intervalMs = 50) {
+    enforceMobileMaxVolume();
+
+    if (mobileVolumeGuardTimer) {
+      clearInterval(mobileVolumeGuardTimer);
+      mobileVolumeGuardTimer = null;
+    }
+
+    const startTime = performance.now();
+    mobileVolumeGuardTimer = setInterval(() => {
+      enforceMobileMaxVolume();
+      if (performance.now() - startTime >= durationMs) {
+        clearInterval(mobileVolumeGuardTimer);
+        mobileVolumeGuardTimer = null;
+        enforceMobileMaxVolume();
+      }
+    }, intervalMs);
+  }
+
+  // Bind to mobile gestures and tab visibility
+  window.addEventListener('touchstart', enforceMobileMaxVolume, { passive: true });
+  window.addEventListener('touchend', enforceMobileMaxVolume, { passive: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      launchMobileVolumeGuard(1500, 50);
+    }
+  });
+
+  // Global exports for external access & automated test verification
+  window.launchAudifyVolumeGuard = launchMobileVolumeGuard;
+  window.enforceAudifyMaxVolume = enforceMobileMaxVolume;
+
   // Song Transition Notification with High-Precision Deduplication & Motion Choreography
   let lastSongChangeTimestamp = 0;
   let lastSongChangeTitle = '';
 
   window.onAudifySongChange = function (songInfo = {}) {
+    // Mobile Audio Protection: High-frequency guard against mobile volume drops
+    launchMobileVolumeGuard(3000, 50);
     const rawTitle = typeof songInfo === 'string' ? songInfo : (songInfo?.title || '');
     const cleanTitle = (rawTitle || '').trim();
     const now = performance.now();

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const songsDir = path.join(root, 'public/songs');
-const scriptTag = '<script src="/js/ui/aurora-and-mix-engine.js" defer></script>';
+const scriptTag = '<link rel="stylesheet" href="/styles/artist-explorer.css" /><script src="/js/ui/aurora-and-mix-engine.js" defer></script><script src="/js/ui/artist-explorer.js" defer></script>';
 
 const dbModule = await import('../api/_lib/curated-songs-db.js?t=' + Date.now());
 const db = dbModule.CURATED_CATEGORIES_DB;

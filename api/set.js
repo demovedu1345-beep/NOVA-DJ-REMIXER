@@ -1,8 +1,9 @@
 import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import { CURATED_CATEGORIES_DB } from './_lib/curated-songs-db.js';
+import { ARTISTS_DB, getArtistProfile } from './_lib/artists-db.js';
 
-const MASTER_COUNTS = {
-  "counts": {
+function computeMasterCounts() {
+  const counts = {
     "language": 3118,
     "language:punjabi": 1097,
     "language:marathi": 200,
@@ -13,42 +14,35 @@ const MASTER_COUNTS = {
     "language:odia": 200,
     "language:bhojpuri-haryanvi": 400,
     "language:haryanvi-bhojpuri": 400,
-    "hindi": 1453,
-    "hindi:diwali": 218,
-    "hindi:dance": 253,
-    "hindi:romantic": 200,
-    "hindi:retro": 220,
-    "hindi:sufi": 275,
-    "hindi:hiphop": 287,
-    "punjabi": 1097,
-    "punjabi:party": 385,
-    "punjabi:wedding": 273,
-    "punjabi:sad": 214,
-    "punjabi:gym": 225,
-    "english": 825,
-    "english:pop": 225,
-    "english:edm": 200,
-    "english:hiphop": 200,
-    "english:love": 200,
-    "tamil-telugu": 400,
-    "tamil-telugu:kuthu": 200,
-    "tamil-telugu:mass": 200,
-    "haryanvi-bhojpuri": 400,
-    "haryanvi-bhojpuri:party": 200,
-    "haryanvi-bhojpuri:desi-beats": 200,
-    "gujarati": 221,
-    "gujarati:garba": 221,
-    "marathi": 200,
-    "marathi:party": 200,
-    "marwadi": 200,
-    "marwadi:rajasthani": 200,
-    "kannada": 200,
-    "kannada:hits": 200,
-    "odia": 200,
-    "odia:hits": 200
-  },
-  "unsure": 484
-};
+    "hindi": 0,
+    "english": 0,
+    "artists": 500,
+    "hindi:artists": 500,
+    "english:artists": 500
+  };
+
+  for (const [k, cat] of Object.entries(CURATED_CATEGORIES_DB)) {
+    const lang = cat.lang || 'hindi';
+    const sub = k.replace(/^[a-z]+-/, '');
+    const c = (cat.songs || []).length;
+    counts[k] = c;
+    if (lang === 'hindi') {
+      counts.hindi += c;
+      counts[`hindi:${sub}`] = c;
+      counts[sub] = c;
+    } else if (lang === 'english') {
+      counts.english += c;
+      counts[`english:${sub}`] = c;
+      counts[sub] = c;
+    } else {
+      counts[`language:${sub}`] = c;
+      counts[sub] = c;
+    }
+  }
+  return { counts, unsure: 484 };
+}
+
+const MASTER_COUNTS = computeMasterCounts();
 
 function slugToSubtype(slug) {
   return slug.replace(/^[a-z]+-/, '');
@@ -58,45 +52,41 @@ function slugMatchesSubtype(slug, subtype) {
   const isFull = subtype.includes(':');
   const [lang, bareSub] = isFull ? subtype.split(':') : [null, subtype];
   const s = slug.toLowerCase();
+  const b = (bareSub || subtype).toLowerCase();
+
   if (lang === 'language') {
-    if (bareSub === 'punjabi') return s.startsWith('punjabi');
-    if (bareSub === 'marathi') return s.startsWith('marathi');
-    if (bareSub === 'gujarati') return s.startsWith('gujarati');
-    if (bareSub === 'tamil-telugu') return s.startsWith('tamil-telugu');
-    if (bareSub === 'kannada') return s.startsWith('kannada');
-    if (bareSub === 'marwadi') return s.startsWith('marwadi');
-    if (bareSub === 'odia') return s.startsWith('odia');
-    if (bareSub === 'haryanvi-bhojpuri' || bareSub === 'bhojpuri-haryanvi') return s.startsWith('haryanvi-bhojpuri');
+    if (b === 'punjabi') return s.startsWith('punjabi');
+    if (b === 'marathi') return s.startsWith('marathi');
+    if (b === 'gujarati') return s.startsWith('gujarati');
+    if (b === 'tamil-telugu') return s.startsWith('tamil-telugu');
+    if (b === 'kannada') return s.startsWith('kannada');
+    if (b === 'marwadi') return s.startsWith('marwadi');
+    if (b === 'odia') return s.startsWith('odia');
+    if (b === 'haryanvi-bhojpuri' || b === 'bhojpuri-haryanvi') return s.startsWith('haryanvi-bhojpuri');
   }
 
-  if (lang === 'hindi' && bareSub === 'hiphop') return s === 'hindi-hiphop';
-  if (lang === 'english' && bareSub === 'hiphop') return s === 'english-hiphop';
-  if (lang === 'punjabi' && bareSub === 'party') return s === 'punjabi-party';
-  if (lang === 'haryanvi-bhojpuri' && bareSub === 'party') return s === 'haryanvi-bhojpuri-party';
+  // Exact matching for language-prefixed slugs
+  if (lang === 'hindi') {
+    if (s === `hindi-${b}`) return true;
+    if (b === 'diwali' && s === 'diwali-party-songs') return true;
+  }
+  if (lang === 'english') {
+    if (s === `english-${b}`) return true;
+  }
 
-  const bare = (bareSub || subtype).toLowerCase();
-  if (bare === 'diwali') return s === 'diwali-party-songs';
-  if (bare === 'dance') return s === 'hindi-dance';
-  if (bare === 'retro') return s === 'hindi-retro';
-  if (bare === 'romantic') return s === 'hindi-romantic';
-  if (bare === 'sufi') return s === 'hindi-sufi';
-  if (bare === 'hiphop') return s === 'hindi-hiphop';
-  if (bare === 'party') return s === 'punjabi-party' || s === 'haryanvi-bhojpuri-party';
-  if (bare === 'wedding') return s === 'punjabi-wedding';
-  if (bare === 'sad') return s === 'punjabi-sad';
-  if (bare === 'gym') return s === 'punjabi-gym';
-  if (bare === 'pop') return s === 'english-pop';
-  if (bare === 'edm') return s === 'english-edm';
-  if (bare === 'love') return s === 'english-love';
-  if (bare === 'kuthu') return s === 'tamil-telugu-kuthu';
-  if (bare === 'mass') return s === 'tamil-telugu-mass';
-  if (bare === 'desi-beats') return s === 'haryanvi-bhojpuri-desi-beats';
-  if (bare === 'garba') return s === 'gujarati-garba';
-  if (bare === 'marathi' || bare === 'marathi:party') return s === 'marathi-party';
-  if (bare === 'marwadi' || bare === 'marwadi:rajasthani') return s === 'marwadi-rajasthani';
-  if (bare === 'kannada' || bare === 'kannada:hits') return s === 'kannada-hits';
-  if (bare === 'odia' || bare === 'odia:hits') return s === 'odia-hits';
-  return s.includes(bare);
+  // Bare subtype matches
+  if (s === b || s === `hindi-${b}` || s === `english-${b}`) return true;
+  if (b === 'diwali' && s === 'diwali-party-songs') return true;
+  if (b === 'party' && (s === 'punjabi-party' || s === 'haryanvi-bhojpuri-party' || s === 'marathi-party')) return true;
+  if (b === 'wedding' && s === 'punjabi-wedding') return true;
+  if (b === 'sad' && s === 'punjabi-sad') return true;
+  if (b === 'gym' && s === 'punjabi-gym') return true;
+  if (b === 'garba' && s === 'gujarati-garba') return true;
+  if (b === 'kuthu' && s === 'tamil-telugu-kuthu') return true;
+  if (b === 'mass' && s === 'tamil-telugu-mass') return true;
+  if (b === 'desi-beats' && s === 'haryanvi-bhojpuri-desi-beats') return true;
+
+  return s.includes(b);
 }
 
 function catMatchesLang(catLang, requestedLangs) {
@@ -131,14 +121,76 @@ function shuffleArray(arr) {
 
 function buildSetFromCuratedDb(body) {
   const answers = body?.answers || {};
-  const requestedLangs = (answers.languages || []).map(l => String(l).toLowerCase());
-  const requestedSubtypes = (answers.subtypes || []).map(s => String(s).toLowerCase());
+  const requestedArtist = body?.artist || answers.artist;
+  const requestedLangs = (answers.languages || (body?.lang ? [body.lang] : [])).map(l => String(l).toLowerCase());
+  const requestedSubtypes = (answers.subtypes || (body?.kind ? [body.kind] : [])).map(s => String(s).toLowerCase());
   const energy = answers.energy || 'peak';
+
+  // 1. DIRECT ARTIST SET SUPPORT: If an artist is requested, return their complete verified discography
+  if (requestedArtist) {
+    const artProfile = getArtistProfile(requestedArtist, requestedLangs[0]);
+    if (artProfile && artProfile.songs && artProfile.songs.length > 0) {
+      const isShuffle = Boolean(body?.shuffle || answers.shuffle);
+      const artistSongs = isShuffle ? shuffleArray(artProfile.songs) : [...artProfile.songs];
+      const cues = [];
+      const seenVideos = new Set();
+      const seenTitles = new Set();
+
+      for (const s of artistSongs) {
+        const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+        if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId) || seenVideos.has(vId)) continue;
+        const titleKey = (s.title || '').toLowerCase().trim();
+        if (seenTitles.has(titleKey)) continue;
+
+        seenVideos.add(vId);
+        seenTitles.add(titleKey);
+
+        const dur = Number(s.durationSec) || 210;
+        const entry = Number.isFinite(s.entrySec) ? s.entrySec : (Number.isFinite(s.hookStartSec) ? s.hookStartSec : 35);
+        const exit = Number.isFinite(s.exitSec) ? s.exitSec : (Number.isFinite(s.hookEndSec) ? s.hookEndSec : Math.min(entry + 42, dur));
+
+        cues.push({
+          song_id: s.id || `artist-${artProfile.id}-${cues.length + 1}`,
+          title: s.title,
+          artist: s.artist,
+          youtube_ids: [vId],
+          duration_sec: dur,
+          entry_sec: entry,
+          exit_sec: exit,
+          play_full: Boolean(s.playFull),
+          era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
+          language: artProfile.lang || 'hindi',
+          subtype: 'artist',
+          energy: s.energy || (energy === 'bangers' ? 9 : 8),
+          tags: artProfile.subcategories || [],
+          style: 'artist-discography',
+          unsure: false,
+          heat: s.heat || Array.from({ length: 100 }, (_, i) => +(0.5 + 0.4 * Math.sin(i / 10)).toFixed(3))
+        });
+      }
+
+      if (cues.length > 0) {
+        return {
+          cues,
+          fillers: [],
+          note: `${artProfile.name} Complete Discography (${cues.length} tracks). Tap APPROVE & PLAY.`,
+          more: "more-token-audify",
+          artist: {
+            id: artProfile.id,
+            name: artProfile.name,
+            image: artProfile.image,
+            bio: artProfile.bio,
+            subcategories: artProfile.subcategories
+          }
+        };
+      }
+    }
+  }
 
   let candidatePool = [];
   const allCategories = Object.values(CURATED_CATEGORIES_DB);
 
-  // 1. If specific subtypes are requested, pull from those exact categories
+  // 2. If specific subtypes are requested, pull from those exact categories
   if (requestedSubtypes.length > 0) {
     for (const sub of requestedSubtypes) {
       for (const cat of allCategories) {
@@ -151,7 +203,7 @@ function buildSetFromCuratedDb(body) {
       }
     }
   } else if (requestedLangs.length > 0) {
-    // 2. If only languages are requested, pull an even balanced mix from all categories of that language
+    // 3. If only languages are requested, pull an even balanced mix from all categories of that language
     for (const cat of allCategories) {
       if (catMatchesLang(cat.lang, requestedLangs)) {
         const songs = shuffleArray(cat.songs || []).slice(0, 40);
@@ -162,7 +214,7 @@ function buildSetFromCuratedDb(body) {
     }
   }
 
-  // 3. Fallback if candidate pool is empty
+  // 4. Fallback if candidate pool is empty
   if (!candidatePool.length) {
     for (const cat of allCategories) {
       const songs = shuffleArray(cat.songs || []).slice(0, 20);
@@ -172,10 +224,10 @@ function buildSetFromCuratedDb(body) {
     }
   }
 
-  // 4. Shuffle candidate pool
+  // 5. Shuffle candidate pool
   candidatePool = shuffleArray(candidatePool);
 
-  // 5. Convert to cue format & deduplicate by title AND videoId
+  // 6. Convert to cue format & deduplicate by title AND videoId
   const seenTitles = new Set();
   const seenVideos = new Set();
   const cues = [];

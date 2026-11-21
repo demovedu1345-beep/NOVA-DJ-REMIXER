@@ -1,0 +1,785 @@
+/**
+ * Audify Artist Explorer & Profiles Stylesheet
+ * Strict Obsidian (#050507), Lime (#D4FF00), and Anton Typography
+ */
+
+/* Modal Backdrop & Container */
+.audify-artist-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
+}
+
+.audify-artist-modal.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.audify-artist-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 7, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.audify-artist-sheet {
+  position: relative;
+  z-index: 1;
+  width: 95vw;
+  max-width: 1200px;
+  height: 90vh;
+  max-height: 860px;
+  background: #09090d;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 28px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 255, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.audify-artist-modal.hidden .audify-artist-sheet {
+  transform: scale(0.96) translateY(12px);
+}
+
+/* Header */
+.audify-artist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 14, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.audify-artist-title-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.audify-artist-badge-pill {
+  font-family: 'Anton', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 4px 10px;
+  background: rgba(212, 255, 0, 0.15);
+  border: 1px solid rgba(212, 255, 0, 0.3);
+  color: #D4FF00;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.audify-artist-main-heading {
+  font-family: 'Anton', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.audify-artist-lang-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.audify-artist-lang-btn {
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.audify-artist-lang-btn.active {
+  background: #D4FF00;
+  color: #050507;
+  box-shadow: 0 0 12px rgba(212, 255, 0, 0.4);
+}
+
+.audify-artist-close-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.audify-artist-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Body Container */
+.audify-artist-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Subcategories Pills Bar */
+.audify-artist-subcats-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.audify-artist-subcat-pill {
+  flex-shrink: 0;
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.audify-artist-subcat-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.audify-artist-subcat-pill.active {
+  background: #D4FF00;
+  color: #050507;
+  border-color: #D4FF00;
+  box-shadow: 0 0 16px rgba(212, 255, 0, 0.35);
+}
+
+/* Search Bar */
+.audify-artist-search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.audify-artist-input-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.audify-artist-search-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 16px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.audify-artist-input {
+  width: 100%;
+  padding: 12px 42px 12px 44px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  color: #FFFFFF;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audify-artist-input:focus {
+  border-color: #D4FF00;
+  box-shadow: 0 0 16px rgba(212, 255, 0, 0.2);
+}
+
+.audify-artist-clear-btn {
+  position: absolute;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.audify-artist-count-badge {
+  font-family: 'Anton', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+}
+
+/* Artists Grid */
+.audify-artist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding-bottom: 24px;
+}
+
+.audify-artist-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.audify-artist-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(212, 255, 0, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 255, 0, 0.15);
+}
+
+.audify-artist-avatar-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+}
+
+.audify-artist-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: border-color 0.2s ease;
+}
+
+.audify-artist-card:hover .audify-artist-avatar {
+  border-color: #D4FF00;
+}
+
+.audify-artist-check {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 24px;
+  height: 24px;
+  background: #D4FF00;
+  color: #050507;
+  border-radius: 9999px;
+  font-weight: 900;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #09090d;
+}
+
+.audify-artist-name {
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: #FFFFFF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.audify-artist-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.audify-artist-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.audify-artist-tag {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 2px 6px;
+  border-radius: 9999px;
+}
+
+.audify-artist-card-actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.audify-artist-play-btn {
+  flex: 1;
+  font-family: 'Anton', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 8px;
+  background: #D4FF00;
+  color: #050507;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.audify-artist-play-btn:hover {
+  background: #e1ff33;
+}
+
+.audify-artist-view-btn {
+  font-family: 'Anton', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.audify-artist-view-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Profile Full View */
+.audify-profile-view {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 40px;
+}
+
+.audify-profile-back-btn {
+  align-self: flex-start;
+  font-family: 'Anton', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+.audify-profile-hero {
+  display: flex;
+  gap: 28px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 28px;
+  align-items: center;
+}
+
+.audify-profile-avatar-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.audify-profile-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 3px solid #D4FF00;
+  box-shadow: 0 0 32px rgba(212, 255, 0, 0.25);
+}
+
+.audify-profile-verified-badge {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #D4FF00;
+  color: #050507;
+  font-family: 'Anton', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.audify-profile-hero-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.audify-profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.audify-profile-tag {
+  font-family: 'Anton', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #D4FF00;
+  background: rgba(212, 255, 0, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.audify-profile-name {
+  font-family: 'Anton', sans-serif;
+  font-size: 38px;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.audify-profile-bio {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  max-width: 720px;
+}
+
+.audify-profile-stats {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.audify-profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.audify-btn-primary {
+  font-family: 'Anton', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  padding: 12px 28px;
+  background: #D4FF00;
+  color: #050507;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212, 255, 0, 0.4);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.audify-btn-primary:hover {
+  background: #e1ff33;
+}
+
+.audify-btn-secondary {
+  font-family: 'Anton', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.audify-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Popular Hits Grid */
+.audify-profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.audify-profile-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.audify-profile-section-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.audify-profile-popular-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.audify-profile-track-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.audify-profile-track-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 255, 0, 0.3);
+}
+
+.audify-profile-track-num {
+  font-family: 'Anton', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.audify-profile-track-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.audify-profile-track-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 15px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audify-profile-track-artist {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audify-profile-hook-badge {
+  font-size: 11px;
+  color: #D4FF00;
+  background: rgba(212, 255, 0, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Discography Song List */
+.audify-profile-discography-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.audify-profile-song-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.audify-profile-song-row:last-child {
+  border-bottom: none;
+}
+
+.audify-profile-song-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.audify-profile-row-idx {
+  font-family: 'Anton', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.3);
+  width: 28px;
+}
+
+.audify-profile-row-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.audify-profile-row-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 16px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audify-profile-row-credits {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.audify-profile-row-dur {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.audify-profile-row-play {
+  font-family: 'Anton', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  background: rgba(212, 255, 0, 0.15);
+  border: 1px solid rgba(212, 255, 0, 0.4);
+  color: #D4FF00;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.audify-profile-song-row:hover .audify-profile-row-play {
+  background: #D4FF00;
+  color: #050507;
+}
+
+/* Loading & Empty States */
+.audify-artist-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 300px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Anton', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.audify-artist-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #D4FF00;
+  border-radius: 9999px;
+  animation: audify-spin 0.8s linear infinite;
+}
+
+@keyframes audify-spin {
+  to { transform: rotate(360deg); }
+}
+
+.audify-artist-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+/* Squeeze Click Micro-Interaction */
+.squeeze:active {
+  transform: scale(0.96) !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .audify-artist-sheet {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+
+  .audify-artist-header {
+    padding: 16px;
+  }
+
+  .audify-artist-body {
+    padding: 16px;
+  }
+
+  .audify-artist-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .audify-profile-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .audify-profile-actions {
+    justify-content: center;
+  }
+}
