@@ -5,6 +5,10 @@
     {
       "source": "/api/events",
       "destination": "/api/health"
+    },
+    {
+      "source": "/api/logout",
+      "destination": "/api/me"
     }
   ],
   "headers": [
