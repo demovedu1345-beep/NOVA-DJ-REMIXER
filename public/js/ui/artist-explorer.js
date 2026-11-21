@@ -115,13 +115,24 @@
         window.triggerAudifySongShockwave();
       }
 
-      // Start in PlayerEngine
-      if (typeof window.__startSetWithCues === 'function') {
-        window.__startSetWithCues(cues);
-      } else if (window.__nauxEngine && typeof window.__nauxEngine.start === 'function') {
-        window.__nauxEngine.start(cues);
-      } else {
-        console.warn('PlayerEngine start method not found, cues ready:', cues.length);
+      // Start in PlayerEngine and force view transition to 'playing'
+      const startPlayback = () => {
+        let started = false;
+        if (typeof window.__startSetWithCues === 'function') {
+          window.__startSetWithCues(cues);
+          started = true;
+        } else if (window.__nauxEngine && typeof window.__nauxEngine.start === 'function') {
+          window.__nauxEngine.start(cues);
+          started = true;
+        }
+        if (typeof window.__setDeckView === 'function') {
+          window.__setDeckView('playing');
+        }
+        return started;
+      };
+
+      if (!startPlayback()) {
+        setTimeout(startPlayback, 100);
       }
     } catch (err) {
       console.error('Error starting artist playback:', err);

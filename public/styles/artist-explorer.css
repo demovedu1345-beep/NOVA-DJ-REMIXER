@@ -783,3 +783,35 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 480px) {
+  .audify-artist-sheet {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  .audify-artist-body {
+    padding: 12px 14px calc(120px + env(safe-area-inset-bottom, 20px));
+  }
+  .audify-artist-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .audify-artist-card {
+    padding: 12px 10px;
+  }
+  .audify-artist-avatar {
+    width: 64px;
+    height: 64px;
+  }
+  .audify-profile-hero {
+    padding: 16px 12px;
+  }
+  .audify-profile-avatar {
+    width: 88px;
+    height: 88px;
+  }
+  .audify-profile-title {
+    font-size: 28px;
+  }
+}

@@ -2075,10 +2075,7 @@ function renderWizard() {
         <p class="mt-12 text-lg text-white/40">
           Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
         </p>
-        <a href="https://www.instagram.com/swpnldubey/" target="_blank" rel="noopener" class="group mt-4 inline-flex items-center gap-2.5 text-lg text-white/50 transition hover:text-white">
-          <svg viewBox="0 0 24 24" aria-hidden="true" class="h-5 w-5 fill-none stroke-current stroke-2"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.6" class="fill-current"></circle></svg>
-          Made by Swapnil · <span class="text-lime group-hover:underline">@swpnldubey</span>
-        </a>
+        <p class="mt-4 text-lg text-white/50">Made with love by Vedant</p>
       </section>
     `;
   } else if (step === 1) {

@@ -982,7 +982,11 @@
       }
     });
   }
-  setInterval(tagCards, 1500);
+    // Zero CPU polling: tag cards on load and user interactions
+  tagCards();
+  document.addEventListener('DOMContentLoaded', tagCards);
+  window.addEventListener('popstate', () => setTimeout(tagCards, 200));
+  document.addEventListener('click', () => setTimeout(tagCards, 300), { passive: true });
 
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
