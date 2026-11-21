@@ -1220,9 +1220,12 @@
     // Prevent double-triggering when multiple hooks (UI click, PlayerEngine startFade, MutationObserver)
     // fire within 1500ms of each other during the same track handoff
     const isRecent = (now - lastSongChangeTimestamp) < 1500;
-    if (isRecent) {
+    const isPlaceholder = (t) => !t || t === 'Next Song' || t === 'Starting Set' || t === 'Preview Next Pattern';
+    const isSameSongOrHandoff = isPlaceholder(cleanTitle) || isPlaceholder(lastSongChangeTitle) || cleanTitle === lastSongChangeTitle;
+
+    if (isRecent && isSameSongOrHandoff && !songInfo?.force) {
       // If we now received an actual track title (not placeholder 'Next Song'), update HUD badge title smoothly
-      if (cleanTitle && cleanTitle !== 'Next Song' && cleanTitle !== 'Starting Set' && cleanTitle !== 'Preview Next Pattern' && cleanTitle !== lastSongChangeTitle) {
+      if (cleanTitle && !isPlaceholder(cleanTitle) && cleanTitle !== lastSongChangeTitle) {
         lastSongChangeTitle = cleanTitle;
         const badgeTitle = document.getElementById('audify-badge-title-el');
         if (badgeTitle) badgeTitle.textContent = cleanTitle;
@@ -2169,8 +2172,6 @@
       }
     }
 
-    if (!targetHeader) return;
-
     let pillGroup = document.getElementById('audify-control-pills-container');
     const isNew = !pillGroup;
     if (isNew) {
@@ -2211,6 +2212,16 @@
       wirePillControls(pillGroup);
     }
 
+    if (!targetHeader) {
+      targetHeader = document.querySelector('header, nav, [role="banner"], main') || document.body;
+      if (targetHeader === document.body || (targetHeader.tagName === 'MAIN' && !targetHeader.classList.contains('justify-between'))) {
+        pillGroup.style.position = 'fixed';
+        pillGroup.style.top = '16px';
+        pillGroup.style.right = '16px';
+        pillGroup.style.zIndex = '100';
+      }
+    }
+
     if (targetRightCluster && targetRightCluster.parentElement === targetHeader) {
       if (pillGroup.nextElementSibling !== targetRightCluster) {
         targetHeader.insertBefore(pillGroup, targetRightCluster);
@@ -2220,12 +2231,17 @@
     }
   }
 
-    let injectAttempts = 0;
+  injectPlayerControls();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectPlayerControls);
+  }
+
+  let injectAttempts = 0;
   const injectTimer = setInterval(() => {
     injectPlayerControls();
     injectAttempts++;
-    const pill = document.getElementById('audify-mix-cluster');
-    if (pill && pill.isConnected && injectAttempts > 15) {
+    const pill = document.getElementById('audify-control-pills-container');
+    if ((pill && pill.isConnected) || injectAttempts >= 20) {
       clearInterval(injectTimer);
     }
   }, 1000);
