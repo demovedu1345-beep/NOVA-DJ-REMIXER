@@ -90,9 +90,13 @@
     try {
       navigator.mediaSession.setActionHandler('play', () => {
         const engine = window.__nauxEngine;
-        const deck = engine?.liveDeck?.();
-        if (deck?.player?.playVideo) {
-          deck.player.playVideo();
+        if (engine && typeof engine.resume === 'function') {
+          engine.resume();
+        } else {
+          const deck = engine?.liveDeck?.();
+          if (deck?.player?.playVideo) {
+            deck.player.playVideo();
+          }
         }
         if (anchorAudio && anchorAudio.paused) {
           anchorAudio.play().catch(() => {});
@@ -102,9 +106,16 @@
 
       navigator.mediaSession.setActionHandler('pause', () => {
         const engine = window.__nauxEngine;
-        const deck = engine?.liveDeck?.();
-        if (deck?.player?.pauseVideo) {
-          deck.player.pauseVideo();
+        if (engine && typeof engine.pause === 'function') {
+          engine.pause();
+        } else {
+          const deck = engine?.liveDeck?.();
+          if (deck?.player?.pauseVideo) {
+            deck.player.pauseVideo();
+          }
+        }
+        if (anchorAudio && !anchorAudio.paused) {
+          anchorAudio.pause();
         }
         navigator.mediaSession.playbackState = 'paused';
       });
@@ -181,6 +192,10 @@
   document.addEventListener('visibilitychange', () => {
     const engine = window.__nauxEngine;
     if (!engine) return;
+    if (engine.paused) {
+      if (anchorAudio && !anchorAudio.paused) anchorAudio.pause();
+      return;
+    }
 
     const live = engine.liveDeck ? engine.liveDeck() : null;
     const player = live?.player;

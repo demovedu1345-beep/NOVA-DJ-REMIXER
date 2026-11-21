@@ -25967,9 +25967,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -91055,9 +91055,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 132,
         "key": "6A",
         "youtube_ids": [
-          "cl0a3i2wFzA"
+          "-BjZmE2gtdo"
         ],
-        "videoId": "cl0a3i2wFzA",
+        "videoId": "-BjZmE2gtdo",
         "heat": [
           0.20551813080886083,
           0.25061409808635415,
@@ -262786,9 +262786,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "w-OPHohw8Co",
+        "videoId": "BddP6PYo2gs",
         "youtube_ids": [
-          "w-OPHohw8Co"
+          "BddP6PYo2gs"
         ],
         "playFull": false,
         "energy": 9,
@@ -401805,9 +401805,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 78,
         "entrySec": 38,
         "exitSec": 78,
-        "videoId": "vrLYt-wi7a4",
+        "videoId": "XzOvgu3GPwY",
         "youtube_ids": [
-          "vrLYt-wi7a4"
+          "XzOvgu3GPwY"
         ],
         "playFull": false,
         "energy": 10,
@@ -408477,9 +408477,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 102,
         "entrySec": 62,
         "exitSec": 102,
-        "videoId": "81qmmlsIE3k",
+        "videoId": "Umqb9KENgmk",
         "youtube_ids": [
-          "81qmmlsIE3k"
+          "Umqb9KENgmk"
         ],
         "playFull": false,
         "energy": 8,
@@ -408834,9 +408834,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 104,
         "entrySec": 64,
         "exitSec": 104,
-        "videoId": "UEvOsQBu1jY",
+        "videoId": "ElZfdU54Cp8",
         "youtube_ids": [
-          "UEvOsQBu1jY"
+          "ElZfdU54Cp8"
         ],
         "playFull": false,
         "energy": 9,
@@ -411452,9 +411452,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 88,
         "entrySec": 48,
         "exitSec": 88,
-        "videoId": "xitd9mEZIHk",
+        "videoId": "V8zXLMIjlcw",
         "youtube_ids": [
-          "xitd9mEZIHk"
+          "V8zXLMIjlcw"
         ],
         "playFull": false,
         "energy": 8,
@@ -412523,9 +412523,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 102,
         "entrySec": 62,
         "exitSec": 102,
-        "videoId": "284Ov7ysmfA",
+        "videoId": "bzSTpdcs-EI",
         "youtube_ids": [
-          "284Ov7ysmfA"
+          "bzSTpdcs-EI"
         ],
         "playFull": false,
         "energy": 9,
@@ -413594,9 +413594,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 84,
         "entrySec": 44,
         "exitSec": 84,
-        "videoId": "zlt38OOqwDc",
+        "videoId": "z-diRlyLGzo",
         "youtube_ids": [
-          "zlt38OOqwDc"
+          "z-diRlyLGzo"
         ],
         "playFull": false,
         "energy": 8,
@@ -420003,9 +420003,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 133,
         "key": "3A",
         "youtube_ids": [
-          "0I4nC4G_2Wc"
+          "87JIOAX3njM"
         ],
-        "videoId": "0I4nC4G_2Wc",
+        "videoId": "87JIOAX3njM",
         "heat": [
           0.0002828844098488048,
           0.005276825714223554,
@@ -421065,9 +421065,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 134,
         "key": "12A",
         "youtube_ids": [
-          "hXh3sQv6z4I"
+          "hoNb6HuNmU0"
         ],
-        "videoId": "hXh3sQv6z4I",
+        "videoId": "hoNb6HuNmU0",
         "heat": [
           0.7549858891936301,
           0.7751999907098956,
@@ -431921,9 +431921,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 128,
         "key": "2A",
         "youtube_ids": [
-          "0I4nC4G_2Wc"
+          "BddP6PYo2gs"
         ],
-        "videoId": "0I4nC4G_2Wc",
+        "videoId": "BddP6PYo2gs",
         "heat": [
           0.4830214518983297,
           0.5311575995303306,
@@ -433949,9 +433949,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 50,
         "exitSec": 95,
-        "videoId": "284C3xZ27xs",
+        "videoId": "bzSTpdcs-EI",
         "youtube_ids": [
-          "284C3xZ27xs"
+          "bzSTpdcs-EI"
         ],
         "playFull": false,
         "energy": 9,
@@ -433983,9 +433983,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 115,
         "entrySec": 65,
         "exitSec": 115,
-        "videoId": "sK7riqg2mr4",
+        "videoId": "xRb8hxwN5zc",
         "youtube_ids": [
-          "sK7riqg2mr4"
+          "xRb8hxwN5zc"
         ],
         "playFull": false,
         "energy": 9,
@@ -434119,9 +434119,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 120,
         "entrySec": 70,
         "exitSec": 120,
-        "videoId": "0eZl9u10s_Y",
+        "videoId": "f3FFOBrUcHg",
         "youtube_ids": [
-          "0eZl9u10s_Y"
+          "f3FFOBrUcHg"
         ],
         "playFull": false,
         "energy": 8,
@@ -436159,9 +436159,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 50,
         "exitSec": 95,
-        "videoId": "dY_m5k_2p8A",
+        "videoId": "cYOB941gyXI",
         "youtube_ids": [
-          "dY_m5k_2p8A"
+          "cYOB941gyXI"
         ],
         "playFull": false,
         "energy": 8,
@@ -436363,9 +436363,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 110,
         "entrySec": 60,
         "exitSec": 110,
-        "videoId": "jY_m5k_2x8A",
+        "videoId": "AEIVhBS6baE",
         "youtube_ids": [
-          "jY_m5k_2x8A"
+          "AEIVhBS6baE"
         ],
         "playFull": false,
         "energy": 8,
@@ -436465,9 +436465,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 50,
         "exitSec": 95,
-        "videoId": "mT_p2k_8m5E",
+        "videoId": "V8zXLMIjlcw",
         "youtube_ids": [
-          "mT_p2k_8m5E"
+          "V8zXLMIjlcw"
         ],
         "playFull": false,
         "energy": 8,
@@ -436499,9 +436499,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 40,
         "exitSec": 85,
-        "videoId": "nY_m5k_2x8A",
+        "videoId": "z-diRlyLGzo",
         "youtube_ids": [
-          "nY_m5k_2x8A"
+          "z-diRlyLGzo"
         ],
         "playFull": false,
         "energy": 8,
@@ -436533,9 +436533,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 35,
         "exitSec": 80,
-        "videoId": "oT_k2m_8p5A",
+        "videoId": "fdubeMFwuGs",
         "youtube_ids": [
-          "oT_k2m_8p5A"
+          "fdubeMFwuGs"
         ],
         "playFull": false,
         "energy": 8,
@@ -437995,9 +437995,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 102,
         "entrySec": 62,
         "exitSec": 102,
-        "videoId": "284Ov7ysmfA",
+        "videoId": "bzSTpdcs-EI",
         "youtube_ids": [
-          "284Ov7ysmfA"
+          "bzSTpdcs-EI"
         ],
         "playFull": false,
         "energy": 9,
@@ -441420,9 +441420,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 70,
         "entrySec": 25,
         "exitSec": 70,
-        "videoId": "8T_m5k_2x8A",
+        "videoId": "bzSTpdcs-EI",
         "youtube_ids": [
-          "8T_m5k_2x8A"
+          "bzSTpdcs-EI"
         ],
         "playFull": false,
         "energy": 9,
@@ -441454,9 +441454,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 90,
         "entrySec": 45,
         "exitSec": 90,
-        "videoId": "9Y_p2k_8m5E",
+        "videoId": "6FURuLYrR_Q",
         "youtube_ids": [
-          "9Y_p2k_8m5E"
+          "6FURuLYrR_Q"
         ],
         "playFull": false,
         "energy": 9,
@@ -441590,9 +441590,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 110,
         "entrySec": 60,
         "exitSec": 110,
-        "videoId": "3C_k2m_8p5E",
+        "videoId": "AEIVhBS6baE",
         "youtube_ids": [
-          "3C_k2m_8p5E"
+          "AEIVhBS6baE"
         ],
         "playFull": false,
         "energy": 9,
@@ -444759,9 +444759,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 35,
         "exitSec": 80,
-        "videoId": "6w_1UvXy5bE",
+        "videoId": "fdubeMFwuGs",
         "youtube_ids": [
-          "6w_1UvXy5bE"
+          "fdubeMFwuGs"
         ],
         "playFull": false,
         "energy": 9,
@@ -445133,9 +445133,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 50,
         "exitSec": 95,
-        "videoId": "hoNb6HuNmU0",
+        "videoId": "cYOB941gyXI",
         "youtube_ids": [
-          "hoNb6HuNmU0"
+          "cYOB941gyXI"
         ],
         "playFull": false,
         "energy": 8,
@@ -449604,9 +449604,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 35,
         "exitSec": 80,
-        "videoId": "oT_k2m_8p5A",
+        "videoId": "fdubeMFwuGs",
         "youtube_ids": [
-          "oT_k2m_8p5A"
+          "fdubeMFwuGs"
         ],
         "playFull": false,
         "energy": 8,
@@ -524617,9 +524617,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "w-OPHohw8Co",
+        "videoId": "BddP6PYo2gs",
         "youtube_ids": [
-          "w-OPHohw8Co"
+          "BddP6PYo2gs"
         ],
         "playFull": false,
         "energy": 9,
@@ -529088,9 +529088,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 35,
         "exitSec": 80,
-        "videoId": "oT_k2m_8p5A",
+        "videoId": "fdubeMFwuGs",
         "youtube_ids": [
-          "oT_k2m_8p5A"
+          "fdubeMFwuGs"
         ],
         "playFull": false,
         "energy": 8,
@@ -601012,9 +601012,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 105,
         "entrySec": 65,
         "exitSec": 105,
-        "videoId": "xitd9mEZIHk",
+        "videoId": "V8zXLMIjlcw",
         "youtube_ids": [
-          "xitd9mEZIHk"
+          "V8zXLMIjlcw"
         ],
         "playFull": false,
         "energy": 8,
@@ -603868,9 +603868,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 45,
         "exitSec": 85,
-        "videoId": "zlt38OOqwDc",
+        "videoId": "z-diRlyLGzo",
         "youtube_ids": [
-          "zlt38OOqwDc"
+          "z-diRlyLGzo"
         ],
         "playFull": false,
         "energy": 8,
@@ -603987,9 +603987,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 100,
         "entrySec": 60,
         "exitSec": 100,
-        "videoId": "81qmmlsIE3k",
+        "videoId": "Umqb9KENgmk",
         "youtube_ids": [
-          "81qmmlsIE3k"
+          "Umqb9KENgmk"
         ],
         "playFull": false,
         "energy": 9,
@@ -740766,9 +740766,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -746357,9 +746357,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 119,
         "key": "5A",
         "youtube_ids": [
-          "k2qgadSvNyU"
+          "16jA-6hiSUo"
         ],
-        "videoId": "k2qgadSvNyU",
+        "videoId": "16jA-6hiSUo",
         "heat": [
           0.5917702154416813,
           0.6340389091761849,
@@ -748127,9 +748127,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 120,
         "key": "2A",
         "youtube_ids": [
-          "k2qgadSvNyU"
+          "34Na4j8AVgA"
         ],
-        "videoId": "k2qgadSvNyU",
+        "videoId": "34Na4j8AVgA",
         "heat": [
           0.40663675689173917,
           0.35672194618795666,
@@ -748245,9 +748245,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 121,
         "key": "3A",
         "youtube_ids": [
-          "hT_nvWreIhg"
+          "PMivT7MJ41M"
         ],
-        "videoId": "hT_nvWreIhg",
+        "videoId": "PMivT7MJ41M",
         "heat": [
           0.35672194618795666,
           0.3074824750391913,
@@ -748599,9 +748599,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 125,
         "key": "7A",
         "youtube_ids": [
-          "OPf0YbXqDm0"
+          "yzTuBuRdAyA"
         ],
-        "videoId": "OPf0YbXqDm0",
+        "videoId": "yzTuBuRdAyA",
         "heat": [
           0.1713754725030625,
           0.13223806950490563,
@@ -749425,9 +749425,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 132,
         "key": "2A",
         "youtube_ids": [
-          "k2qgadSvNyU"
+          "oTau4xsm_oA"
         ],
-        "videoId": "k2qgadSvNyU",
+        "videoId": "oTau4xsm_oA",
         "heat": [
           0.0015263950054082986,
           0.0002828844098488048,
@@ -752753,9 +752753,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -752872,9 +752872,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -753110,9 +753110,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -761797,9 +761797,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 87,
         "entrySec": 45,
         "exitSec": 87,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 10,
@@ -766565,9 +766565,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 89,
         "entrySec": 49,
         "exitSec": 89,
-        "videoId": "uPD0QOGTmMI",
+        "videoId": "QLCpqdqeoII",
         "youtube_ids": [
-          "uPD0QOGTmMI"
+          "QLCpqdqeoII"
         ],
         "playFull": false,
         "energy": 9,
@@ -770133,9 +770133,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 118,
         "key": "4A",
         "youtube_ids": [
-          "JGwWNGJdvx8"
+          "XXYlFuWEuKI"
         ],
-        "videoId": "JGwWNGJdvx8",
+        "videoId": "XXYlFuWEuKI",
         "heat": [
           0.5465090116344191,
           0.5917702154416813,
@@ -770251,9 +770251,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 119,
         "key": "5A",
         "youtube_ids": [
-          "2Vv-BfVoq4g"
+          "ic8j13piAhQ"
         ],
-        "videoId": "2Vv-BfVoq4g",
+        "videoId": "ic8j13piAhQ",
         "heat": [
           0.5917702154416813,
           0.6340389091761849,
@@ -771195,9 +771195,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 127,
         "key": "1A",
         "youtube_ids": [
-          "2Vv-BfVoq4g"
+          "PMivT7MJ41M"
         ],
-        "videoId": "2Vv-BfVoq4g",
+        "videoId": "PMivT7MJ41M",
         "heat": [
           0.7989979946416218,
           0.7994125362159327,
@@ -772021,9 +772021,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 134,
         "key": "8A",
         "youtube_ids": [
-          "JGwWNGJdvx8"
+          "O1OTWCd40bc"
         ],
-        "videoId": "JGwWNGJdvx8",
+        "videoId": "O1OTWCd40bc",
         "heat": [
           0.6774740127813088,
           0.6393888576415826,
@@ -773445,9 +773445,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 55,
         "exitSec": 95,
-        "videoId": "K-a8s8OLBSE",
+        "videoId": "KsZ6tROaVOQ",
         "youtube_ids": [
-          "K-a8s8OLBSE"
+          "KsZ6tROaVOQ"
         ],
         "playFull": false,
         "energy": 5,
@@ -787130,9 +787130,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 86,
         "entrySec": 44,
         "exitSec": 86,
-        "videoId": "uPD0QOGTmMI",
+        "videoId": "QLCpqdqeoII",
         "youtube_ids": [
-          "uPD0QOGTmMI"
+          "QLCpqdqeoII"
         ],
         "playFull": false,
         "energy": 10,
@@ -789153,9 +789153,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -790861,9 +790861,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 45,
         "exitSec": 85,
-        "videoId": "XwQ7lpnxj0o",
+        "videoId": "iWZmdoY1aTE",
         "youtube_ids": [
-          "XwQ7lpnxj0o"
+          "iWZmdoY1aTE"
         ],
         "playFull": false,
         "energy": 6,
@@ -792051,9 +792051,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 55,
         "exitSec": 95,
-        "videoId": "ekzHIouo8Q4",
+        "videoId": "ekzHIWGv82Q",
         "youtube_ids": [
-          "ekzHIouo8Q4"
+          "ekzHIWGv82Q"
         ],
         "playFull": false,
         "energy": 6,
@@ -792323,9 +792323,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 95,
         "entrySec": 55,
         "exitSec": 95,
-        "videoId": "zLSUp53y-HQ",
+        "videoId": "KsZ6tROaVOQ",
         "youtube_ids": [
-          "zLSUp53y-HQ"
+          "KsZ6tROaVOQ"
         ],
         "playFull": false,
         "energy": 6,
@@ -792765,9 +792765,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 45,
         "exitSec": 85,
-        "videoId": "uPD0QOGTmMI",
+        "videoId": "QLCpqdqeoII",
         "youtube_ids": [
-          "uPD0QOGTmMI"
+          "QLCpqdqeoII"
         ],
         "playFull": false,
         "energy": 7,
@@ -804468,9 +804468,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -808258,9 +808258,12 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 30,
         "exitSec": 65,
-        "videoId": "qL7ZRXexzIT",
+        "videoId": "qL7zrWcv6XY",
         "energy": 8,
-        "id": "english-dance-44"
+        "id": "english-dance-44",
+        "youtube_ids": [
+          "qL7zrWcv6XY"
+        ]
       },
       {
         "id": "english-dance-45",
@@ -808986,9 +808989,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -814578,9 +814581,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -814697,9 +814700,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -814935,9 +814938,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -817901,9 +817904,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -818972,9 +818975,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -823374,9 +823377,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -823493,9 +823496,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -823612,9 +823615,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -829570,9 +829573,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -830641,9 +830644,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -835400,9 +835403,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -835519,9 +835522,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -835757,9 +835760,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -842462,9 +842465,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -843533,9 +843536,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -848292,9 +848295,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -848411,9 +848414,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -848649,9 +848652,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -860080,9 +860083,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 117,
         "key": "3A",
         "youtube_ids": [
-          "OPf0YbXqDm0"
+          "ekr2nIex040"
         ],
-        "videoId": "OPf0YbXqDm0",
+        "videoId": "ekr2nIex040",
         "heat": [
           0.4989615837018092,
           0.5465090116344191,
@@ -860316,9 +860319,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 120,
         "key": "6A",
         "youtube_ids": [
-          "e-ORhEE9VVg"
+          "16jA-6hiSUo"
         ],
-        "videoId": "e-ORhEE9VVg",
+        "videoId": "16jA-6hiSUo",
         "heat": [
           0.6340389091761849,
           0.6726555040093336,
@@ -861496,9 +861499,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 118,
         "key": "12A",
         "youtube_ids": [
-          "OPf0YbXqDm0"
+          "XXYlFuWEuKI"
         ],
-        "videoId": "OPf0YbXqDm0",
+        "videoId": "XXYlFuWEuKI",
         "heat": [
           0.5053783973453684,
           0.4564480032239469,
@@ -862086,9 +862089,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 128,
         "key": "10A",
         "youtube_ids": [
-          "e-ORhEE9VVg"
+          "xpVfcZ0ZcFM"
         ],
-        "videoId": "e-ORhEE9VVg",
+        "videoId": "xpVfcZ0ZcFM",
         "heat": [
           0.06704379417680506,
           0.04200425670856661,
@@ -863620,9 +863623,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 126,
         "key": "4A",
         "youtube_ids": [
-          "OPf0YbXqDm0"
+          "PMivT7MJ41M"
         ],
-        "videoId": "OPf0YbXqDm0",
+        "videoId": "PMivT7MJ41M",
         "heat": [
           0.4366742993960711,
           0.4860479952351262,
@@ -863974,9 +863977,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 129,
         "key": "7A",
         "youtube_ids": [
-          "e-ORhEE9VVg"
+          "dqt8Z1k0oWQ"
         ],
-        "videoId": "e-ORhEE9VVg",
+        "videoId": "dqt8Z1k0oWQ",
         "heat": [
           0.5800176295122471,
           0.6231472032363761,
@@ -864092,9 +864095,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 130,
         "key": "8A",
         "youtube_ids": [
-          "09R8_2nJtjg"
+          "uxpDa-c-4Mc"
         ],
-        "videoId": "09R8_2nJtjg",
+        "videoId": "uxpDa-c-4Mc",
         "heat": [
           0.6231472032363761,
           0.6627946394875157,
@@ -864446,9 +864449,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 115,
         "key": "1A",
         "youtube_ids": [
-          "k2qgadSvNyU"
+          "yzTuBuRdAyA"
         ],
-        "videoId": "k2qgadSvNyU",
+        "videoId": "yzTuBuRdAyA",
         "heat": [
           0.7751999907098956,
           0.7895592218600185,
@@ -870953,9 +870956,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "-CmadmM5cOk",
+        "videoId": "-CMADIYUrs8",
         "youtube_ids": [
-          "-CmadmM5cOk"
+          "-CMADIYUrs8"
         ],
         "playFull": false,
         "energy": 9,
@@ -873571,9 +873574,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 82,
         "entrySec": 42,
         "exitSec": 82,
-        "videoId": "kPa7bsKwL-c",
+        "videoId": "kPa7bsKwL-8",
         "youtube_ids": [
-          "kPa7bsKwL-c"
+          "kPa7bsKwL-8"
         ],
         "playFull": false,
         "energy": 9,
@@ -873690,9 +873693,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 70,
         "entrySec": 30,
         "exitSec": 70,
-        "videoId": "dElRVQFqj-k",
+        "videoId": "8v_4O44sf4M",
         "youtube_ids": [
-          "dElRVQFqj-k"
+          "8v_4O44sf4M"
         ],
         "playFull": false,
         "energy": 9,
@@ -873809,9 +873812,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 45,
         "exitSec": 85,
-        "videoId": "adLGHcj_fmA",
+        "videoId": "uRVZpar18hE",
         "youtube_ids": [
-          "adLGHcj_fmA"
+          "uRVZpar18hE"
         ],
         "playFull": false,
         "energy": 8,
@@ -880473,9 +880476,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "fHI8X4OXluQ",
+        "videoId": "4NRXx6U8ABQ",
         "youtube_ids": [
-          "fHI8X4OXluQ"
+          "4NRXx6U8ABQ"
         ],
         "playFull": false,
         "energy": 9,
@@ -883112,9 +883115,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -884183,9 +884186,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -888823,9 +888826,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -888942,9 +888945,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -889180,9 +889183,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -892520,9 +892523,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 85,
         "entrySec": 45,
         "exitSec": 85,
-        "videoId": "adLGHcj_fmA",
+        "videoId": "uRVZpar18hE",
         "youtube_ids": [
-          "adLGHcj_fmA"
+          "uRVZpar18hE"
         ],
         "playFull": false,
         "energy": 8,
@@ -894543,9 +894546,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -895614,9 +895617,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -900373,9 +900376,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -900492,9 +900495,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -900730,9 +900733,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -908592,9 +908595,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 88,
         "entrySec": 48,
         "exitSec": 88,
-        "videoId": "m7Bc3pLyij0",
+        "videoId": "iWZmdoY1aTE",
         "youtube_ids": [
-          "m7Bc3pLyij0"
+          "iWZmdoY1aTE"
         ],
         "playFull": false,
         "energy": 9,
@@ -911444,9 +911447,9 @@ export const CURATED_CATEGORIES_DB = {
         "bpm": 120,
         "key": "6A",
         "youtube_ids": [
-          "OPf0YbXqDm0"
+          "orJSJGHjBLI"
         ],
-        "videoId": "OPf0YbXqDm0",
+        "videoId": "orJSJGHjBLI",
         "heat": [
           0.6340389091761849,
           0.6726555040093336,
@@ -929749,9 +929752,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -933939,9 +933942,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "fHI8X4OXluQ",
+        "videoId": "4NRXx6U8ABQ",
         "youtube_ids": [
-          "fHI8X4OXluQ"
+          "4NRXx6U8ABQ"
         ],
         "playFull": false,
         "energy": 9,
@@ -936370,9 +936373,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -937441,9 +937444,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -942200,9 +942203,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -942319,9 +942322,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -942557,9 +942560,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -948515,9 +948518,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -949586,9 +949589,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -954345,9 +954348,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -954464,9 +954467,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -954702,9 +954705,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -961017,9 +961020,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -962088,9 +962091,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -966847,9 +966850,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -966966,9 +966969,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -967204,9 +967207,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -973757,9 +973760,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -974828,9 +974831,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -979587,9 +979590,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -979706,9 +979709,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -979944,9 +979947,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -986021,9 +986024,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -987092,9 +987095,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -991851,9 +991854,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -991970,9 +991973,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -992208,9 +992211,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -998523,9 +998526,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -999594,9 +999597,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1004353,9 +1004356,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1004472,9 +1004475,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1004710,9 +1004713,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -1011025,9 +1011028,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -1012096,9 +1012099,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1016855,9 +1016858,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1016974,9 +1016977,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1017212,9 +1017215,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -1023527,9 +1023530,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -1024598,9 +1024601,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1029357,9 +1029360,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1029476,9 +1029479,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1029714,9 +1029717,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -1036539,9 +1036542,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -1037610,9 +1037613,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1042250,9 +1042253,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1042369,9 +1042372,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1042607,9 +1042610,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -1048599,9 +1048602,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -1049670,9 +1049673,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1054429,9 +1054432,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1054548,9 +1054551,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1054786,9 +1054789,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,
@@ -1060982,9 +1060985,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mH_LFkWxpI0",
+        "videoId": "-BjZmE2gtdo",
         "youtube_ids": [
-          "mH_LFkWxpI0"
+          "-BjZmE2gtdo"
         ],
         "playFull": false,
         "energy": 10,
@@ -1062053,9 +1062056,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 80,
         "entrySec": 40,
         "exitSec": 80,
-        "videoId": "mym4sKoAnKs",
+        "videoId": "qL7zrWcv6XY",
         "youtube_ids": [
-          "mym4sKoAnKs"
+          "qL7zrWcv6XY"
         ],
         "playFull": false,
         "energy": 9,
@@ -1066812,9 +1066815,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 65,
         "entrySec": 25,
         "exitSec": 65,
-        "videoId": "Co0tTeuUVhU",
+        "videoId": "1DpH-icPpl0",
         "youtube_ids": [
-          "Co0tTeuUVhU"
+          "1DpH-icPpl0"
         ],
         "playFull": false,
         "energy": 8,
@@ -1066931,9 +1066934,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 75,
         "entrySec": 35,
         "exitSec": 75,
-        "videoId": "COz9lDCFHjw",
+        "videoId": "48kX5aEPhx8",
         "youtube_ids": [
-          "COz9lDCFHjw"
+          "48kX5aEPhx8"
         ],
         "playFull": false,
         "energy": 8,
@@ -1067169,9 +1067172,9 @@ export const CURATED_CATEGORIES_DB = {
         "hookEndSec": 68,
         "entrySec": 28,
         "exitSec": 68,
-        "videoId": "lJTRVX9R5EA",
+        "videoId": "7EUP13n3qkE",
         "youtube_ids": [
-          "lJTRVX9R5EA"
+          "7EUP13n3qkE"
         ],
         "playFull": false,
         "energy": 9,

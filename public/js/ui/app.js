@@ -2043,7 +2043,7 @@ function renderWizard() {
 
   if (step === 0) {
     bodyHtml = `
-      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh] pb-36">
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What are we playing?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <p class="text-xl text-white/60 md:text-2xl">Pick every language the room wants.</p>
@@ -2073,7 +2073,7 @@ function renderWizard() {
         </div>
 
         <p class="mt-12 text-lg text-white/40">
-          Plays through YouTube · <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
+          <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
         </p>
         <p class="mt-4 text-lg text-white/50">Made with ❤️ By Vedant</p>
       </section>
@@ -2081,7 +2081,7 @@ function renderWizard() {
   } else if (step === 1) {
     const selectedLangs = (state.selectedLanguages || []).length ? state.selectedLanguages : ['hindi'];
     bodyHtml = `
-      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh] pb-36">
         <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">What kind?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -2122,7 +2122,7 @@ function renderWizard() {
     `;
   } else if (step === 2) {
     bodyHtml = `
-      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh] pb-36">
         <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">Where in the night are we?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -2144,7 +2144,7 @@ function renderWizard() {
     `;
   } else if (step === 3) {
     bodyHtml = `
-      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh]">
+      <section class="mt-[4vh] flex flex-1 flex-col md:mt-[6vh] pb-36">
         <button id="btn-wiz-back" class="mb-6 self-start font-display text-2xl tracking-wide text-white/60 hover:text-white cursor-pointer">← BACK</button>
         <h1 class="font-display text-[44px] uppercase leading-[0.9] md:text-[clamp(56px,8vw,120px)]">How many people?</h1>
         <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">

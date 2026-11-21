@@ -2072,9 +2072,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 102,
           "entrySec": 62,
           "exitSec": 102,
-          "videoId": "81qmmlsIE3k",
+          "videoId": "Umqb9KENgmk",
           "youtube_ids": [
-            "81qmmlsIE3k"
+            "Umqb9KENgmk"
           ],
           "playFull": false,
           "energy": 8,
@@ -2310,9 +2310,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 104,
           "entrySec": 64,
           "exitSec": 104,
-          "videoId": "UEvOsQBu1jY",
+          "videoId": "ElZfdU54Cp8",
           "youtube_ids": [
-            "UEvOsQBu1jY"
+            "ElZfdU54Cp8"
           ],
           "playFull": false,
           "energy": 9,
@@ -3024,9 +3024,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 88,
           "entrySec": 48,
           "exitSec": 88,
-          "videoId": "xitd9mEZIHk",
+          "videoId": "V8zXLMIjlcw",
           "youtube_ids": [
-            "xitd9mEZIHk"
+            "V8zXLMIjlcw"
           ],
           "playFull": false,
           "energy": 8,
@@ -3262,9 +3262,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 102,
           "entrySec": 62,
           "exitSec": 102,
-          "videoId": "284Ov7ysmfA",
+          "videoId": "bzSTpdcs-EI",
           "youtube_ids": [
-            "284Ov7ysmfA"
+            "bzSTpdcs-EI"
           ],
           "playFull": false,
           "energy": 9,
@@ -3976,9 +3976,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 84,
           "entrySec": 44,
           "exitSec": 84,
-          "videoId": "zlt38OOqwDc",
+          "videoId": "z-diRlyLGzo",
           "youtube_ids": [
-            "zlt38OOqwDc"
+            "z-diRlyLGzo"
           ],
           "playFull": false,
           "energy": 8,
@@ -4806,9 +4806,9 @@ export const ARTISTS_DB = {
           "bpm": 133,
           "key": "3A",
           "youtube_ids": [
-            "0I4nC4G_2Wc"
+            "87JIOAX3njM"
           ],
-          "videoId": "0I4nC4G_2Wc",
+          "videoId": "87JIOAX3njM",
           "heat": [
             0.0002828844098488048,
             0.005276825714223554,
@@ -5278,9 +5278,9 @@ export const ARTISTS_DB = {
           "bpm": 134,
           "key": "12A",
           "youtube_ids": [
-            "hXh3sQv6z4I"
+            "hoNb6HuNmU0"
           ],
-          "videoId": "hXh3sQv6z4I",
+          "videoId": "hoNb6HuNmU0",
           "heat": [
             0.7549858891936301,
             0.7751999907098956,
@@ -6694,9 +6694,9 @@ export const ARTISTS_DB = {
           "bpm": 128,
           "key": "2A",
           "youtube_ids": [
-            "0I4nC4G_2Wc"
+            "BddP6PYo2gs"
           ],
-          "videoId": "0I4nC4G_2Wc",
+          "videoId": "BddP6PYo2gs",
           "heat": [
             0.4830214518983297,
             0.5311575995303306,
@@ -6811,9 +6811,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 120,
           "entrySec": 70,
           "exitSec": 120,
-          "videoId": "0eZl9u10s_Y",
+          "videoId": "f3FFOBrUcHg",
           "youtube_ids": [
-            "0eZl9u10s_Y"
+            "f3FFOBrUcHg"
           ],
           "playFull": false,
           "energy": 8,
@@ -7389,9 +7389,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 95,
           "entrySec": 50,
           "exitSec": 95,
-          "videoId": "dY_m5k_2p8A",
+          "videoId": "cYOB941gyXI",
           "youtube_ids": [
-            "dY_m5k_2p8A"
+            "cYOB941gyXI"
           ],
           "playFull": false,
           "energy": 8,
@@ -7593,9 +7593,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 110,
           "entrySec": 60,
           "exitSec": 110,
-          "videoId": "jY_m5k_2x8A",
+          "videoId": "AEIVhBS6baE",
           "youtube_ids": [
-            "jY_m5k_2x8A"
+            "AEIVhBS6baE"
           ],
           "playFull": false,
           "energy": 8,
@@ -7695,9 +7695,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 95,
           "entrySec": 50,
           "exitSec": 95,
-          "videoId": "mT_p2k_8m5E",
+          "videoId": "V8zXLMIjlcw",
           "youtube_ids": [
-            "mT_p2k_8m5E"
+            "V8zXLMIjlcw"
           ],
           "playFull": false,
           "energy": 8,
@@ -7729,9 +7729,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 85,
           "entrySec": 40,
           "exitSec": 85,
-          "videoId": "nY_m5k_2x8A",
+          "videoId": "z-diRlyLGzo",
           "youtube_ids": [
-            "nY_m5k_2x8A"
+            "z-diRlyLGzo"
           ],
           "playFull": false,
           "energy": 8,
@@ -8171,9 +8171,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 70,
           "entrySec": 25,
           "exitSec": 70,
-          "videoId": "8T_m5k_2x8A",
+          "videoId": "bzSTpdcs-EI",
           "youtube_ids": [
-            "8T_m5k_2x8A"
+            "bzSTpdcs-EI"
           ],
           "playFull": false,
           "energy": 9,
@@ -8205,9 +8205,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 90,
           "entrySec": 45,
           "exitSec": 90,
-          "videoId": "9Y_p2k_8m5E",
+          "videoId": "6FURuLYrR_Q",
           "youtube_ids": [
-            "9Y_p2k_8m5E"
+            "6FURuLYrR_Q"
           ],
           "playFull": false,
           "energy": 9,
@@ -12952,9 +12952,9 @@ export const ARTISTS_DB = {
           "bpm": 133,
           "key": "3A",
           "youtube_ids": [
-            "0I4nC4G_2Wc"
+            "87JIOAX3njM"
           ],
-          "videoId": "0I4nC4G_2Wc",
+          "videoId": "87JIOAX3njM",
           "heat": [
             0.0002828844098488048,
             0.005276825714223554,
@@ -28255,9 +28255,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 80,
           "entrySec": 35,
           "exitSec": 80,
-          "videoId": "oT_k2m_8p5A",
+          "videoId": "fdubeMFwuGs",
           "youtube_ids": [
-            "oT_k2m_8p5A"
+            "fdubeMFwuGs"
           ],
           "playFull": false,
           "energy": 8,
@@ -68218,9 +68218,9 @@ export const ARTISTS_DB = {
           "bpm": 119,
           "key": "5A",
           "youtube_ids": [
-            "k2qgadSvNyU"
+            "16jA-6hiSUo"
           ],
-          "videoId": "k2qgadSvNyU",
+          "videoId": "16jA-6hiSUo",
           "heat": [
             0.5917702154416813,
             0.6340389091761849,
@@ -68336,9 +68336,9 @@ export const ARTISTS_DB = {
           "bpm": 120,
           "key": "2A",
           "youtube_ids": [
-            "k2qgadSvNyU"
+            "34Na4j8AVgA"
           ],
-          "videoId": "k2qgadSvNyU",
+          "videoId": "34Na4j8AVgA",
           "heat": [
             0.40663675689173917,
             0.35672194618795666,
@@ -68454,9 +68454,9 @@ export const ARTISTS_DB = {
           "bpm": 125,
           "key": "7A",
           "youtube_ids": [
-            "OPf0YbXqDm0"
+            "yzTuBuRdAyA"
           ],
-          "videoId": "OPf0YbXqDm0",
+          "videoId": "yzTuBuRdAyA",
           "heat": [
             0.1713754725030625,
             0.13223806950490563,
@@ -68571,9 +68571,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 89,
           "entrySec": 49,
           "exitSec": 89,
-          "videoId": "uPD0QOGTmMI",
+          "videoId": "QLCpqdqeoII",
           "youtube_ids": [
-            "uPD0QOGTmMI"
+            "QLCpqdqeoII"
           ],
           "playFull": false,
           "energy": 9,
@@ -68691,9 +68691,9 @@ export const ARTISTS_DB = {
           "bpm": 118,
           "key": "4A",
           "youtube_ids": [
-            "JGwWNGJdvx8"
+            "XXYlFuWEuKI"
           ],
-          "videoId": "JGwWNGJdvx8",
+          "videoId": "XXYlFuWEuKI",
           "heat": [
             0.5465090116344191,
             0.5917702154416813,
@@ -68809,9 +68809,9 @@ export const ARTISTS_DB = {
           "bpm": 134,
           "key": "8A",
           "youtube_ids": [
-            "JGwWNGJdvx8"
+            "O1OTWCd40bc"
           ],
-          "videoId": "JGwWNGJdvx8",
+          "videoId": "O1OTWCd40bc",
           "heat": [
             0.6774740127813088,
             0.6393888576415826,
@@ -69283,9 +69283,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 86,
           "entrySec": 44,
           "exitSec": 86,
-          "videoId": "uPD0QOGTmMI",
+          "videoId": "QLCpqdqeoII",
           "youtube_ids": [
-            "uPD0QOGTmMI"
+            "QLCpqdqeoII"
           ],
           "playFull": false,
           "energy": 10,
@@ -69437,9 +69437,9 @@ export const ARTISTS_DB = {
           "bpm": 129,
           "key": "7A",
           "youtube_ids": [
-            "e-ORhEE9VVg"
+            "dqt8Z1k0oWQ"
           ],
-          "videoId": "e-ORhEE9VVg",
+          "videoId": "dqt8Z1k0oWQ",
           "heat": [
             0.5800176295122471,
             0.6231472032363761,
@@ -71017,9 +71017,9 @@ export const ARTISTS_DB = {
           "bpm": 119,
           "key": "5A",
           "youtube_ids": [
-            "2Vv-BfVoq4g"
+            "ic8j13piAhQ"
           ],
-          "videoId": "2Vv-BfVoq4g",
+          "videoId": "ic8j13piAhQ",
           "heat": [
             0.5917702154416813,
             0.6340389091761849,
@@ -71610,9 +71610,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 95,
           "entrySec": 55,
           "exitSec": 95,
-          "videoId": "K-a8s8OLBSE",
+          "videoId": "KsZ6tROaVOQ",
           "youtube_ids": [
-            "K-a8s8OLBSE"
+            "KsZ6tROaVOQ"
           ],
           "playFull": false,
           "energy": 5,
@@ -72851,9 +72851,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 95,
           "entrySec": 55,
           "exitSec": 95,
-          "videoId": "zLSUp53y-HQ",
+          "videoId": "KsZ6tROaVOQ",
           "youtube_ids": [
-            "zLSUp53y-HQ"
+            "KsZ6tROaVOQ"
           ],
           "playFull": false,
           "energy": 6,
@@ -81174,9 +81174,9 @@ export const ARTISTS_DB = {
           "bpm": 121,
           "key": "3A",
           "youtube_ids": [
-            "hT_nvWreIhg"
+            "PMivT7MJ41M"
           ],
-          "videoId": "hT_nvWreIhg",
+          "videoId": "PMivT7MJ41M",
           "heat": [
             0.35672194618795666,
             0.3074824750391913,
@@ -82958,9 +82958,9 @@ export const ARTISTS_DB = {
           "bpm": 117,
           "key": "3A",
           "youtube_ids": [
-            "OPf0YbXqDm0"
+            "ekr2nIex040"
           ],
-          "videoId": "OPf0YbXqDm0",
+          "videoId": "ekr2nIex040",
           "heat": [
             0.4989615837018092,
             0.5465090116344191,
@@ -83075,9 +83075,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 85,
           "entrySec": 45,
           "exitSec": 85,
-          "videoId": "adLGHcj_fmA",
+          "videoId": "uRVZpar18hE",
           "youtube_ids": [
-            "adLGHcj_fmA"
+            "uRVZpar18hE"
           ],
           "playFull": false,
           "energy": 8,
@@ -83344,9 +83344,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 80,
           "entrySec": 40,
           "exitSec": 80,
-          "videoId": "mym4sKoAnKs",
+          "videoId": "qL7zrWcv6XY",
           "youtube_ids": [
-            "mym4sKoAnKs"
+            "qL7zrWcv6XY"
           ],
           "playFull": false,
           "energy": 9,
@@ -84411,9 +84411,9 @@ export const ARTISTS_DB = {
           "bpm": 132,
           "key": "2A",
           "youtube_ids": [
-            "k2qgadSvNyU"
+            "oTau4xsm_oA"
           ],
-          "videoId": "k2qgadSvNyU",
+          "videoId": "oTau4xsm_oA",
           "heat": [
             0.0015263950054082986,
             0.0002828844098488048,
@@ -84885,9 +84885,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 75,
           "entrySec": 35,
           "exitSec": 75,
-          "videoId": "COz9lDCFHjw",
+          "videoId": "48kX5aEPhx8",
           "youtube_ids": [
-            "COz9lDCFHjw"
+            "48kX5aEPhx8"
           ],
           "playFull": false,
           "energy": 8,
@@ -85123,9 +85123,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 68,
           "entrySec": 28,
           "exitSec": 68,
-          "videoId": "lJTRVX9R5EA",
+          "videoId": "7EUP13n3qkE",
           "youtube_ids": [
-            "lJTRVX9R5EA"
+            "7EUP13n3qkE"
           ],
           "playFull": false,
           "energy": 9,
@@ -86313,9 +86313,9 @@ export const ARTISTS_DB = {
           "hookEndSec": 87,
           "entrySec": 45,
           "exitSec": 87,
-          "videoId": "mym4sKoAnKs",
+          "videoId": "qL7zrWcv6XY",
           "youtube_ids": [
-            "mym4sKoAnKs"
+            "qL7zrWcv6XY"
           ],
           "playFull": false,
           "energy": 10,
