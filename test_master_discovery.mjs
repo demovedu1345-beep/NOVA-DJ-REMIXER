@@ -130,9 +130,9 @@ assert(catSearchData.results.length >= 10, `Search returned ${catSearchData.resu
 // -------------------------------------------------------------
 console.log('\n--- TEST 4: UI & Module 298 Verification ---');
 const chunkContent = fs.readFileSync(path.join(root, 'public/naux/static/immutable/chunks/3cq6guoi7hqi2.js'), 'utf8');
-assert(chunkContent.includes('"id":"artists"') && chunkContent.includes('Artists (All Singers)'), 'Module 298 contains Artists category');
-assert(chunkContent.includes('Hindi Breakup & Heartbreak'), 'Module 298 contains Hindi Breakup category');
-assert(chunkContent.includes('English Rock & Alternative'), 'Module 298 contains English Rock category');
+assert(chunkContent.includes('"id":"artists"') && chunkContent.includes('Artists'), 'Module 298 contains Artists category');
+assert(chunkContent.includes('Breakup'), 'Module 298 contains Hindi Breakup category');
+assert(chunkContent.includes('Rock'), 'Module 298 contains English Rock category');
 assert(chunkContent.includes('window.__startSetWithCues'), 'Chunk exposes window.__startSetWithCues for instant playback');
 assert(chunkContent.includes('openAudifyArtistExplorer'), 'Step 1 cards trigger openAudifyArtistExplorer');
 

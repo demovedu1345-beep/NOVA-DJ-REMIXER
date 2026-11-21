@@ -2224,7 +2224,8 @@
   const injectTimer = setInterval(() => {
     injectPlayerControls();
     injectAttempts++;
-    if (pillGroup && pillGroup.isConnected && injectAttempts > 15) {
+    const pill = document.getElementById('audify-mix-cluster');
+    if (pill && pill.isConnected && injectAttempts > 15) {
       clearInterval(injectTimer);
     }
   }, 1000);
