@@ -2204,13 +2204,36 @@
     const styleEl = document.createElement('style');
     styleEl.id = 'audify-header-pills-style';
     styleEl.textContent = `
+      html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      main {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      main > .flex,
+      main > div.flex,
       main > .flex.items-center.justify-between,
-      main > .relative.z-30.flex {
+      main > .flex.justify-between,
+      main > .relative.z-30.flex,
+      div.flex.items-center.justify-between {
         position: relative !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         flex-wrap: nowrap !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
       }
 
       button[aria-label*="Audify"],
@@ -2237,7 +2260,15 @@
         z-index: 50 !important;
         flex-shrink: 1 !important;
         min-width: 0 !important;
-        max-width: 100% !important;
+        max-width: calc(100vw - 110px) !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        box-sizing: border-box !important;
+      }
+      #audify-control-pills-container::-webkit-scrollbar {
+        display: none !important;
       }
 
       .squeeze {
@@ -2413,19 +2444,23 @@
       }
 
       @media (max-width: 768px) {
+        main {
+          padding-left: 14px !important;
+          padding-right: 14px !important;
+        }
         main > .flex.justify-between > .flex.items-center.gap-5,
         main > .relative.z-30.flex > .ml-auto,
         div.flex.items-center.justify-between > div.flex.items-center {
-          max-width: calc(100vw - 110px) !important;
+          max-width: calc(100vw - 90px) !important;
           overflow-x: auto !important;
           scrollbar-width: none !important;
           -webkit-overflow-scrolling: touch !important;
         }
         #audify-control-pills-container {
           gap: 4px !important;
-          margin-right: 4px !important;
+          margin-right: 0 !important;
           margin-left: auto !important;
-          max-width: 100% !important;
+          max-width: calc(100vw - 90px) !important;
           overflow-x: auto !important;
           scrollbar-width: none !important;
           -webkit-overflow-scrolling: touch !important;
@@ -2451,8 +2486,9 @@
           font-size: 10.5px !important;
         }
         #audify-control-pills-container {
-          margin-right: 2px !important;
+          margin-right: 0 !important;
           gap: 3px !important;
+          max-width: calc(100vw - 80px) !important;
         }
         #audify-mix-label,
         #audify-aurora-label {
@@ -2727,6 +2763,17 @@
       }
     }
 
+    pillGroup.style.display = 'inline-flex';
+    pillGroup.style.alignItems = 'center';
+    pillGroup.style.minWidth = '0';
+    pillGroup.style.maxWidth = 'calc(100vw - 110px)';
+    pillGroup.style.overflowX = 'auto';
+    pillGroup.style.overflowY = 'hidden';
+    pillGroup.style.webkitOverflowScrolling = 'touch';
+    pillGroup.style.scrollbarWidth = 'none';
+    pillGroup.style.flexShrink = '1';
+    pillGroup.style.marginLeft = 'auto';
+
     if (!targetHeader) {
       targetHeader = document.querySelector('header, nav, [role="banner"], main') || document.body;
       if (targetHeader === document.body || (targetHeader.tagName === 'MAIN' && !targetHeader.classList.contains('justify-between'))) {
@@ -2737,12 +2784,26 @@
       }
     }
 
+    if (targetHeader) {
+      targetHeader.style.maxWidth = '100%';
+      targetHeader.style.width = '100%';
+      targetHeader.style.minWidth = '0';
+      targetHeader.style.overflowX = 'hidden';
+      targetHeader.style.boxSizing = 'border-box';
+    }
+
     if (targetRightCluster && targetRightCluster.parentElement === targetHeader) {
       if (pillGroup.nextElementSibling !== targetRightCluster) {
         targetHeader.insertBefore(pillGroup, targetRightCluster);
       }
     } else if (!targetHeader.contains(pillGroup)) {
       targetHeader.appendChild(pillGroup);
+    }
+
+    // Keep artist pill prepended inside pillGroup if present
+    const existingArtistPill = document.getElementById('audify-artist-header-pill');
+    if (existingArtistPill && existingArtistPill.parentElement !== pillGroup) {
+      pillGroup.prepend(existingArtistPill);
     }
   }
 
@@ -2847,6 +2908,19 @@
     const eqBtn = document.getElementById('audify-eq-btn');
     if (!pill || !pill.isConnected || !eqBtn) {
       injectPlayerControls();
+    } else {
+      const artistPill = document.getElementById('audify-artist-header-pill');
+      if (artistPill && artistPill.parentElement !== pill) {
+        pill.prepend(artistPill);
+      }
+      const parentH = pill.parentElement;
+      if (parentH) {
+        parentH.style.maxWidth = '100%';
+        parentH.style.width = '100%';
+        parentH.style.minWidth = '0';
+        parentH.style.overflowX = 'hidden';
+        parentH.style.boxSizing = 'border-box';
+      }
     }
   }
 

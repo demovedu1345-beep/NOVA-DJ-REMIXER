@@ -531,29 +531,38 @@
   // Inject Header "ARTISTS" Navigation Pill
   // -------------------------------------------------------------
   function injectArtistHeaderNav() {
-    if (document.getElementById('audify-artist-header-pill')) return;
-
-    const navPill = document.createElement('button');
-    navPill.id = 'audify-artist-header-pill';
-    navPill.className = 'audify-pill-btn squeeze';
-    navPill.innerHTML = `<span>🎤 ARTISTS</span>`;
-    navPill.title = 'Browse Top Artists & Hitmakers';
-    navPill.addEventListener('click', () => openExplorer(currentLang));
-
+    let navPill = document.getElementById('audify-artist-header-pill');
     const controlPills = document.getElementById('audify-control-pills-container');
+
+    if (!navPill) {
+      navPill = document.createElement('button');
+      navPill.id = 'audify-artist-header-pill';
+      navPill.className = 'audify-pill-btn squeeze';
+      navPill.innerHTML = `<span>🎤 ARTISTS</span>`;
+      navPill.title = 'Browse Top Artists & Hitmakers';
+      navPill.style.flexShrink = '0';
+      navPill.addEventListener('click', () => openExplorer(currentLang));
+    }
+
     if (controlPills) {
-      controlPills.prepend(navPill);
+      if (navPill.parentElement !== controlPills) {
+        controlPills.prepend(navPill);
+      }
       return;
     }
 
-    const header = document.querySelector('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > .flex.items-center.justify-between');
+    const header = document.querySelector('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > .flex.items-center.justify-between, main > div.flex');
     if (!header) return;
 
-    const rightCluster = header.querySelector('.flex.items-center.gap-2, .flex.items-center.gap-3, .flex.items-center.gap-5');
+    const rightCluster = header.querySelector('.flex.items-center.gap-2, .flex.items-center.gap-3, .flex.items-center.gap-5, .ml-auto');
     if (rightCluster) {
-      rightCluster.prepend(navPill);
+      if (navPill.parentElement !== rightCluster) {
+        rightCluster.prepend(navPill);
+      }
     } else {
-      header.appendChild(navPill);
+      if (navPill.parentElement !== header) {
+        header.appendChild(navPill);
+      }
     }
   }
 
