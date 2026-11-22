@@ -413,7 +413,15 @@
       </div>
     `;
 
-    document.body.appendChild(modalEl);
+    if (document.body) {
+      document.body.appendChild(modalEl);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (modalEl && !modalEl.parentNode && document.body) {
+          document.body.appendChild(modalEl);
+        }
+      });
+    }
 
     // Canvas setup
     spectrumCanvas = document.getElementById('audify-spectrum-canvas');

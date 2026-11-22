@@ -2204,79 +2204,15 @@
     const styleEl = document.createElement('style');
     styleEl.id = 'audify-header-pills-style';
     styleEl.textContent = `
-      html {
-        width: 100% !important;
-        max-width: 100vw !important;
-        min-height: 100% !important;
-        height: auto !important;
-        overflow-x: clip !important;
-        overflow-y: auto !important;
-        -webkit-text-size-adjust: 100% !important;
-        -webkit-overflow-scrolling: touch !important;
-      }
-
-      body {
-        width: 100% !important;
-        max-width: 100vw !important;
-        min-height: 100% !important;
-        height: auto !important;
-        overflow-x: clip !important;
-        overflow-y: visible !important;
-        box-sizing: border-box !important;
-        -webkit-overflow-scrolling: touch !important;
-      }
-
-      main {
-        width: 100% !important;
-        max-width: 100vw !important;
-        overflow: visible !important;
-        box-sizing: border-box !important;
-        height: auto !important;
-      }
-
-      main > .flex,
-      main > div.flex,
-      main > .flex.items-center.justify-between,
-      main > .flex.justify-between,
-      main > .relative.z-30.flex,
-      div.flex.items-center.justify-between {
-        position: relative !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        flex-wrap: nowrap !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        overflow: visible !important;
-        box-sizing: border-box !important;
-      }
-
-      button[aria-label*="Audify"],
-      main > .flex.justify-between > button:first-child,
-      main > .relative.z-30.flex > span.text-lime {
-        flex-shrink: 0 !important;
-      }
-
-      main > .flex.justify-between > .flex.items-center.gap-5,
-      main > .relative.z-30.flex > .ml-auto {
-        flex-shrink: 1 !important;
-        min-width: 0 !important;
-        display: inline-flex !important;
-        align-items: center !important;
-      }
-
       #audify-control-pills-container {
         display: inline-flex !important;
         align-items: center !important;
-        gap: 8px !important;
-        margin-left: auto !important;
-        margin-right: 14px !important;
+        gap: 6px !important;
+        margin-right: 8px !important;
         position: relative !important;
         z-index: 50 !important;
         flex-shrink: 1 !important;
         min-width: 0 !important;
-        max-width: calc(100vw - 165px) !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         white-space: nowrap !important;
@@ -2461,29 +2397,15 @@
       }
 
       @media (max-width: 768px) {
-        main {
-          padding-left: 14px !important;
-          padding-right: 14px !important;
-        }
-        main > .flex.justify-between > .flex.items-center.gap-5,
-        main > .relative.z-30.flex > .ml-auto,
-        div.flex.items-center.justify-between > div.flex.items-center {
-          max-width: calc(100vw - 165px) !important;
-          overflow-x: auto !important;
-          scrollbar-width: none !important;
-          -webkit-overflow-scrolling: touch !important;
-        }
         #audify-control-pills-container {
           gap: 4px !important;
-          margin-right: 0 !important;
-          margin-left: auto !important;
-          max-width: calc(100vw - 165px) !important;
+          margin-right: 6px !important;
           overflow-x: auto !important;
           scrollbar-width: none !important;
           -webkit-overflow-scrolling: touch !important;
         }
         .audify-pill-btn {
-          height: 30px !important;
+          height: 28px !important;
           padding: 0 7px !important;
           font-size: 11px !important;
           flex-shrink: 0 !important;
@@ -2493,12 +2415,6 @@
           pointer-events: none !important;
         }
         .audify-dropdown-menu { min-width: 180px !important; }
-
-        .grid.sm\:grid-cols-2.md\:grid-cols-3,
-        .grid.md\:grid-cols-3,
-        .grid.sm\:grid-cols-2 {
-          grid-template-columns: 1fr !important;
-        }
       }
 
       @media (max-width: 520px) {
@@ -2803,37 +2719,17 @@
     pillGroup.style.display = 'inline-flex';
     pillGroup.style.alignItems = 'center';
     pillGroup.style.minWidth = '0';
-    pillGroup.style.maxWidth = 'calc(100vw - 165px)';
     pillGroup.style.overflowX = 'auto';
     pillGroup.style.overflowY = 'hidden';
     pillGroup.style.webkitOverflowScrolling = 'touch';
     pillGroup.style.scrollbarWidth = 'none';
     pillGroup.style.flexShrink = '1';
-    pillGroup.style.marginLeft = 'auto';
 
-    if (!targetHeader) {
-      targetHeader = document.querySelector('header, nav, [role="banner"], main') || document.body;
-      if (targetHeader === document.body || (targetHeader.tagName === 'MAIN' && !targetHeader.classList.contains('justify-between'))) {
-        pillGroup.style.position = 'fixed';
-        pillGroup.style.top = '16px';
-        pillGroup.style.right = '16px';
-        pillGroup.style.zIndex = '100';
+    if (targetRightCluster) {
+      if (!targetRightCluster.contains(pillGroup)) {
+        targetRightCluster.prepend(pillGroup);
       }
-    }
-
-    if (targetHeader) {
-      targetHeader.style.maxWidth = '100%';
-      targetHeader.style.width = '100%';
-      targetHeader.style.minWidth = '0';
-      targetHeader.style.overflow = 'visible';
-      targetHeader.style.boxSizing = 'border-box';
-    }
-
-    if (targetRightCluster && targetRightCluster.parentElement === targetHeader) {
-      if (pillGroup.nextElementSibling !== targetRightCluster) {
-        targetHeader.insertBefore(pillGroup, targetRightCluster);
-      }
-    } else if (!targetHeader.contains(pillGroup)) {
+    } else if (targetHeader && !targetHeader.contains(pillGroup)) {
       targetHeader.appendChild(pillGroup);
     }
 
@@ -2885,6 +2781,7 @@
     const ctx = miniCanvasEl.getContext('2d');
     if (!ctx) return;
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = miniCanvasEl.width || miniLastW || 44;
     const h = miniCanvasEl.height || miniLastH || 16;
     ctx.clearRect(0, 0, w, h);

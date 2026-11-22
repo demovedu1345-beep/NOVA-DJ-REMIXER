@@ -65,21 +65,21 @@
 
     // Global tactile squeeze listener for dynamic buttons & cards
     document.addEventListener('pointerdown', (e) => {
-      const target = e.target.closest('button, .audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
+      const target = e.target.closest('.audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
       if (target) {
         target.style.transform = 'scale(0.96) translate3d(0, 0, 0)';
       }
     }, { passive: true });
 
     document.addEventListener('pointerup', (e) => {
-      const target = e.target.closest('button, .audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
+      const target = e.target.closest('.audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
       if (target) {
         target.style.transform = '';
       }
     }, { passive: true });
 
     document.addEventListener('pointercancel', (e) => {
-      const target = e.target.closest('button, .audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
+      const target = e.target.closest('.audify-pill-btn, .audify-artist-card, .squeeze, .audify-eq-preset-btn, .audify-eq-theme-pill');
       if (target) {
         target.style.transform = '';
       }
