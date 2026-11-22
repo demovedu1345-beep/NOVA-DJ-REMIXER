@@ -2221,7 +2221,8 @@
 
       main > .flex.justify-between > .flex.items-center.gap-5,
       main > .relative.z-30.flex > .ml-auto {
-        flex-shrink: 0 !important;
+        flex-shrink: 1 !important;
+        min-width: 0 !important;
         display: inline-flex !important;
         align-items: center !important;
       }
@@ -2235,6 +2236,7 @@
         position: relative !important;
         z-index: 50 !important;
         flex-shrink: 1 !important;
+        min-width: 0 !important;
         max-width: 100% !important;
       }
 
@@ -2411,15 +2413,59 @@
       }
 
       @media (max-width: 768px) {
-        #audify-control-pills-container { gap: 6px !important; margin-right: 8px !important; }
-        .audify-pill-btn { height: 34px !important; padding: 0 10px !important; font-size: 12px !important; }
-        .audify-dropdown-menu { min-width: 200px !important; }
+        main > .flex.justify-between > .flex.items-center.gap-5,
+        main > .relative.z-30.flex > .ml-auto,
+        div.flex.items-center.justify-between > div.flex.items-center {
+          max-width: calc(100vw - 110px) !important;
+          overflow-x: auto !important;
+          scrollbar-width: none !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        #audify-control-pills-container {
+          gap: 4px !important;
+          margin-right: 4px !important;
+          margin-left: auto !important;
+          max-width: 100% !important;
+          overflow-x: auto !important;
+          scrollbar-width: none !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        .audify-pill-btn {
+          height: 30px !important;
+          padding: 0 7px !important;
+          font-size: 11px !important;
+          flex-shrink: 0 !important;
+        }
+        .audify-dropdown-menu { min-width: 180px !important; }
       }
 
       @media (max-width: 520px) {
-        .audify-pill-tag-aurora, .audify-pill-tag-mix { display: none !important; }
-        .audify-pill-btn { height: 32px !important; padding: 0 8px !important; font-size: 11px !important; }
-        #audify-control-pills-container { margin-right: 6px !important; gap: 4px !important; }
+        .audify-pill-tag-aurora,
+        .audify-pill-tag-mix,
+        #audify-fullscreen-text {
+          display: none !important;
+        }
+        .audify-pill-btn {
+          height: 28px !important;
+          padding: 0 6px !important;
+          font-size: 10.5px !important;
+        }
+        #audify-control-pills-container {
+          margin-right: 2px !important;
+          gap: 3px !important;
+        }
+        #audify-mix-label,
+        #audify-aurora-label {
+          max-width: 65px !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+        }
+        #audify-mini-spectrum-canvas {
+          width: 26px !important;
+          height: 10px !important;
+          margin-left: 2px !important;
+        }
       }
     `;
     document.head.appendChild(styleEl);
