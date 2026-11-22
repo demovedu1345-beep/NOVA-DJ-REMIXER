@@ -49,6 +49,7 @@
   let lastRawTime = -1;
   let lastRawTimeMs = 0;
   let pllInitialized = false;
+  let lastTrackId = null;
 
   // Multi-Band Beat Separation Channels
   let rawKick = 0.0;
@@ -406,18 +407,19 @@
 
   function resolveTrackBpm(cue) {
     if (!cue) return 124;
-    // 1. Direct metadata check
-    if (typeof cue.bpm === 'number' && cue.bpm >= 45 && cue.bpm <= 220) return cue.bpm;
-    if (typeof cue.tempo === 'number' && cue.tempo >= 45 && cue.tempo <= 220) return cue.tempo;
 
-    // 2. Exact song title match
+    // 1. Exact song title match against curated tempo database (HIGHEST PRIORITY)
     const title = (cue.title || '').toLowerCase().trim();
     for (const [key, bpm] of Object.entries(TRACK_BPM_MAP)) {
       if (title.includes(key)) return bpm;
     }
 
-    // 3. Subtype or Genre match
-    const subtype = (cue.subtype || cue.kind || '').toLowerCase();
+    // 2. Direct track metadata (if explicit custom bpm)
+    if (typeof cue.bpm === 'number' && cue.bpm >= 45 && cue.bpm <= 220 && cue.bpm !== 124) return cue.bpm;
+    if (typeof cue.tempo === 'number' && cue.tempo >= 45 && cue.tempo <= 220 && cue.tempo !== 124) return cue.tempo;
+
+    // 3. Subtype, Category, or Genre match
+    const subtype = (cue.subtype || cue.kind || cue.category || cue.genre || '').toLowerCase();
     for (const [g, bpm] of Object.entries(GENRE_DEFAULT_BPM)) {
       if (subtype.includes(g)) return bpm;
     }
@@ -430,6 +432,7 @@
     if (lang === 'english') return 120;
     if (lang === 'hindi') return 128;
 
+    if (typeof cue.bpm === 'number' && cue.bpm >= 45 && cue.bpm <= 220) return cue.bpm;
     return 124;
   }
 
@@ -442,6 +445,15 @@
     const liveDeck = engine?.liveDeck?.();
     const player = liveDeck?.player;
     const cue = liveDeck?.cue || liveDeck?.track || engine?.currentTrack;
+
+    // Track transition detection: reset PLL and per-track downbeat anchor
+    const trackId = cue?.song_id || cue?.id || cue?.title || cue?.videoId;
+    if (trackId && trackId !== lastTrackId) {
+      lastTrackId = trackId;
+      delete settings.downbeatOffsetSec;
+      pllInitialized = false;
+      lastRawTime = -1;
+    }
 
     // Detect if live audio source is actively playing
     let isPlaying = false;
@@ -515,30 +527,39 @@
       const beatDuration = 60.0 / currentBpm;
       const barDuration = beatDuration * 4.0;
 
-      const offset = (cue && typeof cue.entry_sec === 'number')
+      const rawOffset = (cue && typeof cue.entry_sec === 'number')
         ? cue.entry_sec
         : ((cue && typeof cue.entrySec === 'number')
           ? cue.entrySec
           : ((cue && typeof cue.hookStartSec === 'number') ? cue.hookStartSec : 0));
 
-      // Latency calibration: Compensate for YouTube iframe audio-to-DOM buffer delay (~115ms)
+      // Snap the raw entry offset to the nearest integer beat grid
+      const snappedOffset = (rawOffset > 0)
+        ? (Math.round(rawOffset / beatDuration) * beatDuration)
+        : 0;
+
+      const offset = (settings.downbeatOffsetSec !== undefined)
+        ? settings.downbeatOffsetSec
+        : snappedOffset;
+
+      // Latency calibration: Compensate for YouTube iframe audio-to-DOM buffer delay (~75ms)
       // plus user-adjustable phase nudge from EQ modal
       const userNudgeSec = (settings.beatNudgeMs || 0) * 0.001;
-      const latencyCorrectionSec = 0.115 + userNudgeSec;
+      const latencyCorrectionSec = 0.075 + userNudgeSec;
 
       let beatElapsed = (pllEstimatedTime - offset - latencyCorrectionSec) % beatDuration;
       if (beatElapsed < 0) beatElapsed += beatDuration;
       beatPhase = beatElapsed / beatDuration; // 0.0 -> 1.0 within beat
 
-      let barElapsed = (pllEstimatedTime - offset) % barDuration;
+      let barElapsed = (pllEstimatedTime - offset - latencyCorrectionSec) % barDuration;
       if (barElapsed < 0) barElapsed += barDuration;
       barPhase = barElapsed / barDuration;   // 0.0 -> 1.0 within 4-beat bar
 
       // ---------------------------------------------------------------------
       // 3. Multi-Band Beat Separation & Crisp Acoustic Attack Envelopes
       // ---------------------------------------------------------------------
-      // Sub-bass kick (exponential transient attack; peaks sharply at downbeat, clears within 25% of beat)
-      rawKick = Math.exp(-beatPhase * 12.0);
+      // Sub-bass kick (exponential transient attack; peaks sharply at downbeat, clears within 20% of beat)
+      rawKick = Math.exp(-beatPhase * 16.0);
 
       // Snare/clap backbeat on beats 2 & 4
       const beatNumber = Math.floor(barPhase * 4.0);
@@ -748,10 +769,15 @@
       return settings.beatNudgeMs;
     },
     syncDownbeatNow: () => {
-      if (lastRawTime >= 0) {
-        pllEstimatedTime = lastRawTime;
-      }
-      console.log('[Audify Beat] Downbeat synced to current playback position.');
+      const curTime = (pllEstimatedTime > 0) ? pllEstimatedTime : (lastRawTime >= 0 ? lastRawTime : 0);
+      const beatDur = 60.0 / currentBpm;
+      settings.downbeatOffsetSec = curTime % beatDur;
+      settings.beatNudgeMs = 0;
+      try {
+        localStorage.setItem('audify_eq_settings', JSON.stringify(settings));
+      } catch (_) {}
+      console.log('[Audify Beat] 🎯 Downbeat locked to time:', curTime.toFixed(3), 'offset:', settings.downbeatOffsetSec.toFixed(3));
+      return settings.downbeatOffsetSec;
     },
     initAudio: setupEqualizerNodes
   };

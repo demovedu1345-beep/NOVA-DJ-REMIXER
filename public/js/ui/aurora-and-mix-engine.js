@@ -1705,14 +1705,14 @@
     lastTime = now;
 
     // Smooth beat decay & flow velocity: Crisp, snappy transient envelope for high-contrast beat sync
-    beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 8.5);
-    flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 3.0);
+    beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 14.0);
+    flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 4.0);
 
     // Real-Time Master DJ Beat Analyzer & Energy Modulation
     const beatData = window.__audify_beat_analyzer ? window.__audify_beat_analyzer.update(dt, now) : null;
     if (beatData && beatData.beatEnergy > 0.05) {
-      const kickImpulse = (beatData.rawKick || 0) * 0.8;
-      const targetPulse = 1.0 + (beatData.beatEnergy + kickImpulse) * 1.25;
+      const kickImpulse = (beatData.rawKick || 0) * 1.8;
+      const targetPulse = 1.0 + (beatData.beatEnergy + kickImpulse) * 1.45;
       beatPulse = Math.max(beatPulse, targetPulse);
     }
 
@@ -2204,18 +2204,34 @@
     const styleEl = document.createElement('style');
     styleEl.id = 'audify-header-pills-style';
     styleEl.textContent = `
-      html, body {
+      html {
         width: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important;
+        min-height: 100% !important;
+        height: auto !important;
+        overflow-x: clip !important;
+        overflow-y: auto !important;
+        -webkit-text-size-adjust: 100% !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        min-height: 100% !important;
+        height: auto !important;
+        overflow-x: clip !important;
+        overflow-y: visible !important;
         box-sizing: border-box !important;
+        -webkit-overflow-scrolling: touch !important;
       }
 
       main {
         width: 100% !important;
         max-width: 100vw !important;
-        overflow-x: hidden !important;
+        overflow: visible !important;
         box-sizing: border-box !important;
+        height: auto !important;
       }
 
       main > .flex,
@@ -2232,7 +2248,7 @@
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
-        overflow-x: hidden !important;
+        overflow: visible !important;
         box-sizing: border-box !important;
       }
 
@@ -2260,9 +2276,10 @@
         z-index: 50 !important;
         flex-shrink: 1 !important;
         min-width: 0 !important;
-        max-width: calc(100vw - 110px) !important;
+        max-width: calc(100vw - 165px) !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
+        white-space: nowrap !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
         box-sizing: border-box !important;
@@ -2451,7 +2468,7 @@
         main > .flex.justify-between > .flex.items-center.gap-5,
         main > .relative.z-30.flex > .ml-auto,
         div.flex.items-center.justify-between > div.flex.items-center {
-          max-width: calc(100vw - 90px) !important;
+          max-width: calc(100vw - 165px) !important;
           overflow-x: auto !important;
           scrollbar-width: none !important;
           -webkit-overflow-scrolling: touch !important;
@@ -2460,7 +2477,7 @@
           gap: 4px !important;
           margin-right: 0 !important;
           margin-left: auto !important;
-          max-width: calc(100vw - 90px) !important;
+          max-width: calc(100vw - 165px) !important;
           overflow-x: auto !important;
           scrollbar-width: none !important;
           -webkit-overflow-scrolling: touch !important;
@@ -2470,8 +2487,18 @@
           padding: 0 7px !important;
           font-size: 11px !important;
           flex-shrink: 0 !important;
+          touch-action: manipulation !important;
+        }
+        .audify-pill-btn > * {
+          pointer-events: none !important;
         }
         .audify-dropdown-menu { min-width: 180px !important; }
+
+        .grid.sm\:grid-cols-2.md\:grid-cols-3,
+        .grid.md\:grid-cols-3,
+        .grid.sm\:grid-cols-2 {
+          grid-template-columns: 1fr !important;
+        }
       }
 
       @media (max-width: 520px) {
@@ -2484,23 +2511,28 @@
           height: 28px !important;
           padding: 0 6px !important;
           font-size: 10.5px !important;
+          touch-action: manipulation !important;
+        }
+        .audify-pill-btn > * {
+          pointer-events: none !important;
         }
         #audify-control-pills-container {
           margin-right: 0 !important;
           gap: 3px !important;
-          max-width: calc(100vw - 80px) !important;
+          max-width: calc(100vw - 165px) !important;
         }
         #audify-mix-label,
         #audify-aurora-label {
-          max-width: 65px !important;
+          max-width: 58px !important;
           overflow: hidden !important;
           text-overflow: ellipsis !important;
           white-space: nowrap !important;
         }
         #audify-mini-spectrum-canvas {
-          width: 26px !important;
+          width: 24px !important;
           height: 10px !important;
           margin-left: 2px !important;
+          pointer-events: none !important;
         }
       }
     `;
@@ -2578,11 +2610,13 @@
     const eqBtn = pillGroup.querySelector('#audify-eq-btn');
     if (eqBtn && !eqBtn.__audify_wired) {
       eqBtn.__audify_wired = true;
-      eqBtn.addEventListener('click', (e) => {
+      const handleEq = (e) => {
         e.stopPropagation();
         closeAllDropdowns();
         window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
-      });
+      };
+      eqBtn.addEventListener('click', handleEq);
+      eqBtn.addEventListener('touchend', handleEq, { passive: true });
     }
 
     function toggleFullscreen() {
@@ -2735,10 +2769,13 @@
         const eqBtn = eqWrapper.querySelector('#audify-eq-btn');
         if (eqBtn && !eqBtn.__audify_wired) {
           eqBtn.__audify_wired = true;
-          eqBtn.addEventListener('click', (e) => {
+          const handleEq = (e) => {
             e.stopPropagation();
+            closeAllDropdowns();
             window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
-          });
+          };
+          eqBtn.addEventListener('click', handleEq);
+          eqBtn.addEventListener('touchend', handleEq, { passive: true });
         }
       }
       if (!pillGroup.querySelector('#audify-fullscreen-btn')) {
@@ -2766,7 +2803,7 @@
     pillGroup.style.display = 'inline-flex';
     pillGroup.style.alignItems = 'center';
     pillGroup.style.minWidth = '0';
-    pillGroup.style.maxWidth = 'calc(100vw - 110px)';
+    pillGroup.style.maxWidth = 'calc(100vw - 165px)';
     pillGroup.style.overflowX = 'auto';
     pillGroup.style.overflowY = 'hidden';
     pillGroup.style.webkitOverflowScrolling = 'touch';
@@ -2788,7 +2825,7 @@
       targetHeader.style.maxWidth = '100%';
       targetHeader.style.width = '100%';
       targetHeader.style.minWidth = '0';
-      targetHeader.style.overflowX = 'hidden';
+      targetHeader.style.overflow = 'visible';
       targetHeader.style.boxSizing = 'border-box';
     }
 
