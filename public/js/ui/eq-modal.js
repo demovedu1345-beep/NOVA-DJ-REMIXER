@@ -582,26 +582,39 @@
     });
   }
 
-  // 16-Bar Spectrum Canvas Render Loop
+  // 16-Bar Spectrum Canvas Render Loop (Zero-GC, No Layout Thrashing)
+  let spectrumCanvasTargetW = 0;
+  let spectrumCanvasTargetH = 0;
+
+  function updateSpectrumCanvasDimensions() {
+    if (!spectrumCanvas || !spectrumCanvas.isConnected) {
+      spectrumCanvas = document.getElementById('audify-spectrum-canvas');
+    }
+    if (!spectrumCanvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = spectrumCanvas.getBoundingClientRect();
+    if (rect.width > 0) {
+      spectrumCanvasTargetW = Math.floor(rect.width * dpr);
+      spectrumCanvasTargetH = Math.floor(rect.height * dpr);
+      if (spectrumCanvas.width !== spectrumCanvasTargetW || spectrumCanvas.height !== spectrumCanvasTargetH) {
+        spectrumCanvas.width = spectrumCanvasTargetW;
+        spectrumCanvas.height = spectrumCanvasTargetH;
+      }
+    }
+  }
+  window.addEventListener('resize', updateSpectrumCanvasDimensions, { passive: true });
+
   function drawSpectrum() {
     if (!modalEl?.classList.contains('open')) return;
     animFrameId = requestAnimationFrame(drawSpectrum);
     if (!spectrumCtx || !spectrumCanvas) return;
 
-    // HiDPI Retina canvas resolution scaling
-    const dpr = window.devicePixelRatio || 1;
-    const rect = spectrumCanvas.getBoundingClientRect();
-    if (rect.width > 0) {
-      const targetW = Math.floor(rect.width * dpr);
-      const targetH = Math.floor(rect.height * dpr);
-      if (spectrumCanvas.width !== targetW || spectrumCanvas.height !== targetH) {
-        spectrumCanvas.width = targetW;
-        spectrumCanvas.height = targetH;
-      }
+    if (spectrumCanvas.width === 0 || spectrumCanvasTargetW === 0) {
+      updateSpectrumCanvasDimensions();
     }
 
-    const w = spectrumCanvas.width;
-    const h = spectrumCanvas.height;
+    const w = spectrumCanvas.width || spectrumCanvasTargetW || 300;
+    const h = spectrumCanvas.height || spectrumCanvasTargetH || 100;
     spectrumCtx.clearRect(0, 0, w, h);
 
     // Update real-time BPM readout if available
@@ -645,6 +658,7 @@
 
   function openEqModal() {
     createModalDOM();
+    updateSpectrumCanvasDimensions();
     syncSlidersFromSettings();
     modalEl.classList.add('open');
     modalEl.style.display = 'flex';

@@ -1450,8 +1450,16 @@
   }
 
   // -----------------------------------------------------------------------
-  // 9. Audio-Reactive Beat Render Frame Hook (60/120 FPS)
+  // 9. Audio-Reactive Beat Render Frame Hook (60/120 FPS Zero-GC Loop)
   // -----------------------------------------------------------------------
+  let cachedStrokeColor = '';
+  let cachedGlowSpread = -1;
+  let cachedGlowColor = '';
+  let cachedStreakOpacity = '';
+  let cachedInwardSpread = -1;
+  let cachedFlareScale = '';
+  let cachedFlareOpacity = '';
+
   function onRenderFrame(beatPulse = 1.0, beatData = null) {
     if (!borderRoot || !borderRoot.isConnected) return;
     const activePattern = AURORA_PATTERNS[currentPatternIndex];
@@ -1469,29 +1477,52 @@
       strokeColor = 'rgba(255, 255, 255, 0.08)'; // Resting obsidian
     }
 
+    // High-performance Zero-GC caching: only mutate DOM when style values actually change
+    if (strokeColor !== cachedStrokeColor) {
+      cachedStrokeColor = strokeColor;
+      borderRoot.style.setProperty('--audify-border-stroke', strokeColor);
+    }
+
     const glowSpread = Math.round(16 + kickRatio * 44);
-    borderRoot.style.setProperty('--audify-border-stroke', strokeColor);
-    borderRoot.style.setProperty('--audify-border-glow-px', `${glowSpread}px`);
-    borderRoot.style.setProperty('--audify-border-glow-color', kickRatio > 0.4 ? '#D4FF00' : activePattern.glowColor);
+    if (glowSpread !== cachedGlowSpread) {
+      cachedGlowSpread = glowSpread;
+      borderRoot.style.setProperty('--audify-border-glow-px', `${glowSpread}px`);
+    }
+
+    const glowColor = kickRatio > 0.4 ? '#D4FF00' : activePattern.glowColor;
+    if (glowColor !== cachedGlowColor) {
+      cachedGlowColor = glowColor;
+      borderRoot.style.setProperty('--audify-border-glow-color', glowColor);
+    }
 
     // Traveling Electric Neon Streak Opacity surge on beat
     const streakOpacity = Math.min(1.0, 0.32 + kickRatio * 0.68).toFixed(2);
-    borderRoot.style.setProperty('--audify-streak-opacity', streakOpacity);
+    if (streakOpacity !== cachedStreakOpacity) {
+      cachedStreakOpacity = streakOpacity;
+      borderRoot.style.setProperty('--audify-streak-opacity', streakOpacity);
+    }
 
     // Inward Edge Glow Box-Shadow Pulse
     if (inwardGlow) {
       const inwardSpread = Math.round(32 + kickRatio * 48);
-      inwardGlow.style.boxShadow = `inset 0 0 ${inwardSpread}px ${activePattern.glowColor}, inset 0 0 ${Math.round(inwardSpread * 1.5)}px rgba(0, 0, 0, 0.45)`;
+      if (inwardSpread !== cachedInwardSpread) {
+        cachedInwardSpread = inwardSpread;
+        inwardGlow.style.boxShadow = `inset 0 0 ${inwardSpread}px ${activePattern.glowColor}, inset 0 0 ${Math.round(inwardSpread * 1.5)}px rgba(0, 0, 0, 0.45)`;
+      }
     }
 
     // Corner Flares Dynamic Scale
     if (cornerFlares && cornerFlares.length) {
       const scale = (1.0 + kickRatio * 0.35).toFixed(3);
       const opacity = Math.min(1.0, 0.72 + kickRatio * 0.28).toFixed(3);
-      cornerFlares.forEach(el => {
-        el.style.transform = `scale(${scale})`;
-        el.style.opacity = opacity;
-      });
+      if (scale !== cachedFlareScale || opacity !== cachedFlareOpacity) {
+        cachedFlareScale = scale;
+        cachedFlareOpacity = opacity;
+        cornerFlares.forEach(el => {
+          el.style.transform = `scale(${scale})`;
+          el.style.opacity = opacity;
+        });
+      }
     }
 
     // Measure Drop (Beat 1 of 4) Detection & Strobe Sparks Trigger

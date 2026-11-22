@@ -2846,32 +2846,47 @@
 
   // -----------------------------------------------------------------------
   // Live Miniature 16-Bar Audio Spectrum Visualizer Loop
-  // HiDPI Retina Precision, Real-Time Frequency Bouncing & Gravity Falloff
+  // HiDPI Retina Precision, Zero-GC Layout Thrashing & Gravity Falloff
   // -----------------------------------------------------------------------
   const miniPeakVals = new Float32Array(16);
   const miniPeakSpeeds = new Float32Array(16);
   const miniPeakHolds = new Int16Array(16);
   const miniSmoothed = new Float32Array(16);
   let miniSpectrumRunning = false;
+  let miniLastW = 0;
+  let miniLastH = 0;
+  let miniCanvasEl = null;
+
+  function updateMiniCanvasDimensions() {
+    if (!miniCanvasEl || !miniCanvasEl.isConnected) {
+      miniCanvasEl = document.getElementById('audify-mini-spectrum-canvas');
+    }
+    if (!miniCanvasEl) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = miniCanvasEl.getBoundingClientRect();
+    const targetW = Math.floor((rect.width > 0 ? rect.width : 44) * dpr);
+    const targetH = Math.floor((rect.height > 0 ? rect.height : 16) * dpr);
+    if (miniCanvasEl.width !== targetW || miniCanvasEl.height !== targetH) {
+      miniCanvasEl.width = targetW;
+      miniCanvasEl.height = targetH;
+      miniLastW = targetW;
+      miniLastH = targetH;
+    }
+  }
+  window.addEventListener('resize', updateMiniCanvasDimensions, { passive: true });
 
   function renderMiniSpectrum() {
     requestAnimationFrame(renderMiniSpectrum);
-    const canvas = document.getElementById('audify-mini-spectrum-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    if (!miniCanvasEl || !miniCanvasEl.isConnected) {
+      miniCanvasEl = document.getElementById('audify-mini-spectrum-canvas');
+      if (miniCanvasEl) updateMiniCanvasDimensions();
+    }
+    if (!miniCanvasEl) return;
+    const ctx = miniCanvasEl.getContext('2d');
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    const targetW = Math.floor((rect.width > 0 ? rect.width : 44) * dpr);
-    const targetH = Math.floor((rect.height > 0 ? rect.height : 16) * dpr);
-    if (canvas.width !== targetW || canvas.height !== targetH) {
-      canvas.width = targetW;
-      canvas.height = targetH;
-    }
-
-    const w = canvas.width;
-    const h = canvas.height;
+    const w = miniCanvasEl.width || miniLastW || 44;
+    const h = miniCanvasEl.height || miniLastH || 16;
     ctx.clearRect(0, 0, w, h);
 
     const spectrum = (window.__audify_beat_analyzer && typeof window.__audify_beat_analyzer.getSpectrum === 'function')
