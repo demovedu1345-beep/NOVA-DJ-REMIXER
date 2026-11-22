@@ -46,6 +46,10 @@
   uniform vec3 uIntro;
   uniform float uLightMode;
   uniform float uOpacity;
+  uniform float uAberration;
+  uniform float uShockwave;
+  uniform int uVisualMode;
+  uniform float uBeatPulse;
   out vec4 fragColor;
 
   #define TAU 6.28318530718
@@ -139,11 +143,66 @@
     return center + vec2(c * d.x - s * d.y, s * d.x + c * d.y);
   }
 
+  vec3 evalAurora(vec2 sampleField, vec2 sampleUv, float bend, float boost, float t) {
+    float glow1 = auroraGlow(t, sampleField, bend) * boost;
+    float glow2 = auroraGlow(t + uLayerOffset, sampleField, bend) * boost;
+    vec3 gradient1 = mix(vec3(1.0), cosineGradient(sampleUv.x + uHue * 0.2, vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.3, 0.20, 0.20)), uSpectrum);
+    vec3 gradient2 = mix(vec3(1.0), cosineGradient(sampleUv.x + uHue * 0.1, vec3(0.5), vec3(0.5), vec3(2.0, 1.0, 0.0), vec3(0.5, 0.20, 0.25)), uSpectrum);
+    return (0.99 * glow1 * gradient1 * uColor1 + 0.99 * glow2 * gradient2 * uColor2) * uBrightness;
+  }
+
   void main() {
     vec2 uv = gl_FragCoord.xy / uResolution.xy;
     vec2 center = vec2(0.5 * uResolution.x / uResolution.y, 0.5);
     vec2 screen = turn(gl_FragCoord.xy / uResolution.y, center);
     vec2 cursor = turn(uCursor.xy, center);
+
+    // Audio Shockwave Distortion on Beat Drops / Kicks
+    if (uShockwave > 0.001) {
+      vec2 waveCenter = vec2(0.5 * uResolution.x / uResolution.y, 0.5);
+      vec2 diff = screen - waveCenter;
+      float dist = length(diff);
+      float waveDist = uShockwave * 1.5;
+      float waveThickness = 0.16;
+      float diffDist = abs(dist - waveDist);
+      if (diffDist < waveThickness) {
+        float factor = (1.0 - diffDist / waveThickness) * (1.0 - uShockwave);
+        screen += normalize(diff) * factor * 0.055;
+      }
+    }
+
+    // Audio Shockwave Distortion on Beat Drops / Kicks
+    if (uShockwave > 0.001) {
+      vec2 waveCenter = vec2(0.0, 0.5);
+      vec2 diff = vec2(X, y) - waveCenter;
+      float dist = length(diff);
+      float waveDist = uShockwave * 1.4;
+      float waveThickness = 0.15;
+      float diffDist = abs(dist - waveDist);
+      if (diffDist < waveThickness) {
+        float factor = (1.0 - diffDist / waveThickness) * (1.0 - uShockwave);
+        vec2 offset = normalize(diff) * factor * 0.05;
+        X += offset.x;
+        y += offset.y;
+      }
+    }
+
+    // Visual Mode 1: Vortex (Cosmic Spiral Warp)
+    if (uVisualMode == 1) {
+      vec2 d = screen - center;
+      float r = length(d);
+      float angle = atan(d.y, d.x);
+      float spiral = (2.4 + (uBeatPulse - 1.0) * 0.8) * exp(-r * 1.6) + uFlow * 0.35;
+      angle += spiral;
+      screen = center + vec2(cos(angle), sin(angle)) * r;
+    }
+    // Visual Mode 2: Chromatic Wave (RGB Fluid Ripple)
+    else if (uVisualMode == 2) {
+      float waveX = sin(screen.y * 7.5 + uFlow * 1.4) * 0.07 * (1.0 + (uBeatPulse - 1.0) * 0.4);
+      float waveY = cos(screen.x * 6.0 + uFlow * 1.1) * 0.05 * (1.0 + (uBeatPulse - 1.0) * 0.4);
+      screen += vec2(waveX, waveY);
+    }
+
     vec2 field = screen + uShift;
     float t = 0.4 * uFlow;
 
@@ -161,14 +220,26 @@
     }
     float boost = (1.0 + reach * near * 0.25 + pulse * 0.65) * uIntro.x;
 
-    float glow1 = auroraGlow(t, field, bend) * boost;
-    float glow2 = auroraGlow(t + uLayerOffset, field, bend) * boost;
-    vec3 gradient1 = mix(vec3(1.0), cosineGradient(uv.x + uHue * 0.2, vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.3, 0.20, 0.20)), uSpectrum);
-    vec3 gradient2 = mix(vec3(1.0), cosineGradient(uv.x + uHue * 0.1, vec3(0.5), vec3(0.5), vec3(2.0, 1.0, 0.0), vec3(0.5, 0.20, 0.25)), uSpectrum);
+    // Dynamic Chromatic Aberration & Channel Separation
+    // On beat spikes (uBeatPulse > 1.8), uAberration triggers explosive channel separation:
+    // col.r is evaluated at pos - offset, col.b is evaluated at pos + offset
+    float effAberration = uAberration;
+    if (uVisualMode == 2) {
+      effAberration = max(effAberration, 0.022 + 0.015 * sin(uFlow * 2.2));
+    } else if (uVisualMode == 1) {
+      effAberration = max(effAberration, (uBeatPulse > 1.8 ? (uBeatPulse - 1.8) * 0.03 : 0.008));
+    }
 
-    vec3 col = 0.99 * glow1 * gradient1 * uColor1;
-    col += 0.99 * glow2 * gradient2 * uColor2;
-    col *= uBrightness;
+    vec3 col;
+    if (effAberration > 0.0008) {
+      vec2 offset = vec2(effAberration, effAberration * 0.35);
+      float rCh = evalAurora(field - offset, uv - offset * 0.5, bend, boost, t).r;
+      float gCh = evalAurora(field, uv, bend, boost, t).g;
+      float bCh = evalAurora(field + offset, uv + offset * 0.5, bend, boost, t).b;
+      col = vec3(rCh, gCh, bCh);
+    } else {
+      col = evalAurora(field, uv, bend, boost, t);
+    }
 
     float grain = (fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) - 0.5) / 255.0;
     float alpha = clamp(length(col), 0.0, 1.0);
@@ -203,6 +274,10 @@
   uniform float uReveal;
   uniform float uOpacity;
   uniform float uLightMode;
+  uniform float uAberration;
+  uniform float uShockwave;
+  uniform int uVisualMode;
+  uniform float uBeatPulse;
   out vec4 outColor;
 
   vec3 permute(vec3 x) {
@@ -279,6 +354,21 @@
     float u = frag.x / uResolution.x;
     float X = (frag.x - uResolution.x * 0.5) / uResolution.y;
     float t = uTime;
+
+    // Visual Mode 1: Vortex (Cosmic Spiral Warp)
+    if (uVisualMode == 1) {
+      vec2 p = vec2(X, y - 0.5);
+      float r = length(p);
+      float a = atan(p.y, p.x) + (2.2 + (uBeatPulse - 1.0) * 0.6) * exp(-r * 1.5) + t * 0.35;
+      X = cos(a) * r;
+      y = sin(a) * r + 0.5;
+    }
+    // Visual Mode 2: Chromatic Wave
+    else if (uVisualMode == 2) {
+      X += sin(y * 8.0 + t * 1.5) * 0.08 * (1.0 + (uBeatPulse - 1.0) * 0.35);
+      y += cos(X * 6.5 + t * 1.2) * 0.06 * (1.0 + (uBeatPulse - 1.0) * 0.35);
+    }
+
     float reach = uPointer.z * exp(-pow((X - uPointer.x) / 0.38, 2.0));
 
     vec3 glow = vec3(0.0);
@@ -303,7 +393,21 @@
       float alpha = smootherstep(low, high, rise);
       float shape = smootherstep(high, low, rise);
       float tone = clamp(u + layer * 0.18 + warp * 0.1, 0.0, 1.0);
-      vec3 col = ramp(tone);
+
+      float effAberration = uAberration;
+      if (uVisualMode == 2) {
+        effAberration = max(effAberration, 0.02 + 0.015 * sin(t * 2.0));
+      }
+      vec3 col;
+      if (effAberration > 0.001) {
+        vec3 colR = ramp(clamp(tone - effAberration * 0.5, 0.0, 1.0));
+        vec3 colG = ramp(tone);
+        vec3 colB = ramp(clamp(tone + effAberration * 0.5, 0.0, 1.0));
+        col = vec3(colR.r, colG.g, colB.b);
+      } else {
+        col = ramp(tone);
+      }
+
       glow += col * shape * (0.8 + 0.3 * (1.0 - layer / float(uLayers)));
       cover = max(cover, alpha);
     }
@@ -390,16 +494,18 @@
     document.addEventListener('DOMContentLoaded', ensureCanvasAttached);
   }
   canvas.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.94;
-    mix-blend-mode: screen;
-    transition: opacity 0.4s ease;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+    opacity: 0.94 !important;
+    mix-blend-mode: screen !important;
+    transition: opacity 0.4s ease !important;
   `;
 
   const gl = canvas.getContext('webgl2', {
@@ -477,7 +583,11 @@
         uTilt: gl.getUniformLocation(softProgram, 'uTilt'),
         uIntro: gl.getUniformLocation(softProgram, 'uIntro'),
         uLightMode: gl.getUniformLocation(softProgram, 'uLightMode'),
-        uOpacity: gl.getUniformLocation(softProgram, 'uOpacity')
+        uOpacity: gl.getUniformLocation(softProgram, 'uOpacity'),
+        uAberration: gl.getUniformLocation(softProgram, 'uAberration'),
+        uShockwave: gl.getUniformLocation(softProgram, 'uShockwave'),
+        uVisualMode: gl.getUniformLocation(softProgram, 'uVisualMode'),
+        uBeatPulse: gl.getUniformLocation(softProgram, 'uBeatPulse')
       }
     };
   }
@@ -520,7 +630,11 @@
         uPointer: gl.getUniformLocation(curtainProgram, 'uPointer'),
         uReveal: gl.getUniformLocation(curtainProgram, 'uReveal'),
         uOpacity: gl.getUniformLocation(curtainProgram, 'uOpacity'),
-        uLightMode: gl.getUniformLocation(curtainProgram, 'uLightMode')
+        uLightMode: gl.getUniformLocation(curtainProgram, 'uLightMode'),
+        uAberration: gl.getUniformLocation(curtainProgram, 'uAberration'),
+        uShockwave: gl.getUniformLocation(curtainProgram, 'uShockwave'),
+        uVisualMode: gl.getUniformLocation(curtainProgram, 'uVisualMode'),
+        uBeatPulse: gl.getUniformLocation(curtainProgram, 'uBeatPulse')
       }
     };
   }
@@ -648,10 +762,82 @@
       ambientGlow: 'rgba(255, 0, 85, 0.55)',
       laserSpeed: '1.5s',
       mode: 'dual-counter'
+    },
+    {
+      id: 'supernova-gold',
+      name: 'SUPERNOVA CELESTIAL GOLD',
+      tag: 'CELESTIAL GOLD & SUPERMASSIVE WHITE STROBE',
+      icon: '🌟',
+      soft: { c1: '#ffd700', c2: '#ffffff', spectrum: 0.95, bandHeight: 0.50 },
+      curtain: ['#ffd700', '#fff3b0', '#ffffff', '#ffaa00', '#ffd700'],
+      borderGradient: 'linear-gradient(90deg, #ffd700, #fff8db, #ffffff, #ffaa00, #ffd700)',
+      ambientGlow: 'rgba(255, 215, 0, 0.55)',
+      laserSpeed: '1.5s',
+      mode: 'corner-strobing'
+    },
+    {
+      id: 'interstellar-void',
+      name: 'INTERSTELLAR VOID',
+      tag: 'DEEP SPACE OBSIDIAN & COBALT STARLIGHT',
+      icon: '🌌',
+      soft: { c1: '#002b5c', c2: '#00d4ff', spectrum: 0.88, bandHeight: 0.52 },
+      curtain: ['#020b14', '#002b5c', '#0052cc', '#00d4ff', '#020b14'],
+      borderGradient: 'linear-gradient(90deg, #020b14, #002b5c, #0052cc, #00d4ff, #ffffff, #002b5c)',
+      ambientGlow: 'rgba(0, 212, 255, 0.45)',
+      laserSpeed: '2.5s',
+      mode: 'wave-oscillate'
+    },
+    {
+      id: 'hyper-pop-bubblegum',
+      name: 'HYPER-POP BUBBLEGUM',
+      tag: 'ELECTRIC CANDY PASTEL SURGE',
+      icon: '🍬',
+      soft: { c1: '#ff69b4', c2: '#00ffff', spectrum: 1.0, bandHeight: 0.48 },
+      curtain: ['#ff69b4', '#ff1493', '#ffc0cb', '#00ffff', '#ff69b4'],
+      borderGradient: 'linear-gradient(90deg, #ff69b4, #ff1493, #ffffff, #00ffff, #ff69b4)',
+      ambientGlow: 'rgba(255, 105, 180, 0.55)',
+      laserSpeed: '1.6s',
+      mode: 'dual-counter'
+    },
+    {
+      id: 'volcanic-magma',
+      name: 'VOLCANIC MAGMA',
+      tag: 'MOLTEN OBSIDIAN & INCANDESCENT EMBER',
+      icon: '🌋',
+      soft: { c1: '#ff2200', c2: '#ff8800', spectrum: 0.92, bandHeight: 0.46 },
+      curtain: ['#1f0400', '#ff2200', '#ff6600', '#ffcc00', '#1f0400'],
+      borderGradient: 'linear-gradient(90deg, #ff2200, #ff6600, #ffcc00, #ffffff, #1f0400, #ff2200)',
+      ambientGlow: 'rgba(255, 68, 0, 0.60)',
+      laserSpeed: '1.9s',
+      mode: 'perimeter-pulse'
+    },
+    {
+      id: 'glitch-cyberpunk',
+      name: 'GLITCH CYBERPUNK',
+      tag: 'ANARCHIC NEON & CHROMATIC SPLIT',
+      icon: '⚡',
+      soft: { c1: '#ff003c', c2: '#00f0ff', spectrum: 1.0, bandHeight: 0.51 },
+      curtain: ['#ff003c', '#00f0ff', '#fcee0a', '#05d9e8', '#ff003c'],
+      borderGradient: 'linear-gradient(90deg, #ff003c, #fcee0a, #00f0ff, #ffffff, #ff003c)',
+      ambientGlow: 'rgba(255, 0, 60, 0.55)',
+      laserSpeed: '1.2s',
+      mode: 'corner-strobing'
+    },
+    {
+      id: 'radioactive-isotope',
+      name: 'RADIOACTIVE ISOTOPE',
+      tag: 'PHOSPHORESCENT GREEN & ELECTRIC TURQUOISE',
+      icon: '☢️',
+      soft: { c1: '#39ff14', c2: '#00ffcc', spectrum: 0.95, bandHeight: 0.53 },
+      curtain: ['#003300', '#39ff14', '#00ffcc', '#76ff03', '#003300'],
+      borderGradient: 'linear-gradient(90deg, #39ff14, #00ffcc, #ffffff, #76ff03, #39ff14)',
+      ambientGlow: 'rgba(57, 255, 20, 0.55)',
+      laserSpeed: '1.7s',
+      mode: 'conic-sweep'
     }
   ];
 
-  // Aliases for 10 Harmonic Mood Palettes matching RGB Aurora Border Patterns
+  // Aliases for 16 Harmonic Mood Palettes matching RGB Aurora Border Patterns
   const MOOD_PALETTES = AURORA_PATTERNS;
   window.MOOD_PALETTES = MOOD_PALETTES;
   window.AURORA_PATTERNS = AURORA_PATTERNS;
@@ -685,10 +871,10 @@
   let paletteTransitionElapsed = PALETTE_TRANSITION_DURATION;
   let activePatternIdx = 0;
 
-  // Active effect mode: 'auto' | 'soft' | 'curtain' | 'fusion'
+  // Active effect mode: 'auto' | 'soft' | 'curtain' | 'fusion' | 'vortex' | 'chromatic-wave'
   let auroraMode = localStorage.getItem('audify_aurora_mode') || 'auto';
   let activeEffect = 'soft'; // Currently running effect in auto mode
-  const AUTO_EFFECT_CYCLE = ['soft', 'curtain', 'fusion'];
+  const AUTO_EFFECT_CYCLE = ['soft', 'curtain', 'fusion', 'vortex', 'chromatic-wave'];
 
   // -----------------------------------------------------------------------
   // 5. Perimeter RGB Aurora Border, Shockwave & Toast Injection
@@ -1541,7 +1727,7 @@
       }
     }
     if (window.__audifyBorderInstance?.onRenderFrame) {
-      window.__audifyBorderInstance.onRenderFrame(beatPulse);
+      window.__audifyBorderInstance.onRenderFrame(beatPulse, beatData);
     }
 
     // Palette transition: 0.0 -> 1.0 over 1.2s using ease-out cubic curve (1 - (1-t)^3)
@@ -1608,9 +1794,17 @@
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     const whichEffect = auroraMode === 'auto' ? activeEffect : auroraMode;
+    let visualModeInt = 0;
+    if (whichEffect === 'vortex') {
+      visualModeInt = 1;
+    } else if (whichEffect === 'chromatic-wave') {
+      visualModeInt = 2;
+    }
+    const aberration = beatPulse > 1.8 ? Math.min(0.05, (beatPulse - 1.8) * 0.028) : 0.0;
 
     // RENDER 1: SoftAurora Shader (Zero per-frame allocations)
-    if ((whichEffect === 'soft' || whichEffect === 'fusion') && softShader) {
+    const isSoftActive = whichEffect === 'soft' || whichEffect === 'fusion' || whichEffect === 'vortex' || whichEffect === 'chromatic-wave';
+    if (isSoftActive && softShader) {
       gl.useProgram(softShader.program);
       gl.bindVertexArray(softVao);
       const u = softShader.uniforms;
@@ -1649,12 +1843,32 @@
       gl.uniform1f(u.uTilt, 0.0);
       gl.uniform3f(u.uIntro, 1.0, 1.0, 1.0);
       gl.uniform1f(u.uLightMode, 0.0);
-      gl.uniform1f(u.uOpacity, whichEffect === 'fusion' ? 0.65 : 0.95);
+      // Audio Shockwave Progression
+      let shockwaveVal = 0.0;
+      if (beatData && (beatData.rawKick > 0.72 || (beatData.barPhase < 0.04 && beatData.rawKick > 0.42))) {
+        if (typeof shockwaveTimer === 'undefined' || shockwaveTimer <= 0) {
+          shockwaveTimer = 0.001;
+        }
+      }
+      if (typeof shockwaveTimer !== 'undefined' && shockwaveTimer > 0) {
+        shockwaveTimer += dt;
+        shockwaveVal = Math.min(1.0, shockwaveTimer / 0.65);
+        if (shockwaveVal >= 1.0) {
+          shockwaveTimer = 0.0;
+          shockwaveVal = 0.0;
+        }
+      }
+      if (u.uShockwave) gl.uniform1f(u.uShockwave, shockwaveVal);
+      gl.uniform1f(u.uAberration, aberration);
+      gl.uniform1i(u.uVisualMode, visualModeInt);
+      gl.uniform1f(u.uBeatPulse, beatPulse);
+      gl.uniform1f(u.uOpacity, whichEffect === 'fusion' ? 0.65 : (whichEffect === 'vortex' ? 0.75 : (whichEffect === 'chromatic-wave' ? 0.80 : 0.95)));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
     // RENDER 2: Curtain Aurora Shader (Zero per-frame allocations)
-    if ((whichEffect === 'curtain' || whichEffect === 'fusion') && curtainShader) {
+    const isCurtainActive = whichEffect === 'curtain' || whichEffect === 'fusion' || whichEffect === 'vortex' || whichEffect === 'chromatic-wave';
+    if (isCurtainActive && curtainShader) {
       gl.useProgram(curtainShader.program);
       gl.bindVertexArray(curtainVao);
       const u = curtainShader.uniforms;
@@ -1684,7 +1898,26 @@
       gl.uniform1f(u.uFlip, 0.0);
       gl.uniform3f(u.uPointer, curtainState.px, curtainState.py, curtainState.reach);
       gl.uniform1f(u.uReveal, 1.0);
-      gl.uniform1f(u.uOpacity, whichEffect === 'fusion' ? 0.55 : 0.95);
+      // Audio Shockwave Progression
+      let shockwaveVal = 0.0;
+      if (beatData && (beatData.rawKick > 0.72 || (beatData.barPhase < 0.04 && beatData.rawKick > 0.42))) {
+        if (typeof shockwaveTimer === 'undefined' || shockwaveTimer <= 0) {
+          shockwaveTimer = 0.001;
+        }
+      }
+      if (typeof shockwaveTimer !== 'undefined' && shockwaveTimer > 0) {
+        shockwaveTimer += dt;
+        shockwaveVal = Math.min(1.0, shockwaveTimer / 0.65);
+        if (shockwaveVal >= 1.0) {
+          shockwaveTimer = 0.0;
+          shockwaveVal = 0.0;
+        }
+      }
+      if (u.uShockwave) gl.uniform1f(u.uShockwave, shockwaveVal);
+      gl.uniform1f(u.uAberration, aberration);
+      gl.uniform1i(u.uVisualMode, visualModeInt);
+      gl.uniform1f(u.uBeatPulse, beatPulse);
+      gl.uniform1f(u.uOpacity, whichEffect === 'fusion' ? 0.55 : (whichEffect === 'vortex' ? 0.60 : (whichEffect === 'chromatic-wave' ? 0.65 : 0.95)));
       gl.uniform1f(u.uLightMode, 0.0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
@@ -1885,10 +2118,13 @@
   };
 
   window.setAudifyAuroraMode = function (mode) {
-    auroraMode = mode;
-    localStorage.setItem('audify_aurora_mode', mode);
-    const label = document.getElementById('audify-aurora-label');
-    if (label) label.textContent = getAuroraModeLabel(mode);
+    const validModes = ['auto', 'soft', 'curtain', 'fusion', 'vortex', 'chromatic-wave'];
+    if (validModes.includes(mode)) {
+      auroraMode = mode;
+      localStorage.setItem('audify_aurora_mode', mode);
+      const label = document.getElementById('audify-aurora-label');
+      if (label) label.textContent = getAuroraModeLabel(mode);
+    }
   };
 
   function getMixStyleLabel(style) {
@@ -1904,13 +2140,22 @@
 
   function getAuroraModeLabel(mode) {
     if (mode === 'auto') {
-      const effectName = activeEffect === 'soft' ? 'SOFT' : activeEffect === 'curtain' ? 'CURTAIN' : 'FUSION';
+      const effectMap = {
+        soft: 'SOFT',
+        curtain: 'CURTAIN',
+        fusion: 'FUSION',
+        vortex: 'VORTEX',
+        'chromatic-wave': 'CHROMATIC'
+      };
+      const effectName = effectMap[activeEffect] || 'SOFT';
       return `🔀 AUTO (${effectName})`;
     }
     const map = {
       soft: '✨ SOFT AURORA',
       curtain: '🌠 CURTAIN RIBBONS',
-      fusion: '🎆 HYBRID FUSION'
+      fusion: '🎆 HYBRID FUSION',
+      vortex: '🌀 COSMIC VORTEX',
+      'chromatic-wave': '🌈 CHROMATIC WAVE'
     };
     return map[mode] || '🔀 AUTO-SYNC';
   }
@@ -1988,7 +2233,8 @@
         margin-right: 14px !important;
         position: relative !important;
         z-index: 50 !important;
-        flex-shrink: 0 !important;
+        flex-shrink: 1 !important;
+        max-width: 100% !important;
       }
 
       .squeeze {
@@ -2062,6 +2308,26 @@
         border-color: #D4FF00 !important;
         background: rgba(212, 255, 0, 0.18) !important;
         box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 22px rgba(212, 255, 0, 0.4) !important;
+      }
+
+      #audify-mini-spectrum-canvas {
+        display: inline-block !important;
+        width: 44px !important;
+        height: 16px !important;
+        border-radius: 4px !important;
+        background: rgba(0, 0, 0, 0.55) !important;
+        border: 1px solid rgba(212, 255, 0, 0.28) !important;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+        vertical-align: middle !important;
+        pointer-events: none !important;
+        margin-left: 4px !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+      }
+      #audify-eq-btn:hover #audify-mini-spectrum-canvas,
+      #audify-eq-btn:active #audify-mini-spectrum-canvas,
+      #audify-eq-btn.active #audify-mini-spectrum-canvas {
+        border-color: rgba(212, 255, 0, 0.8) !important;
+        box-shadow: 0 0 12px rgba(212, 255, 0, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.8) !important;
       }
 
       .audify-pill-tag-aurora {
@@ -2296,6 +2562,8 @@
             <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="soft"><span>✨ SOFT AURORA (3D Perlin)</span></div>
             <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="curtain"><span>🌠 CURTAIN RIBBONS (OKLab)</span></div>
             <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="fusion"><span>🎆 HYBRID FUSION</span></div>
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="vortex"><span>🌀 COSMIC VORTEX</span></div>
+            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="chromatic-wave"><span>🌈 CHROMATIC WAVE</span></div>
           </div>
         </div>
 
@@ -2319,6 +2587,7 @@
         <div style="position:relative;display:inline-block">
           <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
             <span>🎚️ FX / EQ</span>
+            <canvas id="audify-mini-spectrum-canvas" width="88" height="32" class="audify-mini-spectrum" aria-hidden="true"></canvas>
           </button>
         </div>
       `;
@@ -2331,6 +2600,7 @@
         eqWrapper.innerHTML = `
           <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
             <span>🎚️ FX / EQ</span>
+            <canvas id="audify-mini-spectrum-canvas" width="88" height="32" class="audify-mini-spectrum" aria-hidden="true"></canvas>
           </button>
         `;
         pillGroup.appendChild(eqWrapper);
@@ -2363,6 +2633,102 @@
       targetHeader.appendChild(pillGroup);
     }
   }
+
+  // -----------------------------------------------------------------------
+  // Live Miniature 16-Bar Audio Spectrum Visualizer Loop
+  // HiDPI Retina Precision, Real-Time Frequency Bouncing & Gravity Falloff
+  // -----------------------------------------------------------------------
+  const miniPeakVals = new Float32Array(16);
+  const miniPeakSpeeds = new Float32Array(16);
+  const miniPeakHolds = new Int16Array(16);
+  const miniSmoothed = new Float32Array(16);
+  let miniSpectrumRunning = false;
+
+  function renderMiniSpectrum() {
+    requestAnimationFrame(renderMiniSpectrum);
+    const canvas = document.getElementById('audify-mini-spectrum-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const targetW = Math.floor((rect.width > 0 ? rect.width : 44) * dpr);
+    const targetH = Math.floor((rect.height > 0 ? rect.height : 16) * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const spectrum = (window.__audify_beat_analyzer && typeof window.__audify_beat_analyzer.getSpectrum === 'function')
+      ? window.__audify_beat_analyzer.getSpectrum()
+      : null;
+
+    const now = performance.now() * 0.003;
+    const numBars = 16;
+    const spacing = Math.max(1, Math.floor(1.2 * dpr));
+    const barWidth = Math.max(1, Math.floor((w - (numBars - 1) * spacing) / numBars));
+
+    // Gradient: Neon Acid Lime -> Electric Cyan -> Hot Magenta
+    const grad = ctx.createLinearGradient(0, h, 0, 0);
+    grad.addColorStop(0.0, '#D4FF00');
+    grad.addColorStop(0.55, '#00F0FF');
+    grad.addColorStop(1.0, '#FF007F');
+
+    for (let i = 0; i < numBars; i++) {
+      let raw = (spectrum && spectrum[i] !== undefined) ? spectrum[i] : 0;
+      if (!raw || raw < 0.04) {
+        // Subtle ambient dancing wave so visualizer feels tactile even before playback
+        raw = 0.08 + 0.06 * Math.sin(now * 2.5 + i * 0.45);
+      }
+      const targetVal = Math.min(1.0, Math.max(0.04, raw));
+
+      if (targetVal > miniSmoothed[i]) {
+        miniSmoothed[i] += (targetVal - miniSmoothed[i]) * 0.75;
+      } else {
+        miniSmoothed[i] += (targetVal - miniSmoothed[i]) * 0.2;
+      }
+      const val = miniSmoothed[i];
+
+      // Floating peak falloff calculation
+      if (val >= miniPeakVals[i]) {
+        miniPeakVals[i] = val;
+        miniPeakSpeeds[i] = 0;
+        miniPeakHolds[i] = 12;
+      } else {
+        if (miniPeakHolds[i] > 0) {
+          miniPeakHolds[i]--;
+        } else {
+          miniPeakSpeeds[i] += 0.0035 * dpr;
+          miniPeakVals[i] = Math.max(val, miniPeakVals[i] - miniPeakSpeeds[i]);
+        }
+      }
+
+      const barH = Math.max(2 * dpr, val * (h - 3 * dpr));
+      const x = i * (barWidth + spacing);
+      const y = h - barH;
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, barWidth, barH);
+
+      // Peak LED dot in luminous white
+      const peakY = h - Math.max(2 * dpr, miniPeakVals[i] * (h - 3 * dpr)) - 2 * dpr;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x, Math.max(0, peakY), barWidth, Math.max(1, 1.5 * dpr));
+    }
+  }
+
+  function startMiniSpectrum() {
+    if (miniSpectrumRunning) return;
+    miniSpectrumRunning = true;
+    requestAnimationFrame(renderMiniSpectrum);
+  }
+  window.__audify_init_mini_spectrum = startMiniSpectrum;
+  startMiniSpectrum();
 
   injectPlayerControls();
   if (document.readyState === 'loading') {

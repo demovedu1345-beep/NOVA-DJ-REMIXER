@@ -2138,7 +2138,7 @@ function renderWizard() {
         <p class="mt-12 text-lg text-white/40">
           <a id="link-party-lists" href="/songs" class="underline hover:text-white cursor-pointer">Song lists</a> · <a href="/privacy" class="underline hover:text-white">Privacy</a> · <a href="/terms" class="underline hover:text-white">Terms</a>
         </p>
-        <p class="mt-4 text-lg text-white/50">Made with ❤️ By Vedant</p>
+        <p class="mt-4 text-lg text-white/50">Made With ❤️By Vedant & Kishu</p>
       </section>
     `;
   } else if (step === 1) {

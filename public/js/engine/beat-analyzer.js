@@ -19,8 +19,10 @@
   // Load from LocalStorage
   let settings = { ...DEFAULT_SETTINGS };
   try {
-    const saved = localStorage.getItem('audify_eq_settings');
-    if (saved) settings = { ...settings, ...JSON.parse(saved) };
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('audify_eq_settings');
+      if (saved) settings = { ...settings, ...JSON.parse(saved) };
+    }
   } catch (_) {}
 
   // Web Audio EQ Nodes
@@ -42,6 +44,18 @@
   let prevBassEnergy = 0;
   let isBeatSpikeActive = false;
 
+  // Sub-Millisecond Phase-Locked Loop (PLL) Tracking State
+  let pllEstimatedTime = 0;
+  let lastRawTime = -1;
+  let lastRawTimeMs = 0;
+  let pllInitialized = false;
+
+  // Multi-Band Beat Separation Channels
+  let rawKick = 0.0;
+  let rawSnare = 0.0;
+  let rawDrop = 0.0;
+  let rawHiHat = 0.0;
+
   // 16-Bar Spectrum FFT Visualizer Buffer
   const spectrum16Bars = new Float32Array(16);
 
@@ -49,6 +63,9 @@
   const beatResult = {
     beatEnergy: 1.0,
     rawKick: 0.0,
+    rawSnare: 0.0,
+    rawDrop: 0.0,
+    rawHiHat: 0.0,
     beatPhase: 0.0,
     barPhase: 0.0,
     bpm: 124,
@@ -131,51 +148,120 @@
 
   // Real-Time Beat Analyzer Step (called inside 60 FPS requestAnimationFrame render loop)
   function analyzeBeat(dt, nowMs) {
+    const safeDt = (typeof dt === 'number' && Number.isFinite(dt) && dt > 0 && dt < 0.25) ? dt : 0.0166;
+    const safeNowMs = (typeof nowMs === 'number' && Number.isFinite(nowMs)) ? nowMs : (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
     const engine = window.__nauxEngine;
     const liveDeck = engine?.liveDeck?.();
     const player = liveDeck?.player;
-    const cue = liveDeck?.cue;
+    const cue = liveDeck?.cue || liveDeck?.track || engine?.currentTrack;
 
-    let kickImpulse = 0;
+    // Detect if live audio source is actively playing
+    let isPlaying = false;
+    let rawSec = 0;
+    let hasPlayer = false;
 
-    // Check if live player is playing
-    const isPlaying = player && !engine?.paused && typeof player.getCurrentTime === 'function';
+    if (player && typeof player.getCurrentTime === 'function') {
+      hasPlayer = true;
+      try {
+        rawSec = player.getCurrentTime() || 0;
+        const playerState = (typeof player.getPlayerState === 'function') ? player.getPlayerState() : -1;
+        const isEnginePaused = Boolean(engine?.paused);
+        // YouTube states: 1 = PLAYING, 3 = BUFFERING, -1 = UNSTARTED/ACTIVE
+        isPlaying = !isEnginePaused && (playerState === 1 || playerState === -1 || playerState === 3);
+      } catch (_) {
+        isPlaying = false;
+      }
+    } else if (liveDeck && typeof liveDeck.position === 'number') {
+      hasPlayer = true;
+      rawSec = liveDeck.position || 0;
+      isPlaying = !engine?.paused && (liveDeck.status === 'live' || liveDeck.status === 'playing');
+    }
 
-    if (isPlaying) {
-      const currSec = player.getCurrentTime() || 0;
-      lastPlaybackTime = currSec;
+    if (isPlaying && hasPlayer) {
+      // ---------------------------------------------------------------------
+      // 1. Sub-Millisecond Phase-Locked Loop (PLL)
+      // ---------------------------------------------------------------------
+      // YouTube iframe player.getCurrentTime() only refreshes every ~200-250ms.
+      // Continuous free-running estimation (pllEstimatedTime += safeDt) provides
+      // fluid 60-120 FPS tracking that gently slews toward rawSec when YouTube ticks.
+      if (!pllInitialized || lastRawTime < 0) {
+        // Initial lock / snap to player time
+        pllEstimatedTime = Math.max(0, rawSec);
+        lastRawTime = rawSec;
+        lastRawTimeMs = safeNowMs;
+        pllInitialized = true;
+      } else {
+        const rawTimeDelta = rawSec - lastRawTime;
 
-      // Extract Track BPM
-      const trackBpm = (cue && cue.bpm && cue.bpm >= 60 && cue.bpm <= 220) ? cue.bpm : 124;
+        if (rawTimeDelta !== 0) {
+          // YouTube reported a new tick or user sought
+          if (rawTimeDelta < -0.05 || Math.abs(rawSec - pllEstimatedTime) > 0.4) {
+            // Significant jump or seek: re-anchor immediately
+            pllEstimatedTime = Math.max(0, rawSec);
+          } else {
+            // Gentle PLL phase slew (proportional loop filter):
+            // Smoothly pull estimated time toward raw time without stepping
+            const phaseError = rawSec - pllEstimatedTime;
+            pllEstimatedTime += phaseError * 0.35;
+          }
+          lastRawTime = rawSec;
+          lastRawTimeMs = safeNowMs;
+        } else {
+          // Sub-250ms interval: advance continuously at display refresh rate
+          pllEstimatedTime += safeDt;
+
+          // Anti-runaway guard: prevent runaway drift if playback stalled
+          const timeSinceTick = (safeNowMs - lastRawTimeMs) * 0.001;
+          if (timeSinceTick > 0.5 && pllEstimatedTime > lastRawTime + 0.5) {
+            pllEstimatedTime = lastRawTime + 0.5;
+          }
+        }
+      }
+      lastPlaybackTime = pllEstimatedTime;
+
+      // ---------------------------------------------------------------------
+      // 2. Dynamic BPM & Beat Phase Extraction
+      // ---------------------------------------------------------------------
+      const rawBpm = cue?.bpm ?? cue?.tempo ?? 124;
+      const trackBpm = (typeof rawBpm === 'number' && Number.isFinite(rawBpm) && rawBpm >= 40 && rawBpm <= 240) ? rawBpm : 124;
       currentBpm = trackBpm;
 
-      // Sub-millisecond Beat Phase Tracking
       const beatDuration = 60.0 / currentBpm;
       const barDuration = beatDuration * 4.0;
 
-      // Modulo arithmetic with entry offset
-      const offset = (cue && cue.entrySec) || 0;
-      let beatElapsed = (currSec - offset) % beatDuration;
+      const offset = (cue && typeof cue.entrySec === 'number')
+        ? cue.entrySec
+        : ((cue && typeof cue.hookStartSec === 'number') ? cue.hookStartSec : 0);
+
+      let beatElapsed = (pllEstimatedTime - offset) % beatDuration;
       if (beatElapsed < 0) beatElapsed += beatDuration;
       beatPhase = beatElapsed / beatDuration; // 0.0 -> 1.0 within beat
 
-      let barElapsed = (currSec - offset) % barDuration;
+      let barElapsed = (pllEstimatedTime - offset) % barDuration;
       if (barElapsed < 0) barElapsed += barDuration;
       barPhase = barElapsed / barDuration;   // 0.0 -> 1.0 within 4-beat bar
 
-      // 1. Kick Drum Downbeat Impulse: Sharp exponential onset attack & decay
-      // Peaks at 1.0 exactly at beat start, drops to 0.1 within 80ms
-      kickImpulse = Math.exp(-beatPhase * 9.5);
+      // ---------------------------------------------------------------------
+      // 3. Multi-Band Beat Separation
+      // ---------------------------------------------------------------------
+      // Sub-bass kick (downbeat attack: rawKick = Math.exp(-beatPhase * 11.0))
+      rawKick = Math.exp(-beatPhase * 11.0);
 
-      // 2. Snare / Clapping Backbeat Impulse: peaks on beats 2 & 4
+      // Snare/clap backbeat on beats 2 & 4
       const beatNumber = Math.floor(barPhase * 4.0);
-      const isBackbeat = beatNumber === 1 || beatNumber === 3;
-      const snareImpulse = isBackbeat ? Math.exp(-beatPhase * 8.0) * 0.75 : 0;
+      const isBackbeat = (beatNumber === 1 || beatNumber === 3);
+      rawSnare = isBackbeat ? Math.exp(-beatPhase * 9.0) * 0.8 : 0.0;
 
-      // 3. Drop & Downbeat Measure Impact: massive pulse on beat 1 of each bar
-      const barDropImpulse = Math.exp(-barPhase * 5.0) * 0.9;
+      // Bar drop impact on beat 1 of each 4-beat bar
+      rawDrop = Math.exp(-barPhase * 4.5) * 1.3;
 
+      // Hi-hat shimmer on 1/8th and 1/16th notes
+      rawHiHat = Math.abs(Math.sin(beatPhase * Math.PI * 4.0)) * 0.4;
+
+      // ---------------------------------------------------------------------
       // 4. Web Audio Real-Time FFT Spectral Flux
+      // ---------------------------------------------------------------------
       let currentBassEnergy = 0;
       if (analyserNode && freqDataArray) {
         analyserNode.getByteFrequencyData(freqDataArray);
@@ -188,32 +274,42 @@
         const step = Math.floor(freqDataArray.length / 24);
         for (let b = 0; b < 16; b++) {
           const raw = freqDataArray[b * step] / 255.0;
-          spectrum16Bars[b] += (raw - spectrum16Bars[b]) * Math.min(1.0, dt * 12.0);
+          spectrum16Bars[b] += (raw - spectrum16Bars[b]) * Math.min(1.0, safeDt * 12.0);
         }
       } else {
-        // Fallback synthetic spectrum animated to beat phase
+        // Fallback synthetic spectrum animated to multi-band beat phase
         for (let b = 0; b < 16; b++) {
           const freqCurve = Math.max(0, 1.0 - (b / 16.0) * 0.6);
-          const barVal = (kickImpulse * 0.8 + barDropImpulse * 0.4) * freqCurve * (0.6 + 0.4 * Math.sin(currSec * 8.0 + b));
-          spectrum16Bars[b] += (barVal - spectrum16Bars[b]) * Math.min(1.0, dt * 14.0);
+          const shimmer = (b >= 8) ? (rawHiHat * 1.5) : (rawKick * 0.9 + rawDrop * 0.4);
+          const barVal = shimmer * freqCurve * (0.6 + 0.4 * Math.sin(pllEstimatedTime * 8.0 + b));
+          spectrum16Bars[b] += (barVal - spectrum16Bars[b]) * Math.min(1.0, safeDt * 14.0);
         }
       }
 
       // Spectral Flux Delta
       const bassFlux = Math.max(0, currentBassEnergy - prevBassEnergy);
       prevBassEnergy = currentBassEnergy;
-      smoothedBassFlux += (bassFlux - smoothedBassFlux) * Math.min(1.0, dt * 8.0);
+      smoothedBassFlux += (bassFlux - smoothedBassFlux) * Math.min(1.0, safeDt * 8.0);
 
-      // 5. Combine into Unified Physical Beat Energy
-      const bassMultiplier = 1.0 + (settings.bass / 12.0) * 0.6; // Scale with Bass EQ
-      const rawBeat = (kickImpulse * 1.35 + barDropImpulse * 1.1 + snareImpulse * 0.6 + smoothedBassFlux * 1.8) * bassMultiplier;
+      // ---------------------------------------------------------------------
+      // 5. Combine into Explosive Unified beatEnergy
+      // ---------------------------------------------------------------------
+      // Scale with user bass boost and reactivity multiplier (up to 3.0x)
+      const bassBoostFactor = Math.max(0.2, 1.0 + (settings.bass / 12.0) * 0.65);
+      const combinedBeat = (
+        rawKick * 1.35 * bassBoostFactor +
+        rawDrop * 1.15 * bassBoostFactor +
+        rawSnare * 0.85 +
+        rawHiHat * 0.6 +
+        smoothedBassFlux * 1.75 * bassBoostFactor
+      );
 
-      // Scale by user beat reactivity setting
-      beatEnergy = rawBeat * settings.reactivity;
+      const reactivityMultiplier = Math.max(0.5, Math.min(3.0, settings.reactivity || 1.8));
+      beatEnergy = combinedBeat * reactivityMultiplier;
 
       // Trigger high-energy wave pulses when a strong beat strikes
-      if (beatEnergy > 1.6 && nowMs - lastOnsetMs > 180) {
-        lastOnsetMs = nowMs;
+      if (beatEnergy > 1.6 && safeNowMs - lastOnsetMs > 180) {
+        lastOnsetMs = safeNowMs;
         isBeatSpikeActive = true;
 
         // Dispatch pulse to SoftAurora shader wave ripples
@@ -227,25 +323,53 @@
         isBeatSpikeActive = false;
       }
     } else {
-      // Resting idle beat pulse (smooth breathing)
-      beatEnergy = 0.15 + 0.1 * Math.sin(nowMs * 0.003);
+      // Audio paused or idle: reset PLL tracking state for clean restart
+      if (hasPlayer && rawSec >= 0) {
+        pllEstimatedTime = rawSec;
+        lastRawTime = rawSec;
+      }
+      pllInitialized = false;
+
+      // Subtle organic "heartbeat" ambient breathing pulse (0.25 amplitude at 0.5 Hz)
+      // 0.5 Hz period = 2.0s cardiac cycle
+      const cardiacPhase = ((safeNowMs * 0.001 * 0.5) % 1.0 + 1.0) % 1.0;
+      const lub = Math.exp(-Math.pow((cardiacPhase - 0.08) * 22.0, 2));
+      const dub = Math.exp(-Math.pow((cardiacPhase - 0.22) * 24.0, 2)) * 0.68;
+      const heartbeatSignal = lub + dub;
+
+      beatEnergy = 0.10 + 0.25 * heartbeatSignal;
+      rawKick = 0.25 * lub;
+      rawSnare = 0.18 * dub;
+      rawDrop = 0.0;
+      rawHiHat = 0.06 * Math.abs(Math.sin(cardiacPhase * Math.PI * 4.0));
+      beatPhase = cardiacPhase;
+      barPhase = ((safeNowMs * 0.001 * 0.125) % 1.0 + 1.0) % 1.0;
+      isBeatSpikeActive = false;
+
+      // Ambient breathing undulation across 16 spectrum visualizer bars
       for (let b = 0; b < 16; b++) {
-        spectrum16Bars[b] += (0.05 - spectrum16Bars[b]) * Math.min(1.0, dt * 4.0);
+        const barTarget = 0.035 + (0.075 * (1.0 - (b / 16.0) * 0.5)) * (0.4 + 0.6 * heartbeatSignal);
+        spectrum16Bars[b] += (barTarget - spectrum16Bars[b]) * Math.min(1.0, safeDt * 5.0);
       }
     }
 
     // Zero-allocation precomputed result
     beatResult.beatEnergy = beatEnergy;
-    beatResult.rawKick = kickImpulse;
+    beatResult.rawKick = rawKick;
+    beatResult.rawSnare = rawSnare;
+    beatResult.rawDrop = rawDrop;
+    beatResult.rawHiHat = rawHiHat;
     beatResult.beatPhase = beatPhase;
     beatResult.barPhase = barPhase;
     beatResult.bpm = currentBpm;
+    beatResult.spectrum = spectrum16Bars;
     beatResult.isSpike = isBeatSpikeActive;
     return beatResult;
   }
 
   // Physical RGB Border Glow Pulse on Beat Strikes
   function pulseBorderGlow(energy) {
+    if (typeof document === 'undefined') return;
     const border = document.getElementById('audify-rgb-aurora-border');
     if (!border) return;
     const glowPx = Math.min(36, Math.floor(6 + energy * 18));
@@ -324,15 +448,20 @@
     },
     getPresets: () => PRESETS,
     getSpectrum: () => spectrum16Bars,
+    getBeatResult: () => beatResult,
+    getPllTime: () => pllEstimatedTime,
+    getCurrentBpm: () => currentBpm,
     initAudio: setupEqualizerNodes
   };
 
   // Auto-prime on user interaction
-  ['click', 'touchstart', 'keydown'].forEach(evt => {
-    window.addEventListener(evt, () => {
-      setupEqualizerNodes();
-    }, { once: true, passive: true });
-  });
+  if (typeof window.addEventListener === 'function') {
+    ['click', 'touchstart', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        setupEqualizerNodes();
+      }, { once: true, passive: true });
+    });
+  }
 
-  console.log('[Audify Beat Analyzer] Real-time beat sync & analyzer engine loaded successfully.');
+  console.log('[Audify Beat Analyzer] Real-time beat sync & PLL analyzer engine loaded successfully.');
 })();

@@ -60,7 +60,7 @@ function slugToSubtype(slug) {
   return slug.replace(/^[a-z]+-/, '');
 }
 
-function slugMatchesSubtype(slug, subtype) {
+function slugMatchesSubtype(slug, subtype, requestedLangs = []) {
   const isFull = subtype.includes(':');
   const [lang, bareSub] = isFull ? subtype.split(':') : [null, subtype];
   const s = slug.toLowerCase();
@@ -75,15 +75,25 @@ function slugMatchesSubtype(slug, subtype) {
     if (b === 'marwadi') return s.startsWith('marwadi');
     if (b === 'odia') return s.startsWith('odia');
     if (b === 'haryanvi-bhojpuri' || b === 'bhojpuri-haryanvi') return s.startsWith('haryanvi-bhojpuri');
+    return false;
   }
 
-  // Exact matching for language-prefixed slugs
+  // Strict prefix matching when language prefix is explicit
   if (lang === 'hindi') {
-    if (s === `hindi-${b}`) return true;
-    if (b === 'diwali' && s === 'diwali-party-songs') return true;
+    if (s === `hindi-${b}` || (b === 'diwali' && s === 'diwali-party-songs')) return true;
+    return false;
   }
   if (lang === 'english') {
-    if (s === `english-${b}`) return true;
+    if (s === `english-${b}` || (b === 'rock' && (s === 'english-rock' || s === 'english-classicrock'))) return true;
+    return false;
+  }
+
+  // If requested languages filter is active, respect it
+  if (requestedLangs && requestedLangs.length > 0) {
+    const onlyEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi');
+    const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english');
+    if (onlyEnglish && !s.startsWith('english')) return false;
+    if (onlyHindi && s.startsWith('english')) return false;
   }
 
   // Bare subtype matches
@@ -98,7 +108,7 @@ function slugMatchesSubtype(slug, subtype) {
   if (b === 'mass' && s === 'tamil-telugu-mass') return true;
   if (b === 'desi-beats' && s === 'haryanvi-bhojpuri-desi-beats') return true;
 
-  return s.includes(b);
+  return s.endsWith(`-${b}`) || s === b;
 }
 
 function catMatchesLang(catLang, requestedLangs) {
@@ -134,7 +144,8 @@ function shuffleArray(arr) {
 function buildSetFromCuratedDb(body) {
   const answers = body?.answers || {};
   const requestedArtist = body?.artist || answers.artist;
-  const requestedLangs = (answers.languages || (body?.lang ? [body.lang] : [])).map(l => String(l).toLowerCase());
+  const rawLangs = answers.languages || answers.language || (body?.lang ? [body.lang] : []);
+  const requestedLangs = (Array.isArray(rawLangs) ? rawLangs : [rawLangs]).map(l => String(l).toLowerCase());
   const requestedSubtypes = (answers.subtypes || (body?.kind ? [body.kind] : [])).map(s => String(s).toLowerCase());
   const energy = answers.energy || 'peak';
 
@@ -202,11 +213,14 @@ function buildSetFromCuratedDb(body) {
   let candidatePool = [];
   const allCategories = Object.values(CURATED_CATEGORIES_DB);
 
-  // 2. If specific subtypes are requested, pull from those exact categories
+  // 2. If specific subtypes are requested, pull strictly from matching categories
   if (requestedSubtypes.length > 0) {
     for (const sub of requestedSubtypes) {
       for (const cat of allCategories) {
-        if (slugMatchesSubtype(cat.slug, sub)) {
+        if (slugMatchesSubtype(cat.slug, sub, requestedLangs)) {
+          if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) {
+            continue;
+          }
           const songs = shuffleArray(cat.songs || []);
           for (const s of songs) {
             candidatePool.push({ song: s, cat });
