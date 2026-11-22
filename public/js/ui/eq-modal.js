@@ -315,6 +315,14 @@
           <canvas id="audify-spectrum-canvas" width="520" height="64"></canvas>
         </div>
 
+        <!-- Beat Sync Calibration & Precision Nudge -->
+        <div class="audify-eq-section-title">BEAT SYNC & LATENCY CALIBRATION:</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <button id="audify-sync-tap-btn" class="audify-eq-preset-btn squeeze" style="flex:1;min-width:140px;background:rgba(212,255,0,0.14);border-color:#D4FF00;color:#D4FF00;font-weight:700;">🎯 SYNC DOWNBEAT NOW</button>
+          <button id="audify-nudge-back-btn" class="audify-eq-preset-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms earlier">⏪ -50ms</button>
+          <button id="audify-nudge-fwd-btn" class="audify-eq-preset-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms later">⏩ +50ms</button>
+        </div>
+
         <!-- Quick Presets -->
         <div class="audify-eq-section-title">AUDIO & DYNAMICS PRESETS:</div>
         <div class="audify-eq-presets">
@@ -393,6 +401,34 @@
     });
 
     document.getElementById('audify-eq-close-btn').onclick = closeEqModal;
+
+    // Beat Sync Calibration Buttons
+    const syncTapBtn = document.getElementById('audify-sync-tap-btn');
+    if (syncTapBtn) {
+      syncTapBtn.onclick = () => {
+        window.__audify_beat_analyzer?.syncDownbeatNow?.();
+        syncTapBtn.textContent = '⚡ LOCKED!';
+        setTimeout(() => { syncTapBtn.textContent = '🎯 SYNC DOWNBEAT NOW'; }, 1000);
+      };
+    }
+
+    const nudgeBackBtn = document.getElementById('audify-nudge-back-btn');
+    if (nudgeBackBtn) {
+      nudgeBackBtn.onclick = () => {
+        const tot = window.__audify_beat_analyzer?.nudgeBeatPhase?.(-50) ?? -50;
+        const bpmEl = document.getElementById('audify-eq-bpm-readout');
+        if (bpmEl) bpmEl.textContent = `NUDGE: ${tot > 0 ? '+' : ''}${tot}ms`;
+      };
+    }
+
+    const nudgeFwdBtn = document.getElementById('audify-nudge-fwd-btn');
+    if (nudgeFwdBtn) {
+      nudgeFwdBtn.onclick = () => {
+        const tot = window.__audify_beat_analyzer?.nudgeBeatPhase?.(50) ?? 50;
+        const bpmEl = document.getElementById('audify-eq-bpm-readout');
+        if (bpmEl) bpmEl.textContent = `NUDGE: ${tot > 0 ? '+' : ''}${tot}ms`;
+      };
+    }
 
     // Sliders
     const bSlider = document.getElementById('audify-slider-bass');
