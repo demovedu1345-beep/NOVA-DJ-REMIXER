@@ -171,22 +171,6 @@
       }
     }
 
-    // Audio Shockwave Distortion on Beat Drops / Kicks
-    if (uShockwave > 0.001) {
-      vec2 waveCenter = vec2(0.0, 0.5);
-      vec2 diff = vec2(X, y) - waveCenter;
-      float dist = length(diff);
-      float waveDist = uShockwave * 1.4;
-      float waveThickness = 0.15;
-      float diffDist = abs(dist - waveDist);
-      if (diffDist < waveThickness) {
-        float factor = (1.0 - diffDist / waveThickness) * (1.0 - uShockwave);
-        vec2 offset = normalize(diff) * factor * 0.05;
-        X += offset.x;
-        y += offset.y;
-      }
-    }
-
     // Visual Mode 1: Vortex (Cosmic Spiral Warp)
     if (uVisualMode == 1) {
       vec2 d = screen - center;
@@ -354,6 +338,22 @@
     float u = frag.x / uResolution.x;
     float X = (frag.x - uResolution.x * 0.5) / uResolution.y;
     float t = uTime;
+
+    // Audio Shockwave Distortion on Beat Drops / Kicks
+    if (uShockwave > 0.001) {
+      vec2 waveCenter = vec2(0.0, 0.5);
+      vec2 diff = vec2(X, y) - waveCenter;
+      float dist = length(diff);
+      float waveDist = uShockwave * 1.4;
+      float waveThickness = 0.15;
+      float diffDist = abs(dist - waveDist);
+      if (diffDist < waveThickness) {
+        float factor = (1.0 - diffDist / waveThickness) * (1.0 - uShockwave);
+        vec2 offset = normalize(diff) * factor * 0.05;
+        X += offset.x;
+        y += offset.y;
+      }
+    }
 
     // Visual Mode 1: Vortex (Cosmic Spiral Warp)
     if (uVisualMode == 1) {
@@ -1704,15 +1704,16 @@
     const dt = clamp((now - lastTime) / 1000 || 0, 0, 0.05);
     lastTime = now;
 
-    // Smooth beat decay & flow velocity
-    beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 5.0);
-    flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 2.5);
+    // Smooth beat decay & flow velocity: Crisp, snappy transient envelope for high-contrast beat sync
+    beatPulse += (1.0 - beatPulse) * Math.min(1.0, dt * 8.5);
+    flowVelocity += (1.0 - flowVelocity) * Math.min(1.0, dt * 3.0);
 
     // Real-Time Master DJ Beat Analyzer & Energy Modulation
     const beatData = window.__audify_beat_analyzer ? window.__audify_beat_analyzer.update(dt, now) : null;
-    if (beatData && beatData.beatEnergy > 0) {
-      const kickImpulse = (beatData.rawKick || 0) * 0.4;
-      beatPulse = Math.max(beatPulse, 1.0 + (beatData.beatEnergy + kickImpulse) * 1.5);
+    if (beatData && beatData.beatEnergy > 0.05) {
+      const kickImpulse = (beatData.rawKick || 0) * 0.8;
+      const targetPulse = 1.0 + (beatData.beatEnergy + kickImpulse) * 1.25;
+      beatPulse = Math.max(beatPulse, targetPulse);
     }
 
     // Modulate CSS box-shadow of #audify-rgb-aurora-border using beatPulse (Zero-GC caching)
@@ -1720,7 +1721,7 @@
       borderContainerEl = document.getElementById('audify-rgb-aurora-border');
     }
     if (borderContainerEl) {
-      const glowPx = Math.round(18 + (beatPulse - 1.0) * 32);
+      const glowPx = Math.round(6 + Math.min(4.0, (beatPulse - 1.0)) * 14);
       if (glowPx !== lastBorderGlowPx) {
         lastBorderGlowPx = glowPx;
         borderContainerEl.style.boxShadow = `inset 0 0 ${glowPx}px var(--audify-border-glow), inset 0 0 ${glowPx * 2}px rgba(0, 0, 0, 0.45)`;
@@ -2502,6 +2503,43 @@
       });
     }
 
+    function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          const el = document.documentElement;
+          if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      } catch (_) {}
+    }
+
+    const fsBtn = pillGroup.querySelector('#audify-fullscreen-btn');
+    if (fsBtn && !fsBtn.__audify_wired) {
+      fsBtn.__audify_wired = true;
+      fsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllDropdowns();
+        toggleFullscreen();
+      });
+    }
+
+    const updateFsState = () => {
+      const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      document.querySelectorAll('#audify-fullscreen-btn').forEach(btn => {
+        const icon = btn.querySelector('#audify-fullscreen-icon');
+        const text = btn.querySelector('#audify-fullscreen-text');
+        if (icon) icon.textContent = isFs ? '🗗' : '⛶';
+        if (text) text.textContent = isFs ? 'EXIT' : 'FULL';
+      });
+    };
+    document.removeEventListener('fullscreenchange', updateFsState);
+    document.addEventListener('fullscreenchange', updateFsState);
+    document.removeEventListener('webkitfullscreenchange', updateFsState);
+    document.addEventListener('webkitfullscreenchange', updateFsState);
+
     if (!window.__audify_global_dropdown_listener) {
       window.__audify_global_dropdown_listener = true;
       document.addEventListener('click', (e) => {
@@ -2590,6 +2628,14 @@
             <canvas id="audify-mini-spectrum-canvas" width="88" height="32" class="audify-mini-spectrum" aria-hidden="true"></canvas>
           </button>
         </div>
+
+        <!-- Mobile & Desktop Fullscreen Mode Toggle -->
+        <div style="position:relative;display:inline-block">
+          <button id="audify-fullscreen-btn" class="audify-pill-btn squeeze" title="Toggle True Full Screen">
+            <span id="audify-fullscreen-icon">⛶</span>
+            <span id="audify-fullscreen-text">FULL</span>
+          </button>
+        </div>
       `;
       wirePillControls(pillGroup);
     } else {
@@ -2610,6 +2656,26 @@
           eqBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
+          });
+        }
+      }
+      if (!pillGroup.querySelector('#audify-fullscreen-btn')) {
+        const fsWrapper = document.createElement('div');
+        fsWrapper.style.position = 'relative';
+        fsWrapper.style.display = 'inline-block';
+        fsWrapper.innerHTML = `
+          <button id="audify-fullscreen-btn" class="audify-pill-btn squeeze" title="Toggle True Full Screen">
+            <span id="audify-fullscreen-icon">⛶</span>
+            <span id="audify-fullscreen-text">FULL</span>
+          </button>
+        `;
+        pillGroup.appendChild(fsWrapper);
+        const fsBtn = fsWrapper.querySelector('#audify-fullscreen-btn');
+        if (fsBtn && !fsBtn.__audify_wired) {
+          fsBtn.__audify_wired = true;
+          fsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFullscreen();
           });
         }
       }
@@ -2730,18 +2796,17 @@
   window.__audify_init_mini_spectrum = startMiniSpectrum;
   startMiniSpectrum();
 
+  function ensurePillsAttached() {
+    const pill = document.getElementById('audify-control-pills-container');
+    const eqBtn = document.getElementById('audify-eq-btn');
+    if (!pill || !pill.isConnected || !eqBtn) {
+      injectPlayerControls();
+    }
+  }
+
   injectPlayerControls();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', injectPlayerControls);
   }
-
-  let injectAttempts = 0;
-  const injectTimer = setInterval(() => {
-    injectPlayerControls();
-    injectAttempts++;
-    const pill = document.getElementById('audify-control-pills-container');
-    if ((pill && pill.isConnected) || injectAttempts >= 20) {
-      clearInterval(injectTimer);
-    }
-  }, 1000);
+  setInterval(ensurePillsAttached, 1200);
 })();

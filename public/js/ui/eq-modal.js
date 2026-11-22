@@ -280,6 +280,30 @@
         border-color: #D4FF00;
         box-shadow: 0 0 14px rgba(212, 255, 0, 0.45);
       }
+
+      @media (max-width: 600px) {
+        #audify-eq-overlay {
+          padding: 8px !important;
+        }
+        #audify-eq-card {
+          padding: 16px 14px 20px !important;
+          border-radius: 20px !important;
+          max-height: 94dvh !important;
+        }
+        .audify-eq-title {
+          font-size: 18px !important;
+        }
+        .audify-eq-slider-label {
+          font-size: 11px !important;
+        }
+        .audify-eq-presets {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 6px !important;
+        }
+        .audify-eq-canvas-wrap {
+          margin-bottom: 12px !important;
+        }
+      }
     `;
     document.head.appendChild(s);
   }

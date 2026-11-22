@@ -914,4 +914,23 @@ body {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
+
+  /* Full screen cover & safe-area paddings for fixed elements */
+  body, html {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  
+  /* Ensure header elements fit smoothly with zero cutoff */
+  header, [role="banner"], div.flex.items-center.justify-between {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Full Screen button */
+  #audify-fullscreen-btn {
+    border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  }
 }

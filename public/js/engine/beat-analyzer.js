@@ -229,6 +229,56 @@
     'my way': 75,
     'what a wonderful world': 75,
     'don\'t know why': 88,
+    'sunflower': 90,
+    'white iverson': 150,
+    'congratulations': 123,
+    'better now': 145,
+    'wow.': 100,
+    'still d.r.e.': 93,
+    'california love': 92,
+    'the next episode': 95,
+    'in da club': 90,
+    'many men': 84,
+    'hotline bling': 135,
+    'one dance': 104,
+    'passionfruit': 112,
+    'goosebumps': 130,
+    'antidote': 130,
+    'highest in the room': 76,
+    'fe!n': 148,
+    'money trees': 72,
+    'alright': 110,
+    'dna.': 140,
+    'snooze': 143,
+    'kill bill': 145,
+    'shake it off': 160,
+    'cruel summer': 170,
+    'anti-hero': 97,
+    'blank space': 96,
+    'shape of you': 96,
+    'bad habits': 126,
+    'stay': 170,
+    'peaches': 90,
+    'ghost': 154,
+    'as it was': 174,
+    'watermelon sugar': 95,
+    'flowers': 118,
+    'dance monkey': 98,
+    'counting stars': 122,
+    'thunderstruck': 133,
+    'don\'t stop me now': 156,
+    'another one bites the dust': 110,
+    'welcome to the jungle': 124,
+    'november rain': 80,
+    'paradise city': 100,
+    'kashmir': 80,
+    'whole lotta love': 90,
+    'stairway to heaven': 82,
+    'comfortably numb': 64,
+    'wish you were here': 60,
+    'dream on': 80,
+    'toxicity': 117,
+    'chop suey!': 127,
 
     // Hindi & Bollywood Hits
     'tum hi ho': 94,
@@ -254,6 +304,32 @@
     'garmi': 128,
     'chammak challo': 104,
     'hookah bar': 130,
+    'agar tum saath ho': 120,
+    'ae dil hai mushkil': 114,
+    'gerua': 128,
+    'tera yaar hoon main': 80,
+    'shayad': 136,
+    'ghalti se mistake': 110,
+    'ilahi': 130,
+    'kabira': 88,
+    'raabta': 128,
+    'saturday saturday': 128,
+    'abhi toh party shuru hui hai': 130,
+    'dj waley babu': 100,
+    'tareefan': 98,
+    'jugnu': 102,
+    'chuttamalle': 104,
+    'devara': 124,
+    'chaleya': 102,
+    'jhoome jo pathaan': 105,
+    'besharam rang': 116,
+    'lut gaye': 82,
+    'bekhayali': 80,
+    'tujhe kitna chahne lage': 78,
+    'pal': 88,
+    'hawayein': 100,
+    'soch na sake': 82,
+    'mast magan': 88,
 
     // Punjabi & Regional
     'brown munde': 88,
@@ -264,7 +340,23 @@
     'lover': 104,
     'born to shine': 100,
     'naatu naatu': 136,
-    'arabic kuthu': 130
+    'arabic kuthu': 130,
+    'g.o.a.t.': 98,
+    'do you know': 90,
+    'proper patola': 100,
+    'same beef': 95,
+    'old skool': 90,
+    'legend': 92,
+    'dillagi': 90,
+    'amplifier': 100,
+    'blue eyes': 128,
+    'dope shope': 96,
+    'wavy': 92,
+    'mi amor': 94,
+    'excuses': 96,
+    'insane': 98,
+    'spaces': 90,
+    'softly': 94
   };
 
   const GENRE_DEFAULT_BPM = {
@@ -423,9 +515,11 @@
       const beatDuration = 60.0 / currentBpm;
       const barDuration = beatDuration * 4.0;
 
-      const offset = (cue && typeof cue.entrySec === 'number')
-        ? cue.entrySec
-        : ((cue && typeof cue.hookStartSec === 'number') ? cue.hookStartSec : 0);
+      const offset = (cue && typeof cue.entry_sec === 'number')
+        ? cue.entry_sec
+        : ((cue && typeof cue.entrySec === 'number')
+          ? cue.entrySec
+          : ((cue && typeof cue.hookStartSec === 'number') ? cue.hookStartSec : 0));
 
       // Latency calibration: Compensate for YouTube iframe audio-to-DOM buffer delay (~115ms)
       // plus user-adjustable phase nudge from EQ modal
@@ -441,21 +535,22 @@
       barPhase = barElapsed / barDuration;   // 0.0 -> 1.0 within 4-beat bar
 
       // ---------------------------------------------------------------------
-      // 3. Multi-Band Beat Separation
+      // 3. Multi-Band Beat Separation & Crisp Acoustic Attack Envelopes
       // ---------------------------------------------------------------------
-      // Sub-bass kick (downbeat attack: rawKick = Math.exp(-beatPhase * 11.0))
-      rawKick = Math.exp(-beatPhase * 11.0);
+      // Sub-bass kick (exponential transient attack; peaks sharply at downbeat, clears within 25% of beat)
+      rawKick = Math.exp(-beatPhase * 12.0);
 
       // Snare/clap backbeat on beats 2 & 4
       const beatNumber = Math.floor(barPhase * 4.0);
       const isBackbeat = (beatNumber === 1 || beatNumber === 3);
-      rawSnare = isBackbeat ? Math.exp(-beatPhase * 9.0) * 0.8 : 0.0;
+      rawSnare = isBackbeat ? (Math.exp(-beatPhase * 14.0) * 0.75) : 0.0;
 
       // Bar drop impact on beat 1 of each 4-beat bar
-      rawDrop = Math.exp(-barPhase * 4.5) * 1.3;
+      const isBarDownbeat = (beatNumber === 0);
+      rawDrop = isBarDownbeat ? (Math.exp(-beatPhase * 9.0) * 1.0) : 0.0;
 
       // Hi-hat shimmer on 1/8th and 1/16th notes
-      rawHiHat = Math.abs(Math.sin(beatPhase * Math.PI * 4.0)) * 0.4;
+      rawHiHat = Math.abs(Math.sin(beatPhase * Math.PI * 4.0)) * 0.25;
 
       // ---------------------------------------------------------------------
       // 4. Web Audio Real-Time FFT Spectral Flux
@@ -490,29 +585,27 @@
       smoothedBassFlux += (bassFlux - smoothedBassFlux) * Math.min(1.0, safeDt * 8.0);
 
       // ---------------------------------------------------------------------
-      // 5. Combine into Explosive Unified beatEnergy
+      // 5. Dynamic High-Contrast Rhythmic Energy (Zero Baseline between Beats!)
       // ---------------------------------------------------------------------
-      // Scale with user bass boost and reactivity multiplier (up to 3.0x)
       const bassBoostFactor = Math.max(0.2, 1.0 + (settings.bass / 12.0) * 0.65);
       const combinedBeat = (
-        rawKick * 1.35 * bassBoostFactor +
-        rawDrop * 1.15 * bassBoostFactor +
-        rawSnare * 0.85 +
-        rawHiHat * 0.6 +
-        smoothedBassFlux * 1.75 * bassBoostFactor
+        rawKick * 1.6 * bassBoostFactor +
+        rawDrop * 1.2 * bassBoostFactor +
+        rawSnare * 0.9 +
+        smoothedBassFlux * 1.2 * bassBoostFactor
       );
 
       const reactivityMultiplier = Math.max(0.5, Math.min(3.0, settings.reactivity || 1.8));
       beatEnergy = combinedBeat * reactivityMultiplier;
 
       // Trigger high-energy wave pulses when a strong beat strikes
-      if (beatEnergy > 1.6 && safeNowMs - lastOnsetMs > 180) {
+      if (rawKick > 0.65 && safeNowMs - lastOnsetMs > 150) {
         lastOnsetMs = safeNowMs;
         isBeatSpikeActive = true;
 
         // Dispatch pulse to SoftAurora shader wave ripples
         if (typeof window.__audify_trigger_beat_pulse === 'function') {
-          window.__audify_trigger_beat_pulse(Math.min(3.0, 1.0 + beatEnergy * 0.9));
+          window.__audify_trigger_beat_pulse(Math.min(3.5, 1.0 + beatEnergy * 0.85));
         }
 
         // Pulse RGB border luminescence
@@ -570,9 +663,8 @@
     if (typeof document === 'undefined') return;
     const border = document.getElementById('audify-rgb-aurora-border');
     if (!border) return;
-    const glowPx = Math.min(36, Math.floor(6 + energy * 18));
-    border.style.setProperty('--audify-border-beat-glow', `${glowPx}px`);
-    border.style.setProperty('--audify-border-beat-scale', `${1.0 + energy * 0.015}`);
+    const glowPx = Math.min(48, Math.floor(8 + energy * 12));
+    border.style.boxShadow = `inset 0 0 ${glowPx}px var(--audify-border-glow), inset 0 0 ${glowPx * 2}px rgba(0, 0, 0, 0.45)`;
   }
 
   // Presets Definition
