@@ -2208,7 +2208,7 @@
         display: inline-flex !important;
         align-items: center !important;
         gap: 6px !important;
-        margin-right: 8px !important;
+        margin-left: 8px !important; margin-right: auto !important; max-width: 42vw !important;
         position: relative !important;
         z-index: 50 !important;
         flex-shrink: 1 !important;
@@ -2705,10 +2705,13 @@
     pillGroup.style.scrollbarWidth = 'none';
     pillGroup.style.flexShrink = '1';
 
-    if (targetRightCluster) {
-      if (!targetRightCluster.contains(pillGroup)) {
-        targetRightCluster.prepend(pillGroup);
+    const brand = targetHeader ? (targetHeader.querySelector('.text-lime') || targetHeader.firstElementChild) : null;
+    if (brand && targetHeader) {
+      if (brand.nextElementSibling !== pillGroup) {
+        brand.after(pillGroup);
       }
+    } else if (targetRightCluster && !targetRightCluster.contains(pillGroup)) {
+      targetRightCluster.prepend(pillGroup);
     } else if (targetHeader && !targetHeader.contains(pillGroup)) {
       targetHeader.appendChild(pillGroup);
     }
@@ -2842,10 +2845,14 @@
       if (artistPill && artistPill.parentElement !== pill) {
         pill.prepend(artistPill);
       }
-      const parentH = pill.parentElement;
-      if (parentH) {
-        parentH.style.width = 'auto';
-        parentH.style.maxWidth = 'none';
+      const headers = document.querySelectorAll('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > div.flex');
+      for (const h of headers) {
+        if (h.closest('#audify-languages-section')) continue;
+        const brand = h.querySelector('.text-lime');
+        if (brand && pill.previousElementSibling !== brand) {
+          brand.after(pill);
+          break;
+        }
       }
     }
   }

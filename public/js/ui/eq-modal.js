@@ -628,6 +628,7 @@
 
     const w = spectrumCanvas.width || spectrumCanvasTargetW || 300;
     const h = spectrumCanvas.height || spectrumCanvasTargetH || 100;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     spectrumCtx.clearRect(0, 0, w, h);
 
     // Update real-time BPM readout if available
@@ -778,10 +779,8 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       createModalDOM();
-      wireEqButton();
     });
   } else {
     createModalDOM();
-    wireEqButton();
   }
 })();
