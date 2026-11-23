@@ -38,6 +38,7 @@
         pointer-events: auto;
       }
       #audify-eq-card {
+        box-sizing: border-box;
         width: 100%;
         max-width: 580px;
         max-height: 90vh;
@@ -284,14 +285,23 @@
       @media (max-width: 600px) {
         #audify-eq-overlay {
           padding: 8px !important;
+          box-sizing: border-box !important;
         }
         #audify-eq-card {
+          box-sizing: border-box !important;
+          width: 100% !important;
+          max-width: min(calc(100vw - 16px), 520px) !important;
           padding: 16px 14px 20px !important;
           border-radius: 20px !important;
           max-height: 94dvh !important;
         }
         .audify-eq-title {
-          font-size: 18px !important;
+          font-size: 16px !important;
+          gap: 6px !important;
+        }
+        .audify-eq-badge {
+          font-size: 9px !important;
+          padding: 2px 6px !important;
         }
         .audify-eq-slider-label {
           font-size: 11px !important;
@@ -302,6 +312,7 @@
         }
         .audify-eq-canvas-wrap {
           margin-bottom: 12px !important;
+          padding: 8px 10px !important;
         }
       }
     `;
