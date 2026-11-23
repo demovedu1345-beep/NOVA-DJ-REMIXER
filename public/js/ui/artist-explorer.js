@@ -531,6 +531,8 @@
   // Inject Header "ARTISTS" Navigation Pill
   // -------------------------------------------------------------
   function injectArtistHeaderNav() {
+    // Preserve clean player header without extra clutter
+    if (document.querySelector('main[data-paused]') || document.querySelector('.deck')) return;
     let navPill = document.getElementById('audify-artist-header-pill');
     const controlPills = document.getElementById('audify-control-pills-container');
 

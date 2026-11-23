@@ -2589,137 +2589,31 @@
     ensurePillStyles();
     ensureBorderAttached();
 
-    const headers = document.querySelectorAll('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > div.flex');
-    let targetHeader = null;
-    let targetRightCluster = null;
-
-    for (const h of headers) {
-      if (h.closest('#audify-languages-section')) continue;
-      const hasBrand = h.textContent.includes('Audify') || h.querySelector('button[aria-label*="Audify"], .text-lime');
-      if (hasBrand) {
-        targetHeader = h;
-        const rightCluster = h.querySelector('.flex.items-center.gap-5, .ml-auto');
-        if (rightCluster) targetRightCluster = rightCluster;
-        break;
-      }
-    }
+    const targetHeader = document.querySelector('main > div.relative.z-30.flex, div.relative.z-30.flex');
+    if (!targetHeader) return;
+    const targetRightCluster = targetHeader.querySelector('.ml-auto');
+    if (!targetRightCluster) return;
 
     let pillGroup = document.getElementById('audify-control-pills-container');
-    const isNew = !pillGroup;
-    if (isNew) {
+    if (!pillGroup) {
       pillGroup = document.createElement('div');
       pillGroup.id = 'audify-control-pills-container';
       pillGroup.innerHTML = `
-        <!-- Aurora Mode Selector -->
-        <div style="position:relative;display:inline-block">
-          <button id="audify-aurora-btn" class="audify-pill-btn squeeze" aria-haspopup="true" aria-expanded="false" title="Switch Aurora Mode">
-            <span class="audify-pill-tag-aurora">AURORA:</span>
-            <span id="audify-aurora-label">${getAuroraModeLabel(auroraMode)}</span>
-            <span class="audify-pill-chevron">▼</span>
-          </button>
-          <div id="audify-aurora-dropdown" class="audify-dropdown-menu">
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="auto"><span>🔀 DYNAMIC AUTO-SYNC</span></div>
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="soft"><span>✨ SOFT AURORA (3D Perlin)</span></div>
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="curtain"><span>🌠 CURTAIN RIBBONS (OKLab)</span></div>
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="fusion"><span>🎆 HYBRID FUSION</span></div>
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="vortex"><span>🌀 COSMIC VORTEX</span></div>
-            <div class="audify-dropdown-opt audify-aurora-opt squeeze" data-mode="chromatic-wave"><span>🌈 CHROMATIC WAVE</span></div>
-          </div>
-        </div>
-
-        <!-- Mix Action Pill -->
-        <div style="position:relative;display:inline-block">
-          <button id="audify-mix-btn" class="audify-pill-btn squeeze" aria-haspopup="true" aria-expanded="false" title="Switch Transition FX">
-            <span class="audify-pill-tag-mix">MIX:</span>
-            <span id="audify-mix-label">${getMixStyleLabel(activeMixStyle)}</span>
-            <span class="audify-pill-chevron">▼</span>
-          </button>
-          <div id="audify-mix-dropdown" class="audify-dropdown-menu">
-            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="drum_roll"><span>🥁 DRUM ROLL BUILD</span></div>
-            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="blend"><span>🎚 CLUB S-BLEND</span></div>
-            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="filter_sweep"><span>🌊 FILTER SWEEP</span></div>
-            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="echo_drop"><span>🔊 ECHO OUT DROP</span></div>
-            <div class="audify-dropdown-opt audify-mix-opt squeeze" data-style="sub_drop"><span>💥 808 SUB IMPACT</span></div>
-          </div>
-        </div>
-
-        <!-- Master FX / EQ Pill Button -->
-        <div style="position:relative;display:inline-block">
-          <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
-            <span>🎚️ FX / EQ</span>
-            <canvas id="audify-mini-spectrum-canvas" width="88" height="32" class="audify-mini-spectrum" aria-hidden="true"></canvas>
-          </button>
-        </div>
-
-        <!-- Mobile & Desktop Fullscreen Mode Toggle -->
-        <div style="position:relative;display:inline-block">
-          <button id="audify-fullscreen-btn" class="audify-pill-btn squeeze" title="Toggle True Full Screen">
-            <span id="audify-fullscreen-icon">⛶</span>
-            <span id="audify-fullscreen-text">FULL</span>
-          </button>
-        </div>
+        <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
+          <span>🎚️ FX / EQ</span>
+          <canvas id="audify-mini-spectrum-canvas" width="48" height="20" class="audify-mini-spectrum" aria-hidden="true"></canvas>
+        </button>
       `;
-      wirePillControls(pillGroup);
-    } else {
-      if (!pillGroup.querySelector('#audify-eq-btn')) {
-        const eqWrapper = document.createElement('div');
-        eqWrapper.style.position = 'relative';
-        eqWrapper.style.display = 'inline-block';
-        eqWrapper.innerHTML = `
-          <button id="audify-eq-btn" class="audify-pill-btn squeeze" title="Master DJ Equalizer & FX">
-            <span>🎚️ FX / EQ</span>
-            <canvas id="audify-mini-spectrum-canvas" width="88" height="32" class="audify-mini-spectrum" aria-hidden="true"></canvas>
-          </button>
-        `;
-        pillGroup.appendChild(eqWrapper);
-        // Master FX / EQ click & touch handling delegated cleanly to eq-modal.js
-      }
-      if (!pillGroup.querySelector('#audify-fullscreen-btn')) {
-        const fsWrapper = document.createElement('div');
-        fsWrapper.style.position = 'relative';
-        fsWrapper.style.display = 'inline-block';
-        fsWrapper.innerHTML = `
-          <button id="audify-fullscreen-btn" class="audify-pill-btn squeeze" title="Toggle True Full Screen">
-            <span id="audify-fullscreen-icon">⛶</span>
-            <span id="audify-fullscreen-text">FULL</span>
-          </button>
-        `;
-        pillGroup.appendChild(fsWrapper);
-        const fsBtn = fsWrapper.querySelector('#audify-fullscreen-btn');
-        if (fsBtn && !fsBtn.__audify_wired) {
-          fsBtn.__audify_wired = true;
-          fsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleFullscreen();
-          });
-        }
-      }
     }
 
     pillGroup.style.display = 'inline-flex';
     pillGroup.style.alignItems = 'center';
-    pillGroup.style.minWidth = '0';
-    pillGroup.style.overflowX = 'auto';
-    pillGroup.style.overflowY = 'hidden';
-    pillGroup.style.webkitOverflowScrolling = 'touch';
-    pillGroup.style.scrollbarWidth = 'none';
-    pillGroup.style.flexShrink = '1';
+    pillGroup.style.flexShrink = '0';
+    pillGroup.style.marginRight = '8px';
+    pillGroup.style.marginLeft = '0';
 
-    const brand = targetHeader ? (targetHeader.querySelector('.text-lime') || targetHeader.firstElementChild) : null;
-    if (brand && targetHeader) {
-      if (brand.nextElementSibling !== pillGroup) {
-        brand.after(pillGroup);
-      }
-    } else if (targetRightCluster && !targetRightCluster.contains(pillGroup)) {
+    if (!targetRightCluster.contains(pillGroup)) {
       targetRightCluster.prepend(pillGroup);
-    } else if (targetHeader && !targetHeader.contains(pillGroup)) {
-      targetHeader.appendChild(pillGroup);
-    }
-
-    // Keep artist pill prepended inside pillGroup if present
-    const existingArtistPill = document.getElementById('audify-artist-header-pill');
-    if (existingArtistPill && existingArtistPill.parentElement !== pillGroup) {
-      pillGroup.prepend(existingArtistPill);
     }
   }
 
@@ -2787,7 +2681,6 @@
     for (let i = 0; i < numBars; i++) {
       let raw = (spectrum && spectrum[i] !== undefined) ? spectrum[i] : 0;
       if (!raw || raw < 0.04) {
-        // Subtle ambient dancing wave so visualizer feels tactile even before playback
         raw = 0.08 + 0.06 * Math.sin(now * 2.5 + i * 0.45);
       }
       const targetVal = Math.min(1.0, Math.max(0.04, raw));
@@ -2799,7 +2692,6 @@
       }
       const val = miniSmoothed[i];
 
-      // Floating peak falloff calculation
       if (val >= miniPeakVals[i]) {
         miniPeakVals[i] = val;
         miniPeakSpeeds[i] = 0;
@@ -2820,7 +2712,6 @@
       ctx.fillStyle = grad;
       ctx.fillRect(x, y, barWidth, barH);
 
-      // Peak LED dot in luminous white
       const peakY = h - Math.max(2 * dpr, miniPeakVals[i] * (h - 3 * dpr)) - 2 * dpr;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(x, Math.max(0, peakY), barWidth, Math.max(1, 1.5 * dpr));
@@ -2838,22 +2729,13 @@
   function ensurePillsAttached() {
     const pill = document.getElementById('audify-control-pills-container');
     const eqBtn = document.getElementById('audify-eq-btn');
+    const topBar = document.querySelector('main > div.relative.z-30.flex, div.relative.z-30.flex');
+    const rightCluster = topBar ? topBar.querySelector('.ml-auto') : null;
+
     if (!pill || !pill.isConnected || !eqBtn) {
       injectPlayerControls();
-    } else {
-      const artistPill = document.getElementById('audify-artist-header-pill');
-      if (artistPill && artistPill.parentElement !== pill) {
-        pill.prepend(artistPill);
-      }
-      const headers = document.querySelectorAll('header, nav, main > .flex.justify-between, main > .relative.z-30.flex, main > div.flex');
-      for (const h of headers) {
-        if (h.closest('#audify-languages-section')) continue;
-        const brand = h.querySelector('.text-lime');
-        if (brand && pill.previousElementSibling !== brand) {
-          brand.after(pill);
-          break;
-        }
-      }
+    } else if (rightCluster && !rightCluster.contains(pill)) {
+      rightCluster.prepend(pill);
     }
   }
 
