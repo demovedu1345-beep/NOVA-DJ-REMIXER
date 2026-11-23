@@ -2523,17 +2523,7 @@
       });
     });
 
-    const eqBtn = pillGroup.querySelector('#audify-eq-btn');
-    if (eqBtn && !eqBtn.__audify_wired) {
-      eqBtn.__audify_wired = true;
-      const handleEq = (e) => {
-        e.stopPropagation();
-        closeAllDropdowns();
-        window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
-      };
-      eqBtn.addEventListener('click', handleEq);
-      eqBtn.addEventListener('touchend', handleEq, { passive: true });
-    }
+    // Master FX / EQ Pill Button is handled directly by eq-modal.js event delegation
 
     function toggleFullscreen() {
       try {
@@ -2682,17 +2672,7 @@
           </button>
         `;
         pillGroup.appendChild(eqWrapper);
-        const eqBtn = eqWrapper.querySelector('#audify-eq-btn');
-        if (eqBtn && !eqBtn.__audify_wired) {
-          eqBtn.__audify_wired = true;
-          const handleEq = (e) => {
-            e.stopPropagation();
-            closeAllDropdowns();
-            window.__audify_eq_modal ? window.__audify_eq_modal.toggle() : null;
-          };
-          eqBtn.addEventListener('click', handleEq);
-          eqBtn.addEventListener('touchend', handleEq, { passive: true });
-        }
+        // Master FX / EQ click & touch handling delegated cleanly to eq-modal.js
       }
       if (!pillGroup.querySelector('#audify-fullscreen-btn')) {
         const fsWrapper = document.createElement('div');
@@ -2864,11 +2844,8 @@
       }
       const parentH = pill.parentElement;
       if (parentH) {
-        parentH.style.maxWidth = '100%';
-        parentH.style.width = '100%';
-        parentH.style.minWidth = '0';
-        parentH.style.overflowX = 'hidden';
-        parentH.style.boxSizing = 'border-box';
+        parentH.style.width = 'auto';
+        parentH.style.maxWidth = 'none';
       }
     }
   }

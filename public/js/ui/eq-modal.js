@@ -309,7 +309,12 @@
   }
 
   function createModalDOM() {
-    if (modalEl) return modalEl;
+    if (modalEl) {
+      if (!modalEl.isConnected && document.body) {
+        document.body.appendChild(modalEl);
+      }
+      return modalEl;
+    }
     ensureStyles();
 
     modalEl = document.createElement('div');
@@ -664,42 +669,57 @@
     }
   }
 
+  let isModalOpen = false;
+  let lastToggleTime = 0;
+  let lastTouchTime = 0;
+
   function openEqModal() {
     createModalDOM();
-    updateSpectrumCanvasDimensions();
-    syncSlidersFromSettings();
+    if (!modalEl) return;
+    if (!modalEl.isConnected && document.body) {
+      document.body.appendChild(modalEl);
+    }
+    isModalOpen = true;
     modalEl.classList.add('open');
     modalEl.style.display = 'flex';
     modalEl.style.opacity = '1';
     modalEl.style.pointerEvents = 'auto';
     modalEl.style.visibility = 'visible';
-    document.getElementById('audify-eq-btn')?.classList.add('active');
+    modalEl.style.zIndex = '999999';
+
+    const btn = document.getElementById('audify-eq-btn');
+    if (btn) btn.classList.add('active');
+
+    updateSpectrumCanvasDimensions();
+    syncSlidersFromSettings();
+
     if (!animFrameId) animFrameId = requestAnimationFrame(drawSpectrum);
     window.__audify_beat_analyzer?.initAudio?.();
   }
 
   function closeEqModal() {
     if (!modalEl) return;
+    isModalOpen = false;
     modalEl.classList.remove('open');
     modalEl.style.display = 'none';
     modalEl.style.opacity = '0';
     modalEl.style.pointerEvents = 'none';
     modalEl.style.visibility = 'hidden';
-    document.getElementById('audify-eq-btn')?.classList.remove('active');
+
+    const btn = document.getElementById('audify-eq-btn');
+    if (btn) btn.classList.remove('active');
+
     if (animFrameId) {
       cancelAnimationFrame(animFrameId);
       animFrameId = null;
     }
   }
 
-  let lastToggleTime = 0;
   function toggleEqModal() {
     const now = Date.now();
-    if (now - lastToggleTime < 350) {
-      return;
-    }
+    if (now - lastToggleTime < 300) return;
     lastToggleTime = now;
-    if (modalEl && (modalEl.classList.contains('open') || modalEl.style.display === 'flex')) {
+    if (isModalOpen) {
       closeEqModal();
     } else {
       openEqModal();
@@ -711,46 +731,41 @@
     open: openEqModal,
     close: closeEqModal,
     toggle: toggleEqModal,
-    isOpen: () => !!(modalEl && (modalEl.classList.contains('open') || modalEl.style.display === 'flex'))
+    isOpen: () => isModalOpen
   };
 
   // Backwards compatibility hooks
   window.__audify_open_eq_modal = openEqModal;
   window.__audify_close_eq_modal = closeEqModal;
 
-  // Unbreakable Global Event Delegation on Document (handles clicks and mobile touches)
-  function handleEqClick(e) {
+  // Single unified document-level event delegation (capture phase)
+  document.addEventListener('touchend', (e) => {
     const btn = e.target.closest('#audify-eq-btn');
     if (btn) {
-      if (e.type === 'touchend' && e.cancelable) {
-        e.preventDefault();
-      }
+      lastTouchTime = Date.now();
+      if (e.cancelable) e.preventDefault();
       e.stopPropagation();
       toggleEqModal();
     }
-  }
-  document.addEventListener('click', handleEqClick, true);
-  document.addEventListener('touchend', handleEqClick, { passive: false, capture: true });
+  }, { passive: false, capture: true });
 
-  // Auto-wire EQ Button in Nav or Player Controls
-  function wireEqButton() {
-    const btn = document.getElementById('audify-eq-btn');
-    if (btn && !btn.__audify_eq_wired) {
-      btn.__audify_eq_wired = true;
-      btn.onclick = (e) => {
+  document.addEventListener('click', (e) => {
+    if (Date.now() - lastTouchTime < 500) {
+      // Suppress phantom click following touchend on mobile
+      const btn = e.target.closest('#audify-eq-btn');
+      if (btn) {
         e.preventDefault();
         e.stopPropagation();
-        toggleEqModal();
-      };
-      btn.addEventListener('touchend', (e) => {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-        toggleEqModal();
-      }, { passive: false });
+      }
+      return;
     }
-  }
-
-  setInterval(wireEqButton, 400);
+    const btn = e.target.closest('#audify-eq-btn');
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleEqModal();
+    }
+  }, true);
 
   // Eagerly inject modal DOM so it is ready immediately
   createModalDOM();

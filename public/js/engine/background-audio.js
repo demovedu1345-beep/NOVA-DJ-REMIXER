@@ -252,10 +252,23 @@
     }
   });
 
-  // Periodic metadata and lockscreen sync
+  // Periodic metadata, lockscreen & playback watchdog
   setInterval(() => {
     syncMediaSessionMetadata();
-  }, 1500);
+    const engine = getEngine();
+    if (engine && !engine.paused && engine.started && !engine.finished) {
+      const live = engine.liveDeck ? engine.liveDeck() : null;
+      if (live?.player && live.status === 'live' && !engine.crossfading && !engine.awaitingStart) {
+        if (typeof live.player.getPlayerState === 'function' && live.player.getPlayerState() === 2) {
+          try {
+            live.player.unMute?.();
+            live.player.setVolume?.(100);
+            live.player.playVideo?.();
+          } catch (_) {}
+        }
+      }
+    }
+  }, 1000);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
