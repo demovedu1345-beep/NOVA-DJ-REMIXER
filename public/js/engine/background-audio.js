@@ -77,7 +77,7 @@
   ['touchstart', 'touchend', 'pointerdown', 'click', 'keydown'].forEach(evt => {
     window.addEventListener(evt, () => {
       if (!isUnlocked) unlockAudioSession();
-    }, { passive: true });
+    }, { capture: true, passive: true });
   });
 
   // 3. Screen WakeLock API

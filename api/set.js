@@ -244,7 +244,10 @@ function buildSetFromCuratedDb(body) {
   // 4. Fallback if candidate pool is empty
   if (!candidatePool.length) {
     for (const cat of allCategories) {
-      const songs = shuffleArray(cat.songs || []).slice(0, 20);
+      if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) {
+        continue;
+      }
+      const songs = shuffleArray(cat.songs || []).slice(0, 30);
       for (const s of songs) {
         candidatePool.push({ song: s, cat });
       }
@@ -259,7 +262,10 @@ function buildSetFromCuratedDb(body) {
   const seenVideos = new Set();
   const cues = [];
 
+  const isStrictEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi');
+
   for (const { song: s, cat } of candidatePool) {
+    if (isStrictEnglish && cat.lang !== 'english') continue;
     const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
     if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
     const titleKey = (s.title || '').toLowerCase().trim();
@@ -285,7 +291,7 @@ function buildSetFromCuratedDb(body) {
       ...(s.bpm ? { bpm: s.bpm } : {}),
       play_full: Boolean(s.playFull),
       era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
-      language: cat.lang || 'hindi',
+      language: cat.lang || (isStrictEnglish ? 'english' : 'hindi'),
       subtype: slugToSubtype(cat.slug),
       energy: s.energy || (energy === 'bangers' ? 9 : 8),
       tags: [],
@@ -319,29 +325,6 @@ export default async function handler(req, res) {
     } catch {}
 
     const localSet = buildSetFromCuratedDb(body);
-    if (localSet.cues && localSet.cues.length >= 10) {
-      return sendJson(res, 200, localSet);
-    }
-
-    // Upstream fallback if needed
-    try {
-      const remote = await fetch('https://www.naux.party/api/set', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(4000)
-      });
-      if (remote.ok) {
-        const data = await remote.json();
-        return sendJson(res, 200, data);
-      }
-    } catch (e) {
-      console.warn('POST /api/set upstream fetch failed:', e.message);
-    }
-
     return sendJson(res, 200, localSet);
   }
 

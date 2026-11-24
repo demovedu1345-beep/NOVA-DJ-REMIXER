@@ -161,7 +161,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-9",
           "title": "Dilliwali Girlfriend",
-          "artist": "Arijit Singh, Sunidhi Chauhan \u00b7 Pritam",
+          "artist": "Arijit Singh, Sunidhi Chauhan · Pritam",
           "year": "2013",
           "durationSec": 246,
           "hookStartSec": 45,
@@ -280,7 +280,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-56",
           "title": "Palat Tera Dhyan Kidhar Hai",
-          "artist": "Arijit Singh \u00b7 Sajid-Wajid",
+          "artist": "Arijit Singh · Sajid-Wajid",
           "year": "2014",
           "durationSec": 223,
           "hookStartSec": 40,
@@ -399,7 +399,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-57",
           "title": "Shanivaar Raati",
-          "artist": "Arijit Singh, Shalmali Kholgade \u00b7 Sajid-Wajid",
+          "artist": "Arijit Singh, Shalmali Kholgade · Sajid-Wajid",
           "year": "2014",
           "durationSec": 250,
           "hookStartSec": 45,
@@ -518,7 +518,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-66",
           "title": "Pyaar Hota Kayi Baar Hai",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2023",
           "durationSec": 208,
           "hookStartSec": 45,
@@ -637,7 +637,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-67",
           "title": "Tere Pyaar Mein",
-          "artist": "Arijit Singh, Nikhita Gandhi \u00b7 Pritam",
+          "artist": "Arijit Singh, Nikhita Gandhi · Pritam",
           "year": "2023",
           "durationSec": 256,
           "hookStartSec": 45,
@@ -756,7 +756,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-68",
           "title": "What Jhumka?",
-          "artist": "Arijit Singh, Jonita Gandhi \u00b7 Pritam",
+          "artist": "Arijit Singh, Jonita Gandhi · Pritam",
           "year": "2023",
           "durationSec": 223,
           "hookStartSec": 45,
@@ -4326,7 +4326,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-84",
           "title": "Chann",
-          "artist": "Sachin-Jigar, Arijit Singh & Amitabh Bhattacharya \u00b7 2024",
+          "artist": "Sachin-Jigar, Arijit Singh & Amitabh Bhattacharya · 2024",
           "year": "2024",
           "entrySec": 36,
           "exitSec": 76,
@@ -4418,7 +4418,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -4444,7 +4444,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-86",
           "title": "Gehra Hua",
-          "artist": "Shashwat Sachdev, Arijit Singh, Irshad Kamil & Armaan Khan \u00b7 2024",
+          "artist": "Shashwat Sachdev, Arijit Singh, Irshad Kamil & Armaan Khan · 2024",
           "year": "2024",
           "entrySec": 50,
           "exitSec": 90,
@@ -4534,7 +4534,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -4562,7 +4562,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-90",
           "title": "Tainu Khabar Nahi",
-          "artist": "Sachin-Jigar, Arijit Singh & Amitabh Bhattacharya \u00b7 2024",
+          "artist": "Sachin-Jigar, Arijit Singh & Amitabh Bhattacharya · 2024",
           "year": "2024",
           "entrySec": 30,
           "exitSec": 70,
@@ -4642,7 +4642,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -4680,7 +4680,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-92",
           "title": "Yeh Awarapan",
-          "artist": "Amaal Mallik, Arijit Singh & Rashmi Virag \u00b7 2024",
+          "artist": "Amaal Mallik, Arijit Singh & Rashmi Virag · 2024",
           "year": "2024",
           "entrySec": 58,
           "exitSec": 98,
@@ -4756,7 +4756,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -4798,7 +4798,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-98",
           "title": "Tum Kya Mile",
-          "artist": "Pritam, Arijit Singh, Shreya Ghoshal & Amitabh Bhattacharya \u00b7 2023",
+          "artist": "Pritam, Arijit Singh, Shreya Ghoshal & Amitabh Bhattacharya · 2023",
           "year": "2023",
           "entrySec": 66,
           "exitSec": 106,
@@ -4860,7 +4860,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -4916,7 +4916,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-99",
           "title": "Ve Kamleya",
-          "artist": "Pritam, Arijit Singh, Shreya Ghoshal, Shadab Faridi, Altamash Faridi & Amitabh Bhattacharya \u00b7 2023",
+          "artist": "Pritam, Arijit Singh, Shreya Ghoshal, Shadab Faridi, Altamash Faridi & Amitabh Bhattacharya · 2023",
           "year": "2023",
           "entrySec": 28,
           "exitSec": 68,
@@ -4977,7 +4977,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5034,7 +5034,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-104",
           "title": "Aabaad Barbaad",
-          "artist": "Pritam & Arijit Singh \u00b7 2020",
+          "artist": "Pritam & Arijit Singh · 2020",
           "year": "2020",
           "entrySec": 60,
           "exitSec": 100,
@@ -5084,7 +5084,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5152,7 +5152,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-106",
           "title": "Kalank",
-          "artist": "Pritam & Arijit Singh \u00b7 2019",
+          "artist": "Pritam & Arijit Singh · 2019",
           "year": "2019",
           "entrySec": 26,
           "exitSec": 66,
@@ -5194,7 +5194,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5270,7 +5270,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-107",
           "title": "Khairiyat (Happy)",
-          "artist": "Pritam & Arijit Singh \u00b7 2019",
+          "artist": "Pritam & Arijit Singh · 2019",
           "year": "2019",
           "entrySec": 33,
           "exitSec": 73,
@@ -5311,7 +5311,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5388,7 +5388,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-108",
           "title": "Pachtaoge",
-          "artist": "Arijit Singh \u00b7 2019",
+          "artist": "Arijit Singh · 2019",
           "year": "2019",
           "entrySec": 40,
           "exitSec": 80,
@@ -5428,7 +5428,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5506,7 +5506,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-109",
           "title": "Tujhe Kitna Chahne Lage",
-          "artist": "Arijit Singh & Mithoon \u00b7 2019",
+          "artist": "Arijit Singh & Mithoon · 2019",
           "year": "2019",
           "entrySec": 61,
           "exitSec": 101,
@@ -5543,7 +5543,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5624,7 +5624,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-110",
           "title": "Aaj Se Teri",
-          "artist": "Arijit Singh \u00b7 2018",
+          "artist": "Arijit Singh · 2018",
           "year": "2018",
           "entrySec": 68,
           "exitSec": 108,
@@ -5660,7 +5660,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5742,7 +5742,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-113",
           "title": "Tera Yaar Hoon Main",
-          "artist": "Arijit Singh \u00b7 2018",
+          "artist": "Arijit Singh · 2018",
           "year": "2018",
           "entrySec": 58,
           "exitSec": 98,
@@ -5773,7 +5773,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5860,7 +5860,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-115",
           "title": "Phir Bhi Tumko Chaahunga - Arijit Singh & Shashaa Tirupati Vocals Only",
-          "artist": "Mithoon, Arijit Singh & Shashaa Tirupati \u00b7 2017",
+          "artist": "Mithoon, Arijit Singh & Shashaa Tirupati · 2017",
           "year": "2017",
           "entrySec": 31,
           "exitSec": 71,
@@ -5882,7 +5882,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -5978,7 +5978,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-120",
           "title": "Sanam Re",
-          "artist": "Mithoon & Arijit Singh \u00b7 2016",
+          "artist": "Mithoon & Arijit Singh · 2016",
           "year": "2016",
           "entrySec": 25,
           "exitSec": 65,
@@ -6096,7 +6096,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-123",
           "title": "Soch Na Sake",
-          "artist": "Amaal Mallik, Arijit Singh & Tulsi Kumar \u00b7 2015",
+          "artist": "Amaal Mallik, Arijit Singh & Tulsi Kumar · 2015",
           "year": "2015",
           "entrySec": 50,
           "exitSec": 90,
@@ -6214,7 +6214,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-126",
           "title": "Muskurane",
-          "artist": "Jeet Gannguli, Arijit Singh & Rashmi Virag \u00b7 2014",
+          "artist": "Jeet Gannguli, Arijit Singh & Rashmi Virag · 2014",
           "year": "2014",
           "entrySec": 68,
           "exitSec": 108,
@@ -6332,7 +6332,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-127",
           "title": "Sajde",
-          "artist": "Arijit Singh, Gulzar & Nihira Joshi Deshpande \u00b7 2014",
+          "artist": "Arijit Singh, Gulzar & Nihira Joshi Deshpande · 2014",
           "year": "2014",
           "entrySec": 30,
           "exitSec": 70,
@@ -6450,7 +6450,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-128",
           "title": "Tu Hi Hai Aashiqui (Solo)",
-          "artist": "Palash Muchhal & Arijit Singh \u00b7 2014",
+          "artist": "Palash Muchhal & Arijit Singh · 2014",
           "year": "2014",
           "entrySec": 51,
           "exitSec": 91,
@@ -6568,7 +6568,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-138",
           "title": "Phir Mohabbat",
-          "artist": "Mohammed Irfan, Arijit Singh & Saim Bhat \u00b7 2011",
+          "artist": "Mohammed Irfan, Arijit Singh & Saim Bhat · 2011",
           "year": "2011",
           "entrySec": 63,
           "exitSec": 103,
@@ -6686,7 +6686,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-199",
           "title": "Kesariya",
-          "artist": "Pritam, Arijit Singh & Amitabh Bhattacharya \u00b7 2024",
+          "artist": "Pritam, Arijit Singh & Amitabh Bhattacharya · 2024",
           "year": "2024",
           "entrySec": 41,
           "exitSec": 81,
@@ -6734,7 +6734,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -6804,7 +6804,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-6",
           "title": "Hamari Adhuri Kahani",
-          "artist": "Arijit Singh \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh · Jeet Gannguli",
           "year": "2015",
           "durationSec": 398,
           "hookStartSec": 70,
@@ -6838,7 +6838,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-7",
           "title": "Thodi Jagah",
-          "artist": "Arijit Singh \u00b7 Tanishk Bagchi",
+          "artist": "Arijit Singh · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 218,
           "hookStartSec": 40,
@@ -6872,7 +6872,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-9",
           "title": "Kalank (Sad Version)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2019",
           "durationSec": 311,
           "hookStartSec": 55,
@@ -6906,7 +6906,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-11",
           "title": "Judaai",
-          "artist": "Rekha Bhardwaj, Arijit Singh \u00b7 Sachin-Jigar",
+          "artist": "Rekha Bhardwaj, Arijit Singh · Sachin-Jigar",
           "year": "2015",
           "durationSec": 272,
           "hookStartSec": 50,
@@ -6940,7 +6940,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-12",
           "title": "Phir Bhi Tumko Chaahunga",
-          "artist": "Arijit Singh, Shashaa Tirupati \u00b7 Mithoon",
+          "artist": "Arijit Singh, Shashaa Tirupati · Mithoon",
           "year": "2017",
           "durationSec": 351,
           "hookStartSec": 60,
@@ -6974,7 +6974,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-13",
           "title": "Duaa",
-          "artist": "Nandini Srikar, Arijit Singh \u00b7 Vishal-Shekhar",
+          "artist": "Nandini Srikar, Arijit Singh · Vishal-Shekhar",
           "year": "2012",
           "durationSec": 320,
           "hookStartSec": 55,
@@ -7008,7 +7008,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-14",
           "title": "Main Dhoondne Ko Zamaane Mein",
-          "artist": "Arijit Singh \u00b7 Gaurav Dagaonkar",
+          "artist": "Arijit Singh · Gaurav Dagaonkar",
           "year": "2014",
           "durationSec": 263,
           "hookStartSec": 45,
@@ -7042,7 +7042,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-18",
           "title": "Lo Maan Liya",
-          "artist": "Arijit Singh \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh · Jeet Gannguli",
           "year": "2016",
           "durationSec": 300,
           "hookStartSec": 50,
@@ -7076,7 +7076,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-22",
           "title": "Khairiyat (Sad)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2019",
           "durationSec": 280,
           "hookStartSec": 50,
@@ -7110,7 +7110,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-29",
           "title": "Roke Na Ruke Naina",
-          "artist": "Arijit Singh \u00b7 Amaal Mallik",
+          "artist": "Arijit Singh · Amaal Mallik",
           "year": "2017",
           "durationSec": 278,
           "hookStartSec": 50,
@@ -7144,7 +7144,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-54",
           "title": "O Bedardeya",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2023",
           "durationSec": 313,
           "hookStartSec": 55,
@@ -7178,7 +7178,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-55",
           "title": "Apna Bana Le (Sad)",
-          "artist": "Arijit Singh \u00b7 Sachin-Jigar",
+          "artist": "Arijit Singh · Sachin-Jigar",
           "year": "2022",
           "durationSec": 261,
           "hookStartSec": 45,
@@ -7212,7 +7212,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-58",
           "title": "Ishq Mubarak",
-          "artist": "Arijit Singh \u00b7 Ankit Tiwari",
+          "artist": "Arijit Singh · Ankit Tiwari",
           "year": "2016",
           "durationSec": 296,
           "hookStartSec": 50,
@@ -7246,7 +7246,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-59",
           "title": "Tera Chehra",
-          "artist": "Arijit Singh \u00b7 Himesh Reshammiya",
+          "artist": "Arijit Singh · Himesh Reshammiya",
           "year": "2016",
           "durationSec": 274,
           "hookStartSec": 50,
@@ -7280,7 +7280,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-63",
           "title": "Main Phir Bhi Tumko",
-          "artist": "Arijit Singh \u00b7 Mithoon",
+          "artist": "Arijit Singh · Mithoon",
           "year": "2017",
           "durationSec": 351,
           "hookStartSec": 60,
@@ -7314,7 +7314,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-64",
           "title": "Darkhaast (Sad)",
-          "artist": "Arijit Singh, Sunidhi Chauhan \u00b7 Mithoon",
+          "artist": "Arijit Singh, Sunidhi Chauhan · Mithoon",
           "year": "2016",
           "durationSec": 374,
           "hookStartSec": 65,
@@ -7348,7 +7348,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-65",
           "title": "Zaalima (Sad)",
-          "artist": "Arijit Singh, Harshdeep Kaur \u00b7 JAM8",
+          "artist": "Arijit Singh, Harshdeep Kaur · JAM8",
           "year": "2017",
           "durationSec": 299,
           "hookStartSec": 50,
@@ -7382,7 +7382,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-66",
           "title": "Hawayein (Sad)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2017",
           "durationSec": 290,
           "hookStartSec": 50,
@@ -7416,7 +7416,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-67",
           "title": "Lambiyaan Si Judaiyaan",
-          "artist": "Arijit Singh \u00b7 JAM8",
+          "artist": "Arijit Singh · JAM8",
           "year": "2017",
           "durationSec": 238,
           "hookStartSec": 40,
@@ -7450,7 +7450,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-68",
           "title": "Ik Vaari Aa (Sad)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2017",
           "durationSec": 274,
           "hookStartSec": 50,
@@ -7484,7 +7484,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-69",
           "title": "Enna Sona (Sad)",
-          "artist": "Arijit Singh \u00b7 A.R. Rahman",
+          "artist": "Arijit Singh · A.R. Rahman",
           "year": "2017",
           "durationSec": 213,
           "hookStartSec": 35,
@@ -7518,7 +7518,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-70",
           "title": "Nashe Si Chadh Gayi (Acoustic)",
-          "artist": "Arijit Singh \u00b7 Vishal-Shekhar",
+          "artist": "Arijit Singh · Vishal-Shekhar",
           "year": "2016",
           "durationSec": 234,
           "hookStartSec": 40,
@@ -7552,7 +7552,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-71",
           "title": "Soch Na Sake (Sad)",
-          "artist": "Arijit Singh, Tulsi Kumar \u00b7 Amaal Mallik",
+          "artist": "Arijit Singh, Tulsi Kumar · Amaal Mallik",
           "year": "2016",
           "durationSec": 281,
           "hookStartSec": 50,
@@ -7586,7 +7586,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-72",
           "title": "Gerua (Sad)",
-          "artist": "Arijit Singh, Antara Mitra \u00b7 Pritam",
+          "artist": "Arijit Singh, Antara Mitra · Pritam",
           "year": "2015",
           "durationSec": 345,
           "hookStartSec": 60,
@@ -7620,7 +7620,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-73",
           "title": "Janam Janam (Sad)",
-          "artist": "Arijit Singh, Antara Mitra \u00b7 Pritam",
+          "artist": "Arijit Singh, Antara Mitra · Pritam",
           "year": "2015",
           "durationSec": 238,
           "hookStartSec": 40,
@@ -7654,7 +7654,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-74",
           "title": "Manwa Laage (Sad)",
-          "artist": "Arijit Singh, Shreya Ghoshal \u00b7 Vishal-Shekhar",
+          "artist": "Arijit Singh, Shreya Ghoshal · Vishal-Shekhar",
           "year": "2014",
           "durationSec": 271,
           "hookStartSec": 45,
@@ -7688,7 +7688,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-75",
           "title": "Mast Magan (Sad)",
-          "artist": "Arijit Singh, Chinmayi Sripada \u00b7 Shankar-Ehsaan-Loy",
+          "artist": "Arijit Singh, Chinmayi Sripada · Shankar-Ehsaan-Loy",
           "year": "2014",
           "durationSec": 280,
           "hookStartSec": 50,
@@ -7722,7 +7722,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-76",
           "title": "Raabta (Kehte Hain Khuda)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2012",
           "durationSec": 244,
           "hookStartSec": 40,
@@ -7756,7 +7756,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-78",
           "title": "Kabira (Encore)",
-          "artist": "Harshdeep Kaur, Arijit Singh \u00b7 Pritam",
+          "artist": "Harshdeep Kaur, Arijit Singh · Pritam",
           "year": "2013",
           "durationSec": 269,
           "hookStartSec": 45,
@@ -7790,7 +7790,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-85",
           "title": "Hum Mar Jayenge",
-          "artist": "Arijit Singh, Tulsi Kumar \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh, Tulsi Kumar · Jeet Gannguli",
           "year": "2013",
           "durationSec": 306,
           "hookStartSec": 50,
@@ -7824,7 +7824,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-86",
           "title": "Milne Hai Mujhse Aayi",
-          "artist": "Arijit Singh \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh · Jeet Gannguli",
           "year": "2013",
           "durationSec": 295,
           "hookStartSec": 50,
@@ -7858,7 +7858,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-87",
           "title": "Aasan Nahin Yahan",
-          "artist": "Arijit Singh \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh · Jeet Gannguli",
           "year": "2013",
           "durationSec": 214,
           "hookStartSec": 35,
@@ -7892,7 +7892,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-89",
           "title": "Chahun Main Ya Naa",
-          "artist": "Arijit Singh, Palak Muchhal \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh, Palak Muchhal · Jeet Gannguli",
           "year": "2013",
           "durationSec": 304,
           "hookStartSec": 50,
@@ -7926,7 +7926,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-93",
           "title": "Hamdard",
-          "artist": "Arijit Singh \u00b7 Mithoon",
+          "artist": "Arijit Singh · Mithoon",
           "year": "2014",
           "durationSec": 260,
           "hookStartSec": 45,
@@ -7960,7 +7960,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-95",
           "title": "Dil Sambhal Ja Zara",
-          "artist": "Arijit Singh \u00b7 Harshit Saxena",
+          "artist": "Arijit Singh · Harshit Saxena",
           "year": "2011",
           "durationSec": 332,
           "hookStartSec": 55,
@@ -7994,7 +7994,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-96",
           "title": "Uska Hi Banana",
-          "artist": "Arijit Singh \u00b7 Chirantan Bhatt",
+          "artist": "Arijit Singh · Chirantan Bhatt",
           "year": "2012",
           "durationSec": 327,
           "hookStartSec": 55,
@@ -8028,7 +8028,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-10",
           "title": "Naina",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2016",
           "durationSec": 225,
           "hookStartSec": 35,
@@ -8062,7 +8062,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-12",
           "title": "Ae Watan",
-          "artist": "Arijit Singh \u00b7 Shankar-Ehsaan-Loy",
+          "artist": "Arijit Singh · Shankar-Ehsaan-Loy",
           "year": "2018",
           "durationSec": 223,
           "hookStartSec": 35,
@@ -8096,7 +8096,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-57",
           "title": "Saawali Si Raat",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2012",
           "durationSec": 313,
           "hookStartSec": 50,
@@ -8130,7 +8130,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-59",
           "title": "Phir Le Aya Dil (Reprise)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2012",
           "durationSec": 285,
           "hookStartSec": 45,
@@ -8164,7 +8164,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-63",
           "title": "Channa Mereya (Unplugged)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2016",
           "durationSec": 172,
           "hookStartSec": 25,
@@ -8198,7 +8198,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-64",
           "title": "Ae Dil Hai Mushkil (Title)",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2016",
           "durationSec": 269,
           "hookStartSec": 45,
@@ -8232,7 +8232,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-66",
           "title": "The Breakup Song",
-          "artist": "Arijit Singh, Badshah, Jonita Gandhi \u00b7 Pritam",
+          "artist": "Arijit Singh, Badshah, Jonita Gandhi · Pritam",
           "year": "2016",
           "durationSec": 252,
           "hookStartSec": 40,
@@ -8266,7 +8266,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-67",
           "title": "Alizeh",
-          "artist": "Arijit Singh, Ash King, Shashwat Singh \u00b7 Pritam",
+          "artist": "Arijit Singh, Ash King, Shashwat Singh · Pritam",
           "year": "2016",
           "durationSec": 282,
           "hookStartSec": 45,
@@ -8300,7 +8300,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-69",
           "title": "Janam Janam",
-          "artist": "Arijit Singh, Antara Mitra \u00b7 Pritam",
+          "artist": "Arijit Singh, Antara Mitra · Pritam",
           "year": "2015",
           "durationSec": 238,
           "hookStartSec": 40,
@@ -8334,7 +8334,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-70",
           "title": "Daayre",
-          "artist": "Arijit Singh \u00b7 Pritam",
+          "artist": "Arijit Singh · Pritam",
           "year": "2015",
           "durationSec": 290,
           "hookStartSec": 45,
@@ -8368,7 +8368,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-79",
           "title": "Chunar",
-          "artist": "Arijit Singh \u00b7 Sachin-Jigar",
+          "artist": "Arijit Singh · Sachin-Jigar",
           "year": "2015",
           "durationSec": 270,
           "hookStartSec": 45,
@@ -8402,7 +8402,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-97",
           "title": "Bolna",
-          "artist": "Arijit Singh, Asees Kaur \u00b7 Tanishk Bagchi",
+          "artist": "Arijit Singh, Asees Kaur · Tanishk Bagchi",
           "year": "2016",
           "durationSec": 213,
           "hookStartSec": 35,
@@ -8436,7 +8436,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-104",
           "title": "Dekha Hazaro Dafaa",
-          "artist": "Arijit Singh, Palak Muchhal \u00b7 Jeet Gannguli",
+          "artist": "Arijit Singh, Palak Muchhal · Jeet Gannguli",
           "year": "2016",
           "durationSec": 210,
           "hookStartSec": 30,
@@ -8708,7 +8708,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-117",
           "title": "What Jhumka ?",
-          "artist": "Pritam, Arijit Singh, Jonita Gandhi, Ranveer Singh & Amitabh Bhattacharya \u00b7 2023",
+          "artist": "Pritam, Arijit Singh, Jonita Gandhi, Ranveer Singh & Amitabh Bhattacharya · 2023",
           "year": "2023",
           "entrySec": 63,
           "exitSec": 103,
@@ -8764,7 +8764,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -8826,7 +8826,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-138",
           "title": "First Class",
-          "artist": "Pritam, Arijit Singh & Neeti Mohan \u00b7 2019",
+          "artist": "Pritam, Arijit Singh & Neeti Mohan · 2019",
           "year": "2019",
           "entrySec": 49,
           "exitSec": 89,
@@ -8839,7 +8839,7 @@ export const ARTISTS_DB = {
           "videoId": "v7m7f8iN0Xw",
           "heat": [
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -8944,7 +8944,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-161",
           "title": "Galti Se Mistake",
-          "artist": "Pritam, Arijit Singh & Amit Mishra \u00b7 2017",
+          "artist": "Pritam, Arijit Singh & Amit Mishra · 2017",
           "year": "2017",
           "entrySec": 67,
           "exitSec": 107,
@@ -9062,7 +9062,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-186",
           "title": "Sooraj Dooba Hain",
-          "artist": "Amaal Mallik, Arijit Singh, Aditi Singh Sharma \u00b7 2015",
+          "artist": "Amaal Mallik, Arijit Singh, Aditi Singh Sharma · 2015",
           "year": "2015",
           "entrySec": 61,
           "exitSec": 101,
@@ -9165,7 +9165,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -9180,7 +9180,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-193",
           "title": "Raat Bhar",
-          "artist": "Arijit Singh & Shreya Ghoshal \u00b7 2014",
+          "artist": "Arijit Singh & Shreya Ghoshal · 2014",
           "year": "2014",
           "entrySec": 38,
           "exitSec": 78,
@@ -9267,7 +9267,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -9536,7 +9536,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-44",
           "title": "Dhokha Dhadi",
-          "artist": "Arijit Singh, Palak Muchhal \u00b7 Pritam",
+          "artist": "Arijit Singh, Palak Muchhal · Pritam",
           "year": "2013",
           "durationSec": 248,
           "hookStartSec": 40,
@@ -9570,7 +9570,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-60",
           "title": "Aayat",
-          "artist": "Arijit Singh \u00b7 Sanjay Leela Bhansali",
+          "artist": "Arijit Singh · Sanjay Leela Bhansali",
           "year": "2015",
           "durationSec": 262,
           "hookStartSec": 40,
@@ -9604,7 +9604,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-63",
           "title": "Binte Dil",
-          "artist": "Arijit Singh \u00b7 Sanjay Leela Bhansali",
+          "artist": "Arijit Singh · Sanjay Leela Bhansali",
           "year": "2018",
           "durationSec": 192,
           "hookStartSec": 30,
@@ -9940,7 +9940,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-31",
           "title": "The Humma Song",
-          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah \u00b7 A.R. Rahman, Tanishk Bagchi",
+          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah · A.R. Rahman, Tanishk Bagchi",
           "year": "2017",
           "durationSec": 196,
           "hookStartSec": 45,
@@ -10535,7 +10535,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-83",
           "title": "Barbaad",
-          "artist": "The Rish & Jubin Nautiyal \u00b7 2024",
+          "artist": "The Rish & Jubin Nautiyal · 2024",
           "year": "2024",
           "entrySec": 60,
           "exitSec": 100,
@@ -10630,7 +10630,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -10653,7 +10653,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-41",
           "title": "Bewafa Tera Masoom Chehra",
-          "artist": "Jubin Nautiyal \u00b7 Rochak Kohli",
+          "artist": "Jubin Nautiyal · Rochak Kohli",
           "year": "2020",
           "durationSec": 260,
           "hookStartSec": 45,
@@ -10687,7 +10687,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-42",
           "title": "Humnava Mere",
-          "artist": "Jubin Nautiyal \u00b7 Rocky-Shiv",
+          "artist": "Jubin Nautiyal · Rocky-Shiv",
           "year": "2018",
           "durationSec": 330,
           "hookStartSec": 55,
@@ -10755,7 +10755,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-44",
           "title": "Raataan Lambiyan (Sad)",
-          "artist": "Jubin Nautiyal \u00b7 Tanishk Bagchi",
+          "artist": "Jubin Nautiyal · Tanishk Bagchi",
           "year": "2021",
           "durationSec": 230,
           "hookStartSec": 40,
@@ -10789,7 +10789,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-56",
           "title": "Bedardi Se Pyaar Ka",
-          "artist": "Jubin Nautiyal \u00b7 Meet Bros",
+          "artist": "Jubin Nautiyal · Meet Bros",
           "year": "2021",
           "durationSec": 276,
           "hookStartSec": 50,
@@ -10823,7 +10823,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-57",
           "title": "Wafa Na Raas Aayee",
-          "artist": "Jubin Nautiyal \u00b7 Meet Bros",
+          "artist": "Jubin Nautiyal · Meet Bros",
           "year": "2021",
           "durationSec": 317,
           "hookStartSec": 55,
@@ -10857,7 +10857,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-62",
           "title": "Kaabil Hoon (Sad)",
-          "artist": "Jubin Nautiyal \u00b7 Rajesh Roshan",
+          "artist": "Jubin Nautiyal · Rajesh Roshan",
           "year": "2017",
           "durationSec": 314,
           "hookStartSec": 55,
@@ -11042,7 +11042,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-5",
           "title": "Nagada Sang Dhol",
-          "artist": "Shreya Ghoshal, Osman Mir \u00b7 Sanjay Leela Bhansali",
+          "artist": "Shreya Ghoshal, Osman Mir · Sanjay Leela Bhansali",
           "year": "2013",
           "durationSec": 271,
           "hookStartSec": 55,
@@ -11161,7 +11161,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-80",
           "title": "Deewangi Deewangi",
-          "artist": "Shaan, Udit Narayan, Shreya Ghoshal, Sunidhi Chauhan \u00b7 Vishal-Shekhar",
+          "artist": "Shaan, Udit Narayan, Shreya Ghoshal, Sunidhi Chauhan · Vishal-Shekhar",
           "year": "2007",
           "durationSec": 240,
           "hookStartSec": 55,
@@ -12232,7 +12232,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-105",
           "title": "Mahiya",
-          "artist": "Badshah, Shreya Ghoshal & Hiten \u00b7 2024",
+          "artist": "Badshah, Shreya Ghoshal & Hiten · 2024",
           "year": "2024",
           "entrySec": 50,
           "exitSec": 90,
@@ -12322,7 +12322,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -12826,7 +12826,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-85",
           "title": "Dil Jhoom",
-          "artist": "Ali Zafar, Tanishk Bagchi, Vishal Mishra, Shreya Ghoshal & Gurpreet Saini \u00b7 2024",
+          "artist": "Ali Zafar, Tanishk Bagchi, Vishal Mishra, Shreya Ghoshal & Gurpreet Saini · 2024",
           "year": "2024",
           "entrySec": 43,
           "exitSec": 83,
@@ -12917,7 +12917,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -12944,7 +12944,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-98",
           "title": "Tum Kya Mile",
-          "artist": "Pritam, Arijit Singh, Shreya Ghoshal & Amitabh Bhattacharya \u00b7 2023",
+          "artist": "Pritam, Arijit Singh, Shreya Ghoshal & Amitabh Bhattacharya · 2023",
           "year": "2023",
           "entrySec": 66,
           "exitSec": 106,
@@ -13006,7 +13006,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -13062,7 +13062,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-99",
           "title": "Ve Kamleya",
-          "artist": "Pritam, Arijit Singh, Shreya Ghoshal, Shadab Faridi, Altamash Faridi & Amitabh Bhattacharya \u00b7 2023",
+          "artist": "Pritam, Arijit Singh, Shreya Ghoshal, Shadab Faridi, Altamash Faridi & Amitabh Bhattacharya · 2023",
           "year": "2023",
           "entrySec": 28,
           "exitSec": 68,
@@ -13123,7 +13123,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -13180,7 +13180,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-134",
           "title": "Dil Ye Bekarar Kyun Hai",
-          "artist": "Mohit Chauhan & Shreya Ghoshal \u00b7 2012",
+          "artist": "Mohit Chauhan & Shreya Ghoshal · 2012",
           "year": "2012",
           "entrySec": 45,
           "exitSec": 85,
@@ -13298,7 +13298,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-143",
           "title": "Tere Liye",
-          "artist": "Atif Aslam & Shreya Ghoshal \u00b7 2010",
+          "artist": "Atif Aslam & Shreya Ghoshal · 2010",
           "year": "2010",
           "entrySec": 43,
           "exitSec": 83,
@@ -13416,7 +13416,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-144",
           "title": "Tere Mast Mast Do Nain",
-          "artist": "Rahat Fateh Ali Khan & Shreya Ghoshal \u00b7 2010",
+          "artist": "Rahat Fateh Ali Khan & Shreya Ghoshal · 2010",
           "year": "2010",
           "entrySec": 50,
           "exitSec": 90,
@@ -13534,7 +13534,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-149",
           "title": "Shukran Allah",
-          "artist": "Salim Merchant, Salim-Sulaiman, Sonu Nigam & Shreya Ghoshal \u00b7 2009",
+          "artist": "Salim Merchant, Salim-Sulaiman, Sonu Nigam & Shreya Ghoshal · 2009",
           "year": "2009",
           "entrySec": 68,
           "exitSec": 108,
@@ -13652,7 +13652,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-150",
           "title": "Soniyo",
-          "artist": "Raju Singh, Sonu Nigam, Shreya Ghoshal & Neeraj Shridhar \u00b7 2009",
+          "artist": "Raju Singh, Sonu Nigam, Shreya Ghoshal & Neeraj Shridhar · 2009",
           "year": "2009",
           "entrySec": 30,
           "exitSec": 70,
@@ -13770,7 +13770,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-155",
           "title": "Kaise Mujhe",
-          "artist": "Benny Dayal & Shreya Ghoshal \u00b7 2008",
+          "artist": "Benny Dayal & Shreya Ghoshal · 2008",
           "year": "2008",
           "entrySec": 55,
           "exitSec": 95,
@@ -13888,7 +13888,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-164",
           "title": "Ye Ishq Hai",
-          "artist": "Pritam & Shreya Ghoshal \u00b7 2007",
+          "artist": "Pritam & Shreya Ghoshal · 2007",
           "year": "2007",
           "entrySec": 36,
           "exitSec": 76,
@@ -14006,7 +14006,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-19",
           "title": "Hasi (Female)",
-          "artist": "Shreya Ghoshal \u00b7 Ami Mishra",
+          "artist": "Shreya Ghoshal · Ami Mishra",
           "year": "2015",
           "durationSec": 192,
           "hookStartSec": 35,
@@ -14040,7 +14040,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-74",
           "title": "Manwa Laage (Sad)",
-          "artist": "Arijit Singh, Shreya Ghoshal \u00b7 Vishal-Shekhar",
+          "artist": "Arijit Singh, Shreya Ghoshal · Vishal-Shekhar",
           "year": "2014",
           "durationSec": 271,
           "hookStartSec": 45,
@@ -14108,7 +14108,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-44",
           "title": "Kaise Mujhe Tum Mil Gayi",
-          "artist": "Benny Dayal, Shreya Ghoshal \u00b7 A.R. Rahman",
+          "artist": "Benny Dayal, Shreya Ghoshal · A.R. Rahman",
           "year": "2008",
           "durationSec": 341,
           "hookStartSec": 55,
@@ -14142,7 +14142,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-47",
           "title": "Latoo",
-          "artist": "Shreya Ghoshal \u00b7 A.R. Rahman",
+          "artist": "Shreya Ghoshal · A.R. Rahman",
           "year": "2008",
           "durationSec": 275,
           "hookStartSec": 40,
@@ -14176,7 +14176,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-55",
           "title": "Aashiyan",
-          "artist": "Shreya Ghoshal, Nikhil Paul George \u00b7 Pritam",
+          "artist": "Shreya Ghoshal, Nikhil Paul George · Pritam",
           "year": "2012",
           "durationSec": 236,
           "hookStartSec": 35,
@@ -14278,7 +14278,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-55",
           "title": "Main Agar Kahoon",
-          "artist": "Sonu Nigam, Shreya Ghoshal \u00b7 Vishal-Shekhar",
+          "artist": "Sonu Nigam, Shreya Ghoshal · Vishal-Shekhar",
           "year": "2007",
           "durationSec": 310,
           "hookStartSec": 50,
@@ -14312,7 +14312,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-89",
           "title": "Barso Re",
-          "artist": "Shreya Ghoshal, Uday Mazumdar \u00b7 A.R. Rahman",
+          "artist": "Shreya Ghoshal, Uday Mazumdar · A.R. Rahman",
           "year": "2007",
           "durationSec": 329,
           "hookStartSec": 50,
@@ -14703,7 +14703,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-148",
           "title": "Ek Do Teen",
-          "artist": "Shreya Ghoshal & Parry G \u00b7 2018",
+          "artist": "Shreya Ghoshal & Parry G · 2018",
           "year": "2018",
           "entrySec": 27,
           "exitSec": 67,
@@ -14821,7 +14821,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-150",
           "title": "Ghoomar",
-          "artist": "Shreya Ghoshal, Swaroop Khan & A M Turaz \u00b7 2018",
+          "artist": "Shreya Ghoshal, Swaroop Khan & A M Turaz · 2018",
           "year": "2018",
           "entrySec": 41,
           "exitSec": 81,
@@ -14939,7 +14939,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-193",
           "title": "Raat Bhar",
-          "artist": "Arijit Singh & Shreya Ghoshal \u00b7 2014",
+          "artist": "Arijit Singh & Shreya Ghoshal · 2014",
           "year": "2014",
           "entrySec": 38,
           "exitSec": 78,
@@ -15026,7 +15026,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -15057,7 +15057,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-204",
           "title": "Radha",
-          "artist": "Vishal & Shekhar, Shekhar Ravjiani, Shreya Ghoshal, Udit Narayan & Vishal Dadlani \u00b7 2012",
+          "artist": "Vishal & Shekhar, Shekhar Ravjiani, Shreya Ghoshal, Udit Narayan & Vishal Dadlani · 2012",
           "year": "2012",
           "entrySec": 30,
           "exitSec": 70,
@@ -15113,7 +15113,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -15175,7 +15175,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-224",
           "title": "Dupatta Tera Nau Rang Da",
-          "artist": "Sonu Nigam, Kunal Ganjawala, Shreya Ghoshal & Suzi Q \u00b7 2007",
+          "artist": "Sonu Nigam, Kunal Ganjawala, Shreya Ghoshal & Suzi Q · 2007",
           "year": "2007",
           "entrySec": 51,
           "exitSec": 91,
@@ -15293,7 +15293,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-workout-26",
           "title": "Kar Har Maidaan Fateh",
-          "artist": "Sukhwinder Singh, Shreya Ghoshal \u00b7 Vikram Montrose",
+          "artist": "Sukhwinder Singh, Shreya Ghoshal · Vikram Montrose",
           "year": "2018",
           "durationSec": 311,
           "hookStartSec": 50,
@@ -15309,19 +15309,19 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
@@ -15565,7 +15565,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-32",
           "title": "Ishaqzaade",
-          "artist": "Javed Ali, Shreya Ghoshal \u00b7 Amit Trivedi",
+          "artist": "Javed Ali, Shreya Ghoshal · Amit Trivedi",
           "year": "2012",
           "durationSec": 318,
           "hookStartSec": 50,
@@ -15599,7 +15599,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-34",
           "title": "Jhalla Wallah",
-          "artist": "Shreya Ghoshal \u00b7 Amit Trivedi",
+          "artist": "Shreya Ghoshal · Amit Trivedi",
           "year": "2012",
           "durationSec": 353,
           "hookStartSec": 55,
@@ -15633,7 +15633,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-55",
           "title": "Gajanana",
-          "artist": "Sukhwinder Singh \u00b7 Shreyas Puranik",
+          "artist": "Sukhwinder Singh · Shreyas Puranik",
           "year": "2015",
           "durationSec": 214,
           "hookStartSec": 35,
@@ -15649,25 +15649,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-motivating-57",
           "title": "Deewani Mastani",
-          "artist": "Shreya Ghoshal \u00b7 Sanjay Leela Bhansali",
+          "artist": "Shreya Ghoshal · Sanjay Leela Bhansali",
           "year": "2015",
           "durationSec": 340,
           "hookStartSec": 55,
@@ -15701,7 +15701,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-99",
           "title": "Yeh Ishq Hai (Remix)",
-          "artist": "Shreya Ghoshal \u00b7 DJ A-Sen",
+          "artist": "Shreya Ghoshal · DJ A-Sen",
           "year": "2012",
           "durationSec": 260,
           "hookStartSec": 40,
@@ -15735,7 +15735,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-29",
           "title": "Dagabaaz Re",
-          "artist": "Rahat Fateh Ali Khan, Shreya Ghoshal \u00b7 Sajid-Wajid",
+          "artist": "Rahat Fateh Ali Khan, Shreya Ghoshal · Sajid-Wajid",
           "year": "2012",
           "durationSec": 226,
           "hookStartSec": 50,
@@ -15854,7 +15854,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-88",
           "title": "Aayat",
-          "artist": "Sanjay Leela Bhansali, Shreyas Puranik, Arijit Singh, Mujtaba Aziz Naza, Shadab Faridi, Altamash Faridi & Farhan Sabri \u00b7 2015",
+          "artist": "Sanjay Leela Bhansali, Shreyas Puranik, Arijit Singh, Mujtaba Aziz Naza, Shadab Faridi, Altamash Faridi & Farhan Sabri · 2015",
           "year": "2015",
           "entrySec": 26,
           "exitSec": 66,
@@ -15941,7 +15941,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -15972,7 +15972,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-97",
           "title": "Noor E Khuda",
-          "artist": "Shankar Ehsaan Loy, Adnan Sami, Shankar Mahadevan & Shreya Ghoshal \u00b7 2010",
+          "artist": "Shankar Ehsaan Loy, Adnan Sami, Shankar Mahadevan & Shreya Ghoshal · 2010",
           "year": "2010",
           "entrySec": 31,
           "exitSec": 71,
@@ -16039,7 +16039,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -16717,7 +16717,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-2",
           "title": "London Thumakda",
-          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar \u00b7 Amit Trivedi",
+          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar · Amit Trivedi",
           "year": "2014",
           "durationSec": 215,
           "hookStartSec": 40,
@@ -16836,7 +16836,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-6",
           "title": "Bole Chudiyan",
-          "artist": "Amitabh Bachchan, Sonu Nigam, Alka Yagnik, Udit Narayan, Kavita Krishnamurthy \u00b7 Jatin-Lalit",
+          "artist": "Amitabh Bachchan, Sonu Nigam, Alka Yagnik, Udit Narayan, Kavita Krishnamurthy · Jatin-Lalit",
           "year": "2001",
           "durationSec": 407,
           "hookStartSec": 60,
@@ -16955,7 +16955,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-42",
           "title": "Nagada Nagada",
-          "artist": "Sonu Nigam, Javed Ali \u00b7 Pritam",
+          "artist": "Sonu Nigam, Javed Ali · Pritam",
           "year": "2007",
           "durationSec": 212,
           "hookStartSec": 50,
@@ -17074,7 +17074,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-79",
           "title": "You Are My Soniya",
-          "artist": "Sonu Nigam, Alka Yagnik \u00b7 Sandesh Shandilya",
+          "artist": "Sonu Nigam, Alka Yagnik · Sandesh Shandilya",
           "year": "2001",
           "durationSec": 344,
           "hookStartSec": 50,
@@ -18026,7 +18026,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-149",
           "title": "Shukran Allah",
-          "artist": "Salim Merchant, Salim-Sulaiman, Sonu Nigam & Shreya Ghoshal \u00b7 2009",
+          "artist": "Salim Merchant, Salim-Sulaiman, Sonu Nigam & Shreya Ghoshal · 2009",
           "year": "2009",
           "entrySec": 68,
           "exitSec": 108,
@@ -18144,7 +18144,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-150",
           "title": "Soniyo",
-          "artist": "Raju Singh, Sonu Nigam, Shreya Ghoshal & Neeraj Shridhar \u00b7 2009",
+          "artist": "Raju Singh, Sonu Nigam, Shreya Ghoshal & Neeraj Shridhar · 2009",
           "year": "2009",
           "entrySec": 30,
           "exitSec": 70,
@@ -18262,7 +18262,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-157",
           "title": "Mannata",
-          "artist": "Sajid Wajid, Sonu Nigam & Kavita Krishnamurthy \u00b7 2008",
+          "artist": "Sajid Wajid, Sonu Nigam & Kavita Krishnamurthy · 2008",
           "year": "2008",
           "entrySec": 38,
           "exitSec": 78,
@@ -18380,7 +18380,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-11",
           "title": "Sandese Aate Hai",
-          "artist": "Sonu Nigam, Roop Kumar Rathod \u00b7 Anu Malik",
+          "artist": "Sonu Nigam, Roop Kumar Rathod · Anu Malik",
           "year": "1997",
           "durationSec": 628,
           "hookStartSec": 95,
@@ -18396,25 +18396,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-emotional-41",
           "title": "Inn Lamhon Ke Daaman Mein",
-          "artist": "Sonu Nigam, Madhushree \u00b7 A.R. Rahman",
+          "artist": "Sonu Nigam, Madhushree · A.R. Rahman",
           "year": "2008",
           "durationSec": 397,
           "hookStartSec": 60,
@@ -18448,7 +18448,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-43",
           "title": "Guzarish",
-          "artist": "Javed Ali, Sonu Nigam \u00b7 A.R. Rahman",
+          "artist": "Javed Ali, Sonu Nigam · A.R. Rahman",
           "year": "2008",
           "durationSec": 329,
           "hookStartSec": 50,
@@ -18482,7 +18482,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-53",
           "title": "Phir Milenge Chalte Chalte",
-          "artist": "Sonu Nigam \u00b7 Salim-Sulaiman",
+          "artist": "Sonu Nigam · Salim-Sulaiman",
           "year": "2008",
           "durationSec": 396,
           "hookStartSec": 60,
@@ -18754,7 +18754,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-117",
           "title": "Pyar Dilon Ka Mela Hai",
-          "artist": "Alka Yagnik & Sonu Nigam \u00b7 2000",
+          "artist": "Alka Yagnik & Sonu Nigam · 2000",
           "year": "2000",
           "entrySec": 32,
           "exitSec": 72,
@@ -18853,7 +18853,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -18872,7 +18872,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-53",
           "title": "Kabhi Alvida Naa Kehna",
-          "artist": "Sonu Nigam, Alka Yagnik \u00b7 Shankar-Ehsaan-Loy",
+          "artist": "Sonu Nigam, Alka Yagnik · Shankar-Ehsaan-Loy",
           "year": "2006",
           "durationSec": 483,
           "hookStartSec": 75,
@@ -18906,7 +18906,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-55",
           "title": "Main Agar Kahoon",
-          "artist": "Sonu Nigam, Shreya Ghoshal \u00b7 Vishal-Shekhar",
+          "artist": "Sonu Nigam, Shreya Ghoshal · Vishal-Shekhar",
           "year": "2007",
           "durationSec": 310,
           "hookStartSec": 50,
@@ -18940,7 +18940,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-79",
           "title": "Tanhayee",
-          "artist": "Sonu Nigam \u00b7 Shankar-Ehsaan-Loy",
+          "artist": "Sonu Nigam · Shankar-Ehsaan-Loy",
           "year": "2001",
           "durationSec": 370,
           "hookStartSec": 60,
@@ -18974,7 +18974,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-87",
           "title": "Satrangi Re",
-          "artist": "Sonu Nigam, Kavita Krishnamurthy \u00b7 A.R. Rahman",
+          "artist": "Sonu Nigam, Kavita Krishnamurthy · A.R. Rahman",
           "year": "1998",
           "durationSec": 445,
           "hookStartSec": 70,
@@ -19008,7 +19008,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-220",
           "title": "Aal Izz Well",
-          "artist": "Sonu Nigam, Swanand Kirkire & Shaan \u00b7 2009",
+          "artist": "Sonu Nigam, Swanand Kirkire & Shaan · 2009",
           "year": "2009",
           "entrySec": 43,
           "exitSec": 83,
@@ -19030,7 +19030,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -19126,7 +19126,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-224",
           "title": "Dupatta Tera Nau Rang Da",
-          "artist": "Sonu Nigam, Kunal Ganjawala, Shreya Ghoshal & Suzi Q \u00b7 2007",
+          "artist": "Sonu Nigam, Kunal Ganjawala, Shreya Ghoshal & Suzi Q · 2007",
           "year": "2007",
           "entrySec": 51,
           "exitSec": 91,
@@ -19397,7 +19397,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-75",
           "title": "Gori Tu Latth Maar",
-          "artist": "Sonu Nigam, Palak Muchhal \u00b7 Manas-Shikhar",
+          "artist": "Sonu Nigam, Palak Muchhal · Manas-Shikhar",
           "year": "2017",
           "durationSec": 238,
           "hookStartSec": 35,
@@ -19431,7 +19431,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-82",
           "title": "Ghar Kab Aaoge (Reprise)",
-          "artist": "Sonu Nigam \u00b7 Anu Malik",
+          "artist": "Sonu Nigam · Anu Malik",
           "year": "2021",
           "durationSec": 290,
           "hookStartSec": 45,
@@ -19465,7 +19465,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-103",
           "title": "Nagada Nagada (Remix)",
-          "artist": "Sonu Nigam \u00b7 DJ Kiran",
+          "artist": "Sonu Nigam · DJ Kiran",
           "year": "2012",
           "durationSec": 230,
           "hookStartSec": 35,
@@ -19499,7 +19499,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-110",
           "title": "Tumse Milke Dil Ka",
-          "artist": "Sonu Nigam & Sabri Brothers \u00b7 2004",
+          "artist": "Sonu Nigam & Sabri Brothers · 2004",
           "year": "2004",
           "entrySec": 68,
           "exitSec": 108,
@@ -19535,7 +19535,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -19650,7 +19650,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-2",
           "title": "London Thumakda",
-          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar \u00b7 Amit Trivedi",
+          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar · Amit Trivedi",
           "year": "2014",
           "durationSec": 215,
           "hookStartSec": 40,
@@ -19769,7 +19769,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-10",
           "title": "Dholida",
-          "artist": "Udit Narayan, Neha Kakkar, Palak Muchhal \u00b7 Tanishk Bagchi",
+          "artist": "Udit Narayan, Neha Kakkar, Palak Muchhal · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 230,
           "hookStartSec": 45,
@@ -19888,7 +19888,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-18",
           "title": "Odhani",
-          "artist": "Darshan Raval, Neha Kakkar \u00b7 Sachin-Jigar",
+          "artist": "Darshan Raval, Neha Kakkar · Sachin-Jigar",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -20007,7 +20007,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-21",
           "title": "Chhote Chhote Peg",
-          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans \u00b7 Yo Yo Honey Singh",
+          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans · Yo Yo Honey Singh",
           "year": "2018",
           "durationSec": 170,
           "hookStartSec": 40,
@@ -20126,7 +20126,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-23",
           "title": "Morni Banke",
-          "artist": "Guru Randhawa, Neha Kakkar \u00b7 Tanishk Bagchi",
+          "artist": "Guru Randhawa, Neha Kakkar · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 197,
           "hookStartSec": 45,
@@ -20245,7 +20245,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-26",
           "title": "Kar Gayi Chull",
-          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar \u00b7 Amaal Mallik",
+          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar · Amaal Mallik",
           "year": "2016",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -20364,7 +20364,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-29",
           "title": "Kala Chashma",
-          "artist": "Amar Arshi, Badshah, Neha Kakkar \u00b7 Badshah",
+          "artist": "Amar Arshi, Badshah, Neha Kakkar · Badshah",
           "year": "2016",
           "durationSec": 173,
           "hookStartSec": 45,
@@ -20483,7 +20483,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-33",
           "title": "Aankh Marey",
-          "artist": "Neha Kakkar, Mika Singh, Kumar Sanu \u00b7 Tanishk Bagchi",
+          "artist": "Neha Kakkar, Mika Singh, Kumar Sanu · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 203,
           "hookStartSec": 40,
@@ -20602,7 +20602,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-34",
           "title": "Coca Cola",
-          "artist": "Tony Kakkar, Neha Kakkar \u00b7 Tony Kakkar",
+          "artist": "Tony Kakkar, Neha Kakkar · Tony Kakkar",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 35,
@@ -20721,7 +20721,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-36",
           "title": "Hauli Hauli",
-          "artist": "Garry Sandhu, Neha Kakkar \u00b7 Tanishk Bagchi",
+          "artist": "Garry Sandhu, Neha Kakkar · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 187,
           "hookStartSec": 40,
@@ -20840,7 +20840,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-39",
           "title": "Chandigarh Mein",
-          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur \u00b7 Tanishk Bagchi",
+          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 195,
           "hookStartSec": 40,
@@ -20959,7 +20959,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-48",
           "title": "Desi Boyz",
-          "artist": "KK, Bob \u00b7 Pritam",
+          "artist": "KK, Bob · Pritam",
           "year": "2011",
           "durationSec": 264,
           "hookStartSec": 40,
@@ -21078,7 +21078,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-50",
           "title": "Tune Maari Entriyaan",
-          "artist": "Vishal Dadlani, KK, Neeti Mohan, Bappi Lahiri \u00b7 Sohail Sen",
+          "artist": "Vishal Dadlani, KK, Neeti Mohan, Bappi Lahiri · Sohail Sen",
           "year": "2014",
           "durationSec": 265,
           "hookStartSec": 45,
@@ -21197,7 +21197,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-62",
           "title": "India Waale",
-          "artist": "Vishal Dadlani, KK, Shankar Mahadevan, Neeti Mohan \u00b7 Vishal-Shekhar",
+          "artist": "Vishal Dadlani, KK, Shankar Mahadevan, Neeti Mohan · Vishal-Shekhar",
           "year": "2014",
           "durationSec": 237,
           "hookStartSec": 50,
@@ -24886,7 +24886,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-136",
           "title": "Tujhe Sochta Hoon",
-          "artist": "KK & Pritam \u00b7 2012",
+          "artist": "KK & Pritam · 2012",
           "year": "2012",
           "entrySec": 35,
           "exitSec": 75,
@@ -25004,7 +25004,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-146",
           "title": "Dil Ibaadat",
-          "artist": "KK & Pritam \u00b7 2009",
+          "artist": "KK & Pritam · 2009",
           "year": "2009",
           "entrySec": 33,
           "exitSec": 73,
@@ -25122,7 +25122,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-158",
           "title": "Ajab Si",
-          "artist": "KK & Vishal & Shekhar \u00b7 2007",
+          "artist": "KK & Vishal & Shekhar · 2007",
           "year": "2007",
           "entrySec": 28,
           "exitSec": 68,
@@ -25240,7 +25240,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-159",
           "title": "Beete Lamhein",
-          "artist": "KK \u00b7 2007",
+          "artist": "KK · 2007",
           "year": "2007",
           "entrySec": 35,
           "exitSec": 75,
@@ -25358,7 +25358,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-84",
           "title": "Piya Aaye Na",
-          "artist": "KK, Tulsi Kumar \u00b7 Jeet Gannguli",
+          "artist": "KK, Tulsi Kumar · Jeet Gannguli",
           "year": "2013",
           "durationSec": 286,
           "hookStartSec": 50,
@@ -25392,7 +25392,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-105",
           "title": "Alvida",
-          "artist": "KK \u00b7 Pritam",
+          "artist": "KK · Pritam",
           "year": "2007",
           "durationSec": 338,
           "hookStartSec": 55,
@@ -25426,7 +25426,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-26",
           "title": "Hazaron Khwaishein Aisi",
-          "artist": "K.K. \u00b7 Shantanu Moitra",
+          "artist": "K.K. · Shantanu Moitra",
           "year": "2005",
           "durationSec": 312,
           "hookStartSec": 50,
@@ -25460,7 +25460,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-95",
           "title": "Tu Bhoola Jise",
-          "artist": "KK \u00b7 Amaal Mallik",
+          "artist": "KK · Amaal Mallik",
           "year": "2016",
           "durationSec": 271,
           "hookStartSec": 40,
@@ -25494,7 +25494,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-63",
           "title": "Ae Aa O",
-          "artist": "K.K., Rana Mazumder, Suraj Jagan \u00b7 Pritam",
+          "artist": "K.K., Rana Mazumder, Suraj Jagan · Pritam",
           "year": "2009",
           "durationSec": 239,
           "hookStartSec": 35,
@@ -25528,7 +25528,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-67",
           "title": "O Meri Jaan",
-          "artist": "KK \u00b7 Pritam",
+          "artist": "KK · Pritam",
           "year": "2007",
           "durationSec": 301,
           "hookStartSec": 50,
@@ -25562,7 +25562,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-69",
           "title": "Alvida (Rock)",
-          "artist": "KK \u00b7 Pritam",
+          "artist": "KK · Pritam",
           "year": "2007",
           "durationSec": 340,
           "hookStartSec": 55,
@@ -25630,7 +25630,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-81",
           "title": "Kya Mujhe Pyar Hai",
-          "artist": "KK \u00b7 Pritam",
+          "artist": "KK · Pritam",
           "year": "2006",
           "durationSec": 253,
           "hookStartSec": 40,
@@ -26140,7 +26140,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-120",
           "title": "O Sajna (New)",
-          "artist": "Neha Kakkar, Tanishk Bagchi \u00b7 2022",
+          "artist": "Neha Kakkar, Tanishk Bagchi · 2022",
           "year": "2022",
           "entrySec": 29,
           "exitSec": 69,
@@ -26188,7 +26188,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -26258,7 +26258,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-140",
           "title": "Lamborghini (New)",
-          "artist": "Meet Bros, Neha Kakkar & Jassie Gill \u00b7 2019",
+          "artist": "Meet Bros, Neha Kakkar & Jassie Gill · 2019",
           "year": "2019",
           "entrySec": 46,
           "exitSec": 86,
@@ -26376,7 +26376,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-145",
           "title": "Yaad Piya Ki Aane Lagi (New)",
-          "artist": "Neha Kakkar \u00b7 2019",
+          "artist": "Neha Kakkar · 2019",
           "year": "2019",
           "entrySec": 61,
           "exitSec": 101,
@@ -26494,7 +26494,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-147",
           "title": "Bhangra Ta Sajda (No One Gives a Damn!)",
-          "artist": "Neha Kakkar, Romy & Shashwat Sachdev \u00b7 2018",
+          "artist": "Neha Kakkar, Romy & Shashwat Sachdev · 2018",
           "year": "2018",
           "entrySec": 37,
           "exitSec": 77,
@@ -26612,7 +26612,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-149",
           "title": "Gali Gali",
-          "artist": "Neha Kakkar \u00b7 2018",
+          "artist": "Neha Kakkar · 2018",
           "year": "2018",
           "entrySec": 34,
           "exitSec": 74,
@@ -26730,7 +26730,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-184",
           "title": "Paani Waala Dance",
-          "artist": "Ikka, Arko & Shraddha Pandit \u00b7 2015",
+          "artist": "Ikka, Arko & Shraddha Pandit · 2015",
           "year": "2015",
           "entrySec": 47,
           "exitSec": 87,
@@ -26835,7 +26835,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -26848,7 +26848,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-205",
           "title": "Second Hand Jawaani",
-          "artist": "Pritam, Miss Pooja, Neha Kakkar, Nakkash Aziz \u00b7 2012",
+          "artist": "Pritam, Miss Pooja, Neha Kakkar, Nakkash Aziz · 2012",
           "year": "2012",
           "entrySec": 37,
           "exitSec": 77,
@@ -26903,7 +26903,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -26966,7 +26966,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-212",
           "title": "Make Some Noise For the Desi Boyz",
-          "artist": "KK & Bob \u00b7 2011",
+          "artist": "KK & Bob · 2011",
           "year": "2011",
           "entrySec": 59,
           "exitSec": 99,
@@ -27005,7 +27005,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -27084,7 +27084,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-19",
           "title": "Aashayein",
-          "artist": "KK \u00b7 Salim-Sulaiman",
+          "artist": "KK · Salim-Sulaiman",
           "year": "2005",
           "durationSec": 259,
           "hookStartSec": 40,
@@ -27506,7 +27506,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-134",
           "title": "Dil Ye Bekarar Kyun Hai",
-          "artist": "Mohit Chauhan & Shreya Ghoshal \u00b7 2012",
+          "artist": "Mohit Chauhan & Shreya Ghoshal · 2012",
           "year": "2012",
           "entrySec": 45,
           "exitSec": 85,
@@ -27624,7 +27624,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-135",
           "title": "Rab Ka Shukrana",
-          "artist": "Mohit Chauhan & Pritam \u00b7 2012",
+          "artist": "Mohit Chauhan & Pritam · 2012",
           "year": "2012",
           "entrySec": 28,
           "exitSec": 68,
@@ -27742,7 +27742,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-139",
           "title": "Phir Se Ud Chala",
-          "artist": "Mohit Chauhan \u00b7 2011",
+          "artist": "Mohit Chauhan · 2011",
           "year": "2011",
           "entrySec": 25,
           "exitSec": 65,
@@ -27860,7 +27860,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-140",
           "title": "Tum Ho",
-          "artist": "Mohit Chauhan & Suzanne D'Mello \u00b7 2011",
+          "artist": "Mohit Chauhan & Suzanne D'Mello · 2011",
           "year": "2011",
           "entrySec": 46,
           "exitSec": 86,
@@ -27978,7 +27978,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-141",
           "title": "Bheegi Si Bhaagi Si",
-          "artist": "Pritam, Mohit Chauhan & Antara Mitra \u00b7 2010",
+          "artist": "Pritam, Mohit Chauhan & Antara Mitra · 2010",
           "year": "2010",
           "entrySec": 53,
           "exitSec": 93,
@@ -28096,7 +28096,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-151",
           "title": "Tune Jo Na Kaha",
-          "artist": "Pritam, Mohit Chauhan, Sandeep Shrivastava \u00b7 2009",
+          "artist": "Pritam, Mohit Chauhan, Sandeep Shrivastava · 2009",
           "year": "2009",
           "entrySec": 58,
           "exitSec": 98,
@@ -28214,7 +28214,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-5",
           "title": "Tujhe Bhula Diya",
-          "artist": "Mohit Chauhan, Shekhar Ravjiani \u00b7 Vishal-Shekhar",
+          "artist": "Mohit Chauhan, Shekhar Ravjiani · Vishal-Shekhar",
           "year": "2010",
           "durationSec": 279,
           "hookStartSec": 60,
@@ -28248,7 +28248,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-77",
           "title": "Ilahi (Reprise Sad)",
-          "artist": "Mohit Chauhan \u00b7 Pritam",
+          "artist": "Mohit Chauhan · Pritam",
           "year": "2013",
           "durationSec": 213,
           "hookStartSec": 35,
@@ -28316,7 +28316,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-30",
           "title": "Khoon Chala",
-          "artist": "Mohit Chauhan \u00b7 A.R. Rahman",
+          "artist": "Mohit Chauhan · A.R. Rahman",
           "year": "2006",
           "durationSec": 189,
           "hookStartSec": 30,
@@ -28350,7 +28350,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-58",
           "title": "Ala Barfi",
-          "artist": "Mohit Chauhan \u00b7 Pritam",
+          "artist": "Mohit Chauhan · Pritam",
           "year": "2012",
           "durationSec": 319,
           "hookStartSec": 50,
@@ -28384,7 +28384,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-7",
           "title": "Khaabon Ke Parindey",
-          "artist": "Mohit Chauhan, Alyssa Mendonsa \u00b7 Shankar-Ehsaan-Loy",
+          "artist": "Mohit Chauhan, Alyssa Mendonsa · Shankar-Ehsaan-Loy",
           "year": "2011",
           "durationSec": 253,
           "hookStartSec": 40,
@@ -29727,7 +29727,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-101",
           "title": "Tum Se Hi (Remix)",
-          "artist": "Mohit Chauhan \u00b7 DJ Suketu",
+          "artist": "Mohit Chauhan · DJ Suketu",
           "year": "2012",
           "durationSec": 290,
           "hookStartSec": 45,
@@ -29761,7 +29761,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-96",
           "title": "Nadaan Parinde",
-          "artist": "A.R. Rahman & Mohit Chauhan \u00b7 2011",
+          "artist": "A.R. Rahman & Mohit Chauhan · 2011",
           "year": "2011",
           "entrySec": 55,
           "exitSec": 95,
@@ -29831,7 +29831,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -30503,7 +30503,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-86",
           "title": "Gehra Hua",
-          "artist": "Shashwat Sachdev, Arijit Singh, Irshad Kamil & Armaan Khan \u00b7 2024",
+          "artist": "Shashwat Sachdev, Arijit Singh, Irshad Kamil & Armaan Khan · 2024",
           "year": "2024",
           "entrySec": 50,
           "exitSec": 90,
@@ -30593,7 +30593,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -30621,7 +30621,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-31",
           "title": "Sab Tera",
-          "artist": "Armaan Malik, Shraddha Kapoor \u00b7 Amaal Mallik",
+          "artist": "Armaan Malik, Shraddha Kapoor · Amaal Mallik",
           "year": "2016",
           "durationSec": 228,
           "hookStartSec": 40,
@@ -30655,7 +30655,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-61",
           "title": "Hua Hain Aaj Pehli Baar",
-          "artist": "Armaan Malik, Palak Muchhal \u00b7 Amaal Mallik",
+          "artist": "Armaan Malik, Palak Muchhal · Amaal Mallik",
           "year": "2016",
           "durationSec": 309,
           "hookStartSec": 55,
@@ -30689,7 +30689,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-98",
           "title": "Buddhu Sa Mann",
-          "artist": "Armaan Malik, Amaal Mallik \u00b7 Amaal Mallik",
+          "artist": "Armaan Malik, Amaal Mallik · Amaal Mallik",
           "year": "2016",
           "durationSec": 206,
           "hookStartSec": 30,
@@ -30723,7 +30723,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-24",
           "title": "Besabriyaan",
-          "artist": "Armaan Malik \u00b7 Amaal Mallik",
+          "artist": "Armaan Malik · Amaal Mallik",
           "year": "2016",
           "durationSec": 255,
           "hookStartSec": 40,
@@ -30757,7 +30757,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-84",
           "title": "Sau Aasmaan",
-          "artist": "Armaan Malik, Neeti Mohan \u00b7 Amaal Mallik",
+          "artist": "Armaan Malik, Neeti Mohan · Amaal Mallik",
           "year": "2016",
           "durationSec": 234,
           "hookStartSec": 35,
@@ -30791,7 +30791,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-93",
           "title": "Badass Babuaa",
-          "artist": "Armaan Malik, Shahid Mallya \u00b7 Sameer Uddin",
+          "artist": "Armaan Malik, Shahid Mallya · Sameer Uddin",
           "year": "2017",
           "durationSec": 159,
           "hookStartSec": 25,
@@ -31092,7 +31092,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-85",
           "title": "Dil Jhoom",
-          "artist": "Ali Zafar, Tanishk Bagchi, Vishal Mishra, Shreya Ghoshal & Gurpreet Saini \u00b7 2024",
+          "artist": "Ali Zafar, Tanishk Bagchi, Vishal Mishra, Shreya Ghoshal & Gurpreet Saini · 2024",
           "year": "2024",
           "entrySec": 43,
           "exitSec": 83,
@@ -31183,7 +31183,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -31210,7 +31210,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-91",
           "title": "Tumhein Bhi Humse",
-          "artist": "Vishal Mishra & Mithoon \u00b7 2024",
+          "artist": "Vishal Mishra & Mithoon · 2024",
           "year": "2024",
           "entrySec": 51,
           "exitSec": 91,
@@ -31287,7 +31287,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -31328,7 +31328,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-94",
           "title": "Diwali",
-          "artist": "Vishal Mishra \u00b7 2023",
+          "artist": "Vishal Mishra · 2023",
           "year": "2023",
           "entrySec": 41,
           "exitSec": 81,
@@ -31400,7 +31400,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -31480,7 +31480,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-127",
           "title": "Naacho Naacho",
-          "artist": "Vishal Mishra, Rahul Sipligunj & M.M. Kreem \u00b7 2021",
+          "artist": "Vishal Mishra, Rahul Sipligunj & M.M. Kreem · 2021",
           "year": "2021",
           "entrySec": 61,
           "exitSec": 101,
@@ -31517,7 +31517,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -31627,7 +31627,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-4",
           "title": "Chogada",
-          "artist": "Darshan Raval, Asees Kaur \u00b7 Lijo George - DJ Chetas",
+          "artist": "Darshan Raval, Asees Kaur · Lijo George - DJ Chetas",
           "year": "2018",
           "durationSec": 275,
           "hookStartSec": 50,
@@ -31746,7 +31746,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-13",
           "title": "Kamariya",
-          "artist": "Darshan Raval \u00b7 Lijo George - DJ Chetas",
+          "artist": "Darshan Raval · Lijo George - DJ Chetas",
           "year": "2018",
           "durationSec": 254,
           "hookStartSec": 45,
@@ -31865,7 +31865,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-18",
           "title": "Odhani",
-          "artist": "Darshan Raval, Neha Kakkar \u00b7 Sachin-Jigar",
+          "artist": "Darshan Raval, Neha Kakkar · Sachin-Jigar",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -31984,7 +31984,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-69",
           "title": "Dhindhora Baje Re",
-          "artist": "Darshan Raval, Bhoomi Trivedi \u00b7 Pritam",
+          "artist": "Darshan Raval, Bhoomi Trivedi · Pritam",
           "year": "2023",
           "durationSec": 269,
           "hookStartSec": 50,
@@ -32137,7 +32137,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-137",
           "title": "Dil Mera Blast",
-          "artist": "Darshan Raval \u00b7 2019",
+          "artist": "Darshan Raval · 2019",
           "year": "2019",
           "entrySec": 42,
           "exitSec": 82,
@@ -32151,7 +32151,7 @@ export const ARTISTS_DB = {
           "heat": [
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -32404,7 +32404,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-23",
           "title": "Pachtaoge",
-          "artist": "Arijit Singh \u00b7 B Praak",
+          "artist": "Arijit Singh · B Praak",
           "year": "2019",
           "durationSec": 226,
           "hookStartSec": 40,
@@ -32438,7 +32438,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-24",
           "title": "Filhall",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2019",
           "durationSec": 255,
           "hookStartSec": 45,
@@ -32472,7 +32472,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-25",
           "title": "Filhaal 2 Mohabbat",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2021",
           "durationSec": 290,
           "hookStartSec": 50,
@@ -32540,7 +32540,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-27",
           "title": "Teri Mitti (Tribute)",
-          "artist": "B Praak \u00b7 Arko",
+          "artist": "B Praak · Arko",
           "year": "2019",
           "durationSec": 314,
           "hookStartSec": 55,
@@ -32574,7 +32574,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-28",
           "title": "Dil Tod Ke",
-          "artist": "B Praak \u00b7 Rochak Kohli",
+          "artist": "B Praak · Rochak Kohli",
           "year": "2020",
           "durationSec": 314,
           "hookStartSec": 55,
@@ -32642,7 +32642,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-46",
           "title": "Baarish Ki Jaaye",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2021",
           "durationSec": 258,
           "hookStartSec": 45,
@@ -32676,7 +32676,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-47",
           "title": "Qismat",
-          "artist": "Ammy Virk, B Praak \u00b7 Jaani",
+          "artist": "Ammy Virk, B Praak · Jaani",
           "year": "2017",
           "durationSec": 250,
           "hookStartSec": 45,
@@ -32710,7 +32710,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-48",
           "title": "Hath Chumme",
-          "artist": "Ammy Virk, B Praak \u00b7 Jaani",
+          "artist": "Ammy Virk, B Praak · Jaani",
           "year": "2018",
           "durationSec": 260,
           "hookStartSec": 45,
@@ -32744,7 +32744,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-49",
           "title": "Dholna",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2018",
           "durationSec": 270,
           "hookStartSec": 50,
@@ -32778,7 +32778,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-50",
           "title": "Besharam Bewaffa",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2020",
           "durationSec": 265,
           "hookStartSec": 45,
@@ -32812,7 +32812,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-51",
           "title": "Jannat",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -32846,7 +32846,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-52",
           "title": "Kya Loge Tum",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2023",
           "durationSec": 235,
           "hookStartSec": 40,
@@ -32880,7 +32880,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-53",
           "title": "Yaar Ka Sataya Hua Hai",
-          "artist": "B Praak \u00b7 Jaani",
+          "artist": "B Praak · Jaani",
           "year": "2023",
           "durationSec": 250,
           "hookStartSec": 45,
@@ -33271,7 +33271,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-12",
           "title": "Roar of Kesari",
-          "artist": "B Praak \u00b7 Arko",
+          "artist": "B Praak · Arko",
           "year": "2019",
           "durationSec": 210,
           "hookStartSec": 30,
@@ -33287,19 +33287,19 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
@@ -33453,7 +33453,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-2",
           "title": "London Thumakda",
-          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar \u00b7 Amit Trivedi",
+          "artist": "Labh Janjua, Sonu Kakkar, Neha Kakkar · Amit Trivedi",
           "year": "2014",
           "durationSec": 215,
           "hookStartSec": 40,
@@ -33572,7 +33572,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-10",
           "title": "Dholida",
-          "artist": "Udit Narayan, Neha Kakkar, Palak Muchhal \u00b7 Tanishk Bagchi",
+          "artist": "Udit Narayan, Neha Kakkar, Palak Muchhal · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 230,
           "hookStartSec": 45,
@@ -33691,7 +33691,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-18",
           "title": "Odhani",
-          "artist": "Darshan Raval, Neha Kakkar \u00b7 Sachin-Jigar",
+          "artist": "Darshan Raval, Neha Kakkar · Sachin-Jigar",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -33810,7 +33810,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-21",
           "title": "Chhote Chhote Peg",
-          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans \u00b7 Yo Yo Honey Singh",
+          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans · Yo Yo Honey Singh",
           "year": "2018",
           "durationSec": 170,
           "hookStartSec": 40,
@@ -33929,7 +33929,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-23",
           "title": "Morni Banke",
-          "artist": "Guru Randhawa, Neha Kakkar \u00b7 Tanishk Bagchi",
+          "artist": "Guru Randhawa, Neha Kakkar · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 197,
           "hookStartSec": 45,
@@ -34048,7 +34048,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-26",
           "title": "Kar Gayi Chull",
-          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar \u00b7 Amaal Mallik",
+          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar · Amaal Mallik",
           "year": "2016",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -34167,7 +34167,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-29",
           "title": "Kala Chashma",
-          "artist": "Amar Arshi, Badshah, Neha Kakkar \u00b7 Badshah",
+          "artist": "Amar Arshi, Badshah, Neha Kakkar · Badshah",
           "year": "2016",
           "durationSec": 173,
           "hookStartSec": 45,
@@ -34286,7 +34286,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-33",
           "title": "Aankh Marey",
-          "artist": "Neha Kakkar, Mika Singh, Kumar Sanu \u00b7 Tanishk Bagchi",
+          "artist": "Neha Kakkar, Mika Singh, Kumar Sanu · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 203,
           "hookStartSec": 40,
@@ -34405,7 +34405,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-34",
           "title": "Coca Cola",
-          "artist": "Tony Kakkar, Neha Kakkar \u00b7 Tony Kakkar",
+          "artist": "Tony Kakkar, Neha Kakkar · Tony Kakkar",
           "year": "2019",
           "durationSec": 240,
           "hookStartSec": 35,
@@ -34524,7 +34524,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-36",
           "title": "Hauli Hauli",
-          "artist": "Garry Sandhu, Neha Kakkar \u00b7 Tanishk Bagchi",
+          "artist": "Garry Sandhu, Neha Kakkar · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 187,
           "hookStartSec": 40,
@@ -34643,7 +34643,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-39",
           "title": "Chandigarh Mein",
-          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur \u00b7 Tanishk Bagchi",
+          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 195,
           "hookStartSec": 40,
@@ -36309,7 +36309,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-120",
           "title": "O Sajna (New)",
-          "artist": "Neha Kakkar, Tanishk Bagchi \u00b7 2022",
+          "artist": "Neha Kakkar, Tanishk Bagchi · 2022",
           "year": "2022",
           "entrySec": 29,
           "exitSec": 69,
@@ -36357,7 +36357,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -36427,7 +36427,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-140",
           "title": "Lamborghini (New)",
-          "artist": "Meet Bros, Neha Kakkar & Jassie Gill \u00b7 2019",
+          "artist": "Meet Bros, Neha Kakkar & Jassie Gill · 2019",
           "year": "2019",
           "entrySec": 46,
           "exitSec": 86,
@@ -36545,7 +36545,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-145",
           "title": "Yaad Piya Ki Aane Lagi (New)",
-          "artist": "Neha Kakkar \u00b7 2019",
+          "artist": "Neha Kakkar · 2019",
           "year": "2019",
           "entrySec": 61,
           "exitSec": 101,
@@ -36663,7 +36663,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-147",
           "title": "Bhangra Ta Sajda (No One Gives a Damn!)",
-          "artist": "Neha Kakkar, Romy & Shashwat Sachdev \u00b7 2018",
+          "artist": "Neha Kakkar, Romy & Shashwat Sachdev · 2018",
           "year": "2018",
           "entrySec": 37,
           "exitSec": 77,
@@ -36781,7 +36781,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-149",
           "title": "Gali Gali",
-          "artist": "Neha Kakkar \u00b7 2018",
+          "artist": "Neha Kakkar · 2018",
           "year": "2018",
           "entrySec": 34,
           "exitSec": 74,
@@ -36899,7 +36899,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-205",
           "title": "Second Hand Jawaani",
-          "artist": "Pritam, Miss Pooja, Neha Kakkar, Nakkash Aziz \u00b7 2012",
+          "artist": "Pritam, Miss Pooja, Neha Kakkar, Nakkash Aziz · 2012",
           "year": "2012",
           "entrySec": 37,
           "exitSec": 77,
@@ -36954,7 +36954,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -37017,7 +37017,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-227",
           "title": "Soni De Nakhre",
-          "artist": "Wajid, Labh Janjua & Sneha Pant \u00b7 2007",
+          "artist": "Wajid, Labh Janjua & Sneha Pant · 2007",
           "year": "2007",
           "entrySec": 55,
           "exitSec": 95,
@@ -37177,7 +37177,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-9",
           "title": "Dilliwali Girlfriend",
-          "artist": "Arijit Singh, Sunidhi Chauhan \u00b7 Pritam",
+          "artist": "Arijit Singh, Sunidhi Chauhan · Pritam",
           "year": "2013",
           "durationSec": 246,
           "hookStartSec": 45,
@@ -37296,7 +37296,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-43",
           "title": "Ainvayi Ainvayi",
-          "artist": "Salim Merchant, Sunidhi Chauhan \u00b7 Salim-Sulaiman",
+          "artist": "Salim Merchant, Sunidhi Chauhan · Salim-Sulaiman",
           "year": "2010",
           "durationSec": 282,
           "hookStartSec": 45,
@@ -37415,7 +37415,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-65",
           "title": "Show Me The Thumka",
-          "artist": "Sunidhi Chauhan, Shashwat Singh \u00b7 Pritam",
+          "artist": "Sunidhi Chauhan, Shashwat Singh · Pritam",
           "year": "2023",
           "durationSec": 226,
           "hookStartSec": 45,
@@ -37534,7 +37534,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-78",
           "title": "Say Shava Shava",
-          "artist": "Alka Yagnik, Sunidhi Chauhan, Udit Narayan, Sudesh Bhosle, Amitabh Bachchan \u00b7 Aadesh Shrivastava",
+          "artist": "Alka Yagnik, Sunidhi Chauhan, Udit Narayan, Sudesh Bhosle, Amitabh Bachchan · Aadesh Shrivastava",
           "year": "2001",
           "durationSec": 437,
           "hookStartSec": 60,
@@ -37653,7 +37653,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-80",
           "title": "Deewangi Deewangi",
-          "artist": "Shaan, Udit Narayan, Shreya Ghoshal, Sunidhi Chauhan \u00b7 Vishal-Shekhar",
+          "artist": "Shaan, Udit Narayan, Shreya Ghoshal, Sunidhi Chauhan · Vishal-Shekhar",
           "year": "2007",
           "durationSec": 240,
           "hookStartSec": 55,
@@ -39557,7 +39557,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-20",
           "title": "Kyon",
-          "artist": "Papon, Sunidhi Chauhan \u00b7 Pritam",
+          "artist": "Papon, Sunidhi Chauhan · Pritam",
           "year": "2012",
           "durationSec": 266,
           "hookStartSec": 45,
@@ -39591,7 +39591,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-64",
           "title": "Darkhaast (Sad)",
-          "artist": "Arijit Singh, Sunidhi Chauhan \u00b7 Mithoon",
+          "artist": "Arijit Singh, Sunidhi Chauhan · Mithoon",
           "year": "2016",
           "durationSec": 374,
           "hookStartSec": 65,
@@ -39625,7 +39625,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-48",
           "title": "Tu Jahan",
-          "artist": "Lucky Ali, Sunidhi Chauhan \u00b7 Vishal-Shekhar",
+          "artist": "Lucky Ali, Sunidhi Chauhan · Vishal-Shekhar",
           "year": "2005",
           "durationSec": 308,
           "hookStartSec": 50,
@@ -39659,7 +39659,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-56",
           "title": "Kyon (Barfi)",
-          "artist": "Papon, Sunidhi Chauhan \u00b7 Pritam",
+          "artist": "Papon, Sunidhi Chauhan · Pritam",
           "year": "2012",
           "durationSec": 266,
           "hookStartSec": 45,
@@ -39693,7 +39693,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-61",
           "title": "Marjaani",
-          "artist": "Sukhwinder Singh, Sunidhi Chauhan \u00b7 Pritam",
+          "artist": "Sukhwinder Singh, Sunidhi Chauhan · Pritam",
           "year": "2009",
           "durationSec": 325,
           "hookStartSec": 50,
@@ -40203,7 +40203,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-105",
           "title": "Chor Bazari Phir Se",
-          "artist": "Tanishk Bagchi, Pritam, Irshad Kamil, Sunidhi Chauhan, Neeraj Shridhar & Zahrah S Khan \u00b7 2024",
+          "artist": "Tanishk Bagchi, Pritam, Irshad Kamil, Sunidhi Chauhan, Neeraj Shridhar & Zahrah S Khan · 2024",
           "year": "2024",
           "entrySec": 33,
           "exitSec": 73,
@@ -40289,7 +40289,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -40321,7 +40321,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-116",
           "title": "Pari Hoon Main (New)",
-          "artist": "Sunidhi Chauhan, Sushant Divgikar & Rajesh Johri \u00b7 2023",
+          "artist": "Sunidhi Chauhan, Sushant Divgikar & Rajesh Johri · 2023",
           "year": "2023",
           "entrySec": 66,
           "exitSec": 106,
@@ -40383,7 +40383,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -40439,7 +40439,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-206",
           "title": "The Disco Song",
-          "artist": "Vishal & Shekhar, Benny Dayal, Nazia Hassan & Sunidhi Chauhan \u00b7 2012",
+          "artist": "Vishal & Shekhar, Benny Dayal, Nazia Hassan & Sunidhi Chauhan · 2012",
           "year": "2012",
           "entrySec": 44,
           "exitSec": 84,
@@ -40493,7 +40493,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -40557,7 +40557,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-216",
           "title": "Aapka Kya Hoga (Dhanno) (New)",
-          "artist": "Mika Singh, Sunidhi Chauhan & Sajid Khan \u00b7 2010",
+          "artist": "Mika Singh, Sunidhi Chauhan & Sajid Khan · 2010",
           "year": "2010",
           "entrySec": 25,
           "exitSec": 65,
@@ -40588,7 +40588,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -40675,7 +40675,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-229",
           "title": "Beedi",
-          "artist": "Vishal Bhardwaj, Sunidhi Chauhan, Sukhwinder Singh, Nachiketa Chakraborty & Clinton Cerejo \u00b7 2006",
+          "artist": "Vishal Bhardwaj, Sunidhi Chauhan, Sukhwinder Singh, Nachiketa Chakraborty & Clinton Cerejo · 2006",
           "year": "2006",
           "entrySec": 69,
           "exitSec": 109,
@@ -40793,7 +40793,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-29",
           "title": "Jhalli Patakha",
-          "artist": "Sunidhi Chauhan \u00b7 Santhosh Narayanan",
+          "artist": "Sunidhi Chauhan · Santhosh Narayanan",
           "year": "2016",
           "durationSec": 249,
           "hookStartSec": 40,
@@ -40827,7 +40827,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-36",
           "title": "Chokra Jawaan",
-          "artist": "Vishal Dadlani, Sunidhi Chauhan \u00b7 Amit Trivedi",
+          "artist": "Vishal Dadlani, Sunidhi Chauhan · Amit Trivedi",
           "year": "2012",
           "durationSec": 311,
           "hookStartSec": 50,
@@ -40861,7 +40861,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-45",
           "title": "Mat Maari",
-          "artist": "Sunidhi Chauhan, Kunal Ganjawala \u00b7 Pritam",
+          "artist": "Sunidhi Chauhan, Kunal Ganjawala · Pritam",
           "year": "2013",
           "durationSec": 261,
           "hookStartSec": 40,
@@ -40895,7 +40895,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-motivating-76",
           "title": "Bakheda",
-          "artist": "Sukhwinder Singh, Sunidhi Chauhan \u00b7 Vayu",
+          "artist": "Sukhwinder Singh, Sunidhi Chauhan · Vayu",
           "year": "2017",
           "durationSec": 207,
           "hookStartSec": 30,
@@ -41078,7 +41078,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-26",
           "title": "Kar Gayi Chull",
-          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar \u00b7 Amaal Mallik",
+          "artist": "Badshah, Fazilpuria, Sukriti Kakar, Neha Kakkar · Amaal Mallik",
           "year": "2016",
           "durationSec": 240,
           "hookStartSec": 40,
@@ -41197,7 +41197,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-27",
           "title": "Let's Nacho",
-          "artist": "Badshah, Benny Dayal \u00b7 Nucleya, Benny Dayal",
+          "artist": "Badshah, Benny Dayal · Nucleya, Benny Dayal",
           "year": "2016",
           "durationSec": 163,
           "hookStartSec": 40,
@@ -41316,7 +41316,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-28",
           "title": "Abhi Toh Party Shuru Hui Hai",
-          "artist": "Badshah, Aastha Gill \u00b7 Badshah",
+          "artist": "Badshah, Aastha Gill · Badshah",
           "year": "2014",
           "durationSec": 189,
           "hookStartSec": 40,
@@ -41435,7 +41435,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-29",
           "title": "Kala Chashma",
-          "artist": "Amar Arshi, Badshah, Neha Kakkar \u00b7 Badshah",
+          "artist": "Amar Arshi, Badshah, Neha Kakkar · Badshah",
           "year": "2016",
           "durationSec": 173,
           "hookStartSec": 45,
@@ -41554,7 +41554,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-31",
           "title": "The Humma Song",
-          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah \u00b7 A.R. Rahman, Tanishk Bagchi",
+          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah · A.R. Rahman, Tanishk Bagchi",
           "year": "2017",
           "durationSec": 196,
           "hookStartSec": 45,
@@ -41673,7 +41673,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-32",
           "title": "Proper Patola",
-          "artist": "Badshah, Diljit Dosanjh, Aastha Gill \u00b7 Badshah",
+          "artist": "Badshah, Diljit Dosanjh, Aastha Gill · Badshah",
           "year": "2018",
           "durationSec": 180,
           "hookStartSec": 40,
@@ -41792,7 +41792,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-39",
           "title": "Chandigarh Mein",
-          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur \u00b7 Tanishk Bagchi",
+          "artist": "Badshah, Harrdy Sandhu, Neha Kakkar, Asees Kaur · Tanishk Bagchi",
           "year": "2019",
           "durationSec": 195,
           "hookStartSec": 40,
@@ -43458,7 +43458,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-105",
           "title": "Mahiya",
-          "artist": "Badshah, Shreya Ghoshal & Hiten \u00b7 2024",
+          "artist": "Badshah, Shreya Ghoshal & Hiten · 2024",
           "year": "2024",
           "entrySec": 50,
           "exitSec": 90,
@@ -43548,7 +43548,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -43576,7 +43576,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-113",
           "title": "She Move It Like",
-          "artist": "Badshah \u00b7 2018",
+          "artist": "Badshah · 2018",
           "year": "2018",
           "entrySec": 34,
           "exitSec": 74,
@@ -43649,7 +43649,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -44884,7 +44884,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-66",
           "title": "The Breakup Song",
-          "artist": "Arijit Singh, Badshah, Jonita Gandhi \u00b7 Pritam",
+          "artist": "Arijit Singh, Badshah, Jonita Gandhi · Pritam",
           "year": "2016",
           "durationSec": 252,
           "hookStartSec": 40,
@@ -44986,7 +44986,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-108",
           "title": "Naina",
-          "artist": "Diljit Dosanjh, Badshah & Raj Ranjodh \u00b7 2024",
+          "artist": "Diljit Dosanjh, Badshah & Raj Ranjodh · 2024",
           "year": "2024",
           "entrySec": 37,
           "exitSec": 77,
@@ -45065,7 +45065,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -45104,7 +45104,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-168",
           "title": "Tamma Tamma Again (New)",
-          "artist": "Bappi Lahiri, Anuradha Paudwal & Badshah \u00b7 2017",
+          "artist": "Bappi Lahiri, Anuradha Paudwal & Badshah · 2017",
           "year": "2017",
           "entrySec": 51,
           "exitSec": 91,
@@ -45222,7 +45222,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-182",
           "title": "Dj Waley Babu",
-          "artist": "Badshah \u00b7 2015",
+          "artist": "Badshah · 2015",
           "year": "2015",
           "entrySec": 43,
           "exitSec": 83,
@@ -46442,7 +46442,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-111",
           "title": "Apna Time Aayega",
-          "artist": "Ranveer Singh, Dub Sharma & DIVINE \u00b7 2019",
+          "artist": "Ranveer Singh, Dub Sharma & DIVINE · 2019",
           "year": "2019",
           "entrySec": 51,
           "exitSec": 91,
@@ -46519,7 +46519,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -46560,7 +46560,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-116",
           "title": "3:59",
-          "artist": "DIVINE \u00b7 2024",
+          "artist": "DIVINE · 2024",
           "year": "2024",
           "entrySec": 66,
           "exitSec": 106,
@@ -46622,7 +46622,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -48732,7 +48732,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-16",
           "title": "Rangtaari",
-          "artist": "Dev Negi, Yo Yo Honey Singh \u00b7 Tanishk Bagchi",
+          "artist": "Dev Negi, Yo Yo Honey Singh · Tanishk Bagchi",
           "year": "2018",
           "durationSec": 239,
           "hookStartSec": 40,
@@ -48851,7 +48851,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-20",
           "title": "Dil Chori",
-          "artist": "Yo Yo Honey Singh, Simar Kaur, Ishers \u00b7 Yo Yo Honey Singh",
+          "artist": "Yo Yo Honey Singh, Simar Kaur, Ishers · Yo Yo Honey Singh",
           "year": "2017",
           "durationSec": 212,
           "hookStartSec": 45,
@@ -48970,7 +48970,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-21",
           "title": "Chhote Chhote Peg",
-          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans \u00b7 Yo Yo Honey Singh",
+          "artist": "Yo Yo Honey Singh, Neha Kakkar, Navraj Hans · Yo Yo Honey Singh",
           "year": "2018",
           "durationSec": 170,
           "hookStartSec": 40,
@@ -49089,7 +49089,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-58",
           "title": "High Heels Te Nachche",
-          "artist": "Meet Bros, Jaz Dhami, Yo Yo Honey Singh \u00b7 Meet Bros",
+          "artist": "Meet Bros, Jaz Dhami, Yo Yo Honey Singh · Meet Bros",
           "year": "2016",
           "durationSec": 177,
           "hookStartSec": 40,
@@ -50755,7 +50755,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-107",
           "title": "God Style",
-          "artist": "Yo Yo Honey Singh & Hommie Dilliwala \u00b7 2023",
+          "artist": "Yo Yo Honey Singh & Hommie Dilliwala · 2023",
           "year": "2023",
           "entrySec": 33,
           "exitSec": 73,
@@ -50841,7 +50841,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -50873,7 +50873,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-108",
           "title": "Moonlight",
-          "artist": "Yo Yo Honey Singh, Priceless \u00b7 2023",
+          "artist": "Yo Yo Honey Singh, Priceless · 2023",
           "year": "2023",
           "entrySec": 40,
           "exitSec": 80,
@@ -50958,7 +50958,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -50991,7 +50991,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-109",
           "title": "So Swaezy",
-          "artist": "Yo Yo Honey Singh & Hommie Dilliwala \u00b7 2023",
+          "artist": "Yo Yo Honey Singh & Hommie Dilliwala · 2023",
           "year": "2023",
           "entrySec": 61,
           "exitSec": 101,
@@ -51073,7 +51073,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51109,7 +51109,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-110",
           "title": "Ka Kha Ga",
-          "artist": "Hommie Dilliwala, Yo Yo Honey Singh \u00b7 2022",
+          "artist": "Hommie Dilliwala, Yo Yo Honey Singh · 2022",
           "year": "2022",
           "entrySec": 68,
           "exitSec": 108,
@@ -51190,7 +51190,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51227,7 +51227,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-hiphop-114",
           "title": "Desi Kalakaar",
-          "artist": "Yo Yo Honey Singh \u00b7 2014",
+          "artist": "Yo Yo Honey Singh · 2014",
           "year": "2014",
           "entrySec": 38,
           "exitSec": 78,
@@ -51293,7 +51293,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51345,7 +51345,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-102",
           "title": "Together Forever",
-          "artist": "Yo Yo Honey Singh \u00b7 2022",
+          "artist": "Yo Yo Honey Singh · 2022",
           "year": "2022",
           "entrySec": 25,
           "exitSec": 65,
@@ -51400,7 +51400,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51463,7 +51463,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-121",
           "title": "Dheere Dheere (New)",
-          "artist": "Yo Yo Honey Singh \u00b7 2015",
+          "artist": "Yo Yo Honey Singh · 2015",
           "year": "2015",
           "entrySec": 53,
           "exitSec": 93,
@@ -51700,7 +51700,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-106",
           "title": "Hauli Hauli",
-          "artist": "Guru Randhawa, Yo Yo Honey Singh, Neha Kakkar & JSL Singh \u00b7 2024",
+          "artist": "Guru Randhawa, Yo Yo Honey Singh, Neha Kakkar & JSL Singh · 2024",
           "year": "2024",
           "entrySec": 40,
           "exitSec": 80,
@@ -51785,7 +51785,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51818,7 +51818,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-115",
           "title": "Pankhudi",
-          "artist": "Yo Yo Honey Singh \u00b7 2023",
+          "artist": "Yo Yo Honey Singh · 2023",
           "year": "2023",
           "entrySec": 59,
           "exitSec": 99,
@@ -51881,7 +51881,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -51936,7 +51936,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-139",
           "title": "Khadke Glassy (New)",
-          "artist": "Yo Yo Honey Singh, Ashok Mastie, Jyotica Tangri, Bonafide & Koncept \u00b7 2019",
+          "artist": "Yo Yo Honey Singh, Ashok Mastie, Jyotica Tangri, Bonafide & Koncept · 2019",
           "year": "2019",
           "entrySec": 39,
           "exitSec": 79,
@@ -52054,7 +52054,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-158",
           "title": "Urvashi (New)",
-          "artist": "Yo Yo Honey Singh \u00b7 2018",
+          "artist": "Yo Yo Honey Singh · 2018",
           "year": "2018",
           "entrySec": 63,
           "exitSec": 103,
@@ -52172,7 +52172,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-207",
           "title": "Brown Rang",
-          "artist": "Yo Yo Honey Singh \u00b7 2011",
+          "artist": "Yo Yo Honey Singh · 2011",
           "year": "2011",
           "entrySec": 34,
           "exitSec": 74,
@@ -52221,7 +52221,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -52290,7 +52290,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-225",
           "title": "Glassy (OG)",
-          "artist": "Yo Yo Honey Singh, Ashok Mastie, Channi Rakhala, Bonafide & Koncept \u00b7 2007",
+          "artist": "Yo Yo Honey Singh, Ashok Mastie, Channi Rakhala, Bonafide & Koncept · 2007",
           "year": "2007",
           "entrySec": 58,
           "exitSec": 98,
@@ -52408,7 +52408,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-21",
           "title": "Dama Dam Mast Qalandar",
-          "artist": "Mika Singh, Yo Yo Honey Singh \u00b7 Traditional",
+          "artist": "Mika Singh, Yo Yo Honey Singh · Traditional",
           "year": "2013",
           "durationSec": 174,
           "hookStartSec": 45,
@@ -57940,7 +57940,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-172",
           "title": "Haseeno Ka Deewana (New)",
-          "artist": "Raftaar & Payal Dev \u00b7 2016",
+          "artist": "Raftaar & Payal Dev · 2016",
           "year": "2016",
           "entrySec": 69,
           "exitSec": 109,
@@ -58058,7 +58058,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-dance-180",
           "title": "All Black",
-          "artist": "Raftaar & Sukh-E Muzical Doctorz \u00b7 2015",
+          "artist": "Raftaar & Sukh-E Muzical Doctorz · 2015",
           "year": "2015",
           "entrySec": 46,
           "exitSec": 86,
@@ -60110,7 +60110,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-67",
           "title": "Alizeh",
-          "artist": "Arijit Singh, Ash King, Shashwat Singh \u00b7 Pritam",
+          "artist": "Arijit Singh, Ash King, Shashwat Singh · Pritam",
           "year": "2016",
           "durationSec": 282,
           "hookStartSec": 45,
@@ -60447,7 +60447,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-82",
           "title": "Arz Kiya Hai Coke Studio Bharat",
-          "artist": "Anuv Jain \u00b7 2024",
+          "artist": "Anuv Jain · 2024",
           "year": "2024",
           "entrySec": 53,
           "exitSec": 93,
@@ -60543,7 +60543,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -60565,7 +60565,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-95",
           "title": "Husn",
-          "artist": "Anuv Jain \u00b7 2023",
+          "artist": "Anuv Jain · 2023",
           "year": "2023",
           "entrySec": 48,
           "exitSec": 88,
@@ -60636,7 +60636,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -61159,7 +61159,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-indie-10",
           "title": "Afsos",
-          "artist": "Anuv Jain & AP Dhillon \u00b7 2024",
+          "artist": "Anuv Jain & AP Dhillon · 2024",
           "year": "2024",
           "entrySec": 32,
           "exitSec": 72,
@@ -61258,7 +61258,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -61306,7 +61306,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-119",
           "title": "Kho Gaye Hum Kahan - Jasleen Royal Vocals Only",
-          "artist": "Jasleen Royal & Prateek Kuhad \u00b7 2016",
+          "artist": "Jasleen Royal & Prateek Kuhad · 2016",
           "year": "2016",
           "entrySec": 63,
           "exitSec": 103,
@@ -62012,7 +62012,7 @@ export const ARTISTS_DB = {
         {
           "id": "diwali-party-songs-31",
           "title": "The Humma Song",
-          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah \u00b7 A.R. Rahman, Tanishk Bagchi",
+          "artist": "Jubin Nautiyal, Shashaa Tirupati, Badshah · A.R. Rahman, Tanishk Bagchi",
           "year": "2017",
           "durationSec": 196,
           "hookStartSec": 45,
@@ -62488,7 +62488,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-131",
           "title": "Raanjhanaa",
-          "artist": "A.R. Rahman, Jaswinder Singh & Shiraz Uppal \u00b7 2013",
+          "artist": "A.R. Rahman, Jaswinder Singh & Shiraz Uppal · 2013",
           "year": "2013",
           "entrySec": 48,
           "exitSec": 88,
@@ -62606,7 +62606,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-132",
           "title": "Tum Tak",
-          "artist": "A.R. Rahman, Javed Ali, Pooja Vaidyanath, Keerthi Sagathia \u00b7 2013",
+          "artist": "A.R. Rahman, Javed Ali, Pooja Vaidyanath, Keerthi Sagathia · 2013",
           "year": "2013",
           "entrySec": 31,
           "exitSec": 71,
@@ -62724,7 +62724,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-153",
           "title": "Jashn-E-Bahaaraa",
-          "artist": "A.R. Rahman & Javed Ali \u00b7 2008",
+          "artist": "A.R. Rahman & Javed Ali · 2008",
           "year": "2008",
           "entrySec": 41,
           "exitSec": 81,
@@ -62842,7 +62842,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-romantic-175",
           "title": "Mehndi Hai Rachnewali",
-          "artist": "A.R. Rahman & Alka Yagnik \u00b7 2001",
+          "artist": "A.R. Rahman & Alka Yagnik · 2001",
           "year": "2001",
           "entrySec": 48,
           "exitSec": 88,
@@ -62934,7 +62934,7 @@ export const ARTISTS_DB = {
             0.028284749105464413,
             0.012765269637459498,
             0.003288458622753676,
-            2.1985276300595658e-06,
+            0.0000021985276300595658,
             0.002957770341754873,
             0.012109053355485233,
             0.027313244858117813,
@@ -62960,7 +62960,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-breakup-69",
           "title": "Enna Sona (Sad)",
-          "artist": "Arijit Singh \u00b7 A.R. Rahman",
+          "artist": "Arijit Singh · A.R. Rahman",
           "year": "2017",
           "durationSec": 213,
           "hookStartSec": 35,
@@ -63062,7 +63062,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-4",
           "title": "Arziyan",
-          "artist": "Javed Ali, Kailash Kher \u00b7 A.R. Rahman",
+          "artist": "Javed Ali, Kailash Kher · A.R. Rahman",
           "year": "2009",
           "durationSec": 509,
           "hookStartSec": 80,
@@ -63130,7 +63130,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-13",
           "title": "Bharat Humko Jaan Se Pyara Hai",
-          "artist": "Hariharan \u00b7 A.R. Rahman",
+          "artist": "Hariharan · A.R. Rahman",
           "year": "1992",
           "durationSec": 368,
           "hookStartSec": 60,
@@ -63164,7 +63164,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-29",
           "title": "Tu Bin Bataye",
-          "artist": "Madhushree, Naresh Iyer \u00b7 A.R. Rahman",
+          "artist": "Madhushree, Naresh Iyer · A.R. Rahman",
           "year": "2006",
           "durationSec": 354,
           "hookStartSec": 55,
@@ -63198,7 +63198,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-30",
           "title": "Khoon Chala",
-          "artist": "Mohit Chauhan \u00b7 A.R. Rahman",
+          "artist": "Mohit Chauhan · A.R. Rahman",
           "year": "2006",
           "durationSec": 189,
           "hookStartSec": 30,
@@ -63232,7 +63232,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-38",
           "title": "Man Kunto Maula",
-          "artist": "Kailash Kher \u00b7 A.R. Rahman",
+          "artist": "Kailash Kher · A.R. Rahman",
           "year": "2003",
           "durationSec": 330,
           "hookStartSec": 50,
@@ -63300,7 +63300,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-41",
           "title": "Inn Lamhon Ke Daaman Mein",
-          "artist": "Sonu Nigam, Madhushree \u00b7 A.R. Rahman",
+          "artist": "Sonu Nigam, Madhushree · A.R. Rahman",
           "year": "2008",
           "durationSec": 397,
           "hookStartSec": 60,
@@ -63334,7 +63334,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-42",
           "title": "Tu Muskuraye",
-          "artist": "Alka Yagnik, Javed Ali \u00b7 A.R. Rahman",
+          "artist": "Alka Yagnik, Javed Ali · A.R. Rahman",
           "year": "2008",
           "durationSec": 335,
           "hookStartSec": 50,
@@ -63368,7 +63368,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-43",
           "title": "Guzarish",
-          "artist": "Javed Ali, Sonu Nigam \u00b7 A.R. Rahman",
+          "artist": "Javed Ali, Sonu Nigam · A.R. Rahman",
           "year": "2008",
           "durationSec": 329,
           "hookStartSec": 50,
@@ -63402,7 +63402,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-44",
           "title": "Kaise Mujhe Tum Mil Gayi",
-          "artist": "Benny Dayal, Shreya Ghoshal \u00b7 A.R. Rahman",
+          "artist": "Benny Dayal, Shreya Ghoshal · A.R. Rahman",
           "year": "2008",
           "durationSec": 341,
           "hookStartSec": 55,
@@ -63436,7 +63436,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-45",
           "title": "Behka",
-          "artist": "Karthik \u00b7 A.R. Rahman",
+          "artist": "Karthik · A.R. Rahman",
           "year": "2008",
           "durationSec": 313,
           "hookStartSec": 50,
@@ -63470,7 +63470,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-46",
           "title": "Aye Bachchu",
-          "artist": "Suzanne D'Mello \u00b7 A.R. Rahman",
+          "artist": "Suzanne D'Mello · A.R. Rahman",
           "year": "2008",
           "durationSec": 228,
           "hookStartSec": 35,
@@ -63504,7 +63504,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-emotional-47",
           "title": "Latoo",
-          "artist": "Shreya Ghoshal \u00b7 A.R. Rahman",
+          "artist": "Shreya Ghoshal · A.R. Rahman",
           "year": "2008",
           "durationSec": 275,
           "hookStartSec": 40,
@@ -63538,7 +63538,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-2",
           "title": "Safarnama",
-          "artist": "Lucky Ali \u00b7 A.R. Rahman",
+          "artist": "Lucky Ali · A.R. Rahman",
           "year": "2015",
           "durationSec": 251,
           "hookStartSec": 40,
@@ -63572,7 +63572,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-8",
           "title": "Yuhi Chala Chal",
-          "artist": "Udit Narayan, Hariharan \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan, Hariharan · A.R. Rahman",
           "year": "2004",
           "durationSec": 448,
           "hookStartSec": 70,
@@ -63606,7 +63606,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-9",
           "title": "Phir Se Ud Chala",
-          "artist": "Mohit Chauhan \u00b7 A.R. Rahman",
+          "artist": "Mohit Chauhan · A.R. Rahman",
           "year": "2011",
           "durationSec": 271,
           "hookStartSec": 45,
@@ -63640,7 +63640,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-10",
           "title": "Patakha Guddi",
-          "artist": "Nooran Sisters \u00b7 A.R. Rahman",
+          "artist": "Nooran Sisters · A.R. Rahman",
           "year": "2014",
           "durationSec": 285,
           "hookStartSec": 45,
@@ -63656,25 +63656,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-trip-26",
           "title": "Yeh Haseen Wadiyan",
-          "artist": "S.P. Balasubrahmanyam, K.S. Chithra \u00b7 A.R. Rahman",
+          "artist": "S.P. Balasubrahmanyam, K.S. Chithra · A.R. Rahman",
           "year": "1992",
           "durationSec": 319,
           "hookStartSec": 50,
@@ -63708,7 +63708,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-27",
           "title": "Roja Janeman",
-          "artist": "S.P. Balasubrahmanyam \u00b7 A.R. Rahman",
+          "artist": "S.P. Balasubrahmanyam · A.R. Rahman",
           "year": "1992",
           "durationSec": 304,
           "hookStartSec": 50,
@@ -63742,7 +63742,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-29",
           "title": "Yun Hi Chala Chal Rahil",
-          "artist": "Udit Narayan \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan · A.R. Rahman",
           "year": "2004",
           "durationSec": 400,
           "hookStartSec": 60,
@@ -63776,7 +63776,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-84",
           "title": "Chaiyya Chaiyya",
-          "artist": "Sukhwinder Singh, Sapna Awasthi \u00b7 A.R. Rahman",
+          "artist": "Sukhwinder Singh, Sapna Awasthi · A.R. Rahman",
           "year": "1998",
           "durationSec": 394,
           "hookStartSec": 65,
@@ -63792,25 +63792,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-trip-85",
           "title": "Jiya Jale",
-          "artist": "Lata Mangeshkar, M.G. Sreekumar \u00b7 A.R. Rahman",
+          "artist": "Lata Mangeshkar, M.G. Sreekumar · A.R. Rahman",
           "year": "1998",
           "durationSec": 314,
           "hookStartSec": 50,
@@ -63878,7 +63878,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-87",
           "title": "Satrangi Re",
-          "artist": "Sonu Nigam, Kavita Krishnamurthy \u00b7 A.R. Rahman",
+          "artist": "Sonu Nigam, Kavita Krishnamurthy · A.R. Rahman",
           "year": "1998",
           "durationSec": 445,
           "hookStartSec": 70,
@@ -63912,7 +63912,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-88",
           "title": "Ae Ajnabi",
-          "artist": "Udit Narayan, Mahalakshmi Iyer \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan, Mahalakshmi Iyer · A.R. Rahman",
           "year": "1998",
           "durationSec": 347,
           "hookStartSec": 55,
@@ -63946,7 +63946,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-89",
           "title": "Barso Re",
-          "artist": "Shreya Ghoshal, Uday Mazumdar \u00b7 A.R. Rahman",
+          "artist": "Shreya Ghoshal, Uday Mazumdar · A.R. Rahman",
           "year": "2007",
           "durationSec": 329,
           "hookStartSec": 50,
@@ -64014,7 +64014,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-91",
           "title": "Mayya Mayya",
-          "artist": "Maryem Tollar, Chinmayi \u00b7 A.R. Rahman",
+          "artist": "Maryem Tollar, Chinmayi · A.R. Rahman",
           "year": "2007",
           "durationSec": 302,
           "hookStartSec": 50,
@@ -64048,7 +64048,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-92",
           "title": "Ek Lo Ek Muft",
-          "artist": "Bappi Lahiri, Chitra \u00b7 A.R. Rahman",
+          "artist": "Bappi Lahiri, Chitra · A.R. Rahman",
           "year": "2007",
           "durationSec": 290,
           "hookStartSec": 45,
@@ -64082,7 +64082,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-93",
           "title": "Jaage Hain",
-          "artist": "K.S. Chithra \u00b7 A.R. Rahman",
+          "artist": "K.S. Chithra · A.R. Rahman",
           "year": "2007",
           "durationSec": 395,
           "hookStartSec": 60,
@@ -64116,7 +64116,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-94",
           "title": "Ghanan Ghanan",
-          "artist": "Udit Narayan, Sukhwinder Singh \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan, Sukhwinder Singh · A.R. Rahman",
           "year": "2001",
           "durationSec": 371,
           "hookStartSec": 60,
@@ -64150,7 +64150,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-95",
           "title": "Mitwa (Lagaan)",
-          "artist": "Udit Narayan, Alka Yagnik \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan, Alka Yagnik · A.R. Rahman",
           "year": "2001",
           "durationSec": 407,
           "hookStartSec": 65,
@@ -64184,7 +64184,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-96",
           "title": "Radha Kaise Na Jale",
-          "artist": "Asha Bhosle, Udit Narayan \u00b7 A.R. Rahman",
+          "artist": "Asha Bhosle, Udit Narayan · A.R. Rahman",
           "year": "2001",
           "durationSec": 334,
           "hookStartSec": 50,
@@ -64252,7 +64252,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-98",
           "title": "O Rey Chhori",
-          "artist": "Udit Narayan, Alka Yagnik \u00b7 A.R. Rahman",
+          "artist": "Udit Narayan, Alka Yagnik · A.R. Rahman",
           "year": "2001",
           "durationSec": 359,
           "hookStartSec": 55,
@@ -64320,7 +64320,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-trip-100",
           "title": "Rang De Basanti",
-          "artist": "Daler Mehndi, K.S. Chithra \u00b7 A.R. Rahman",
+          "artist": "Daler Mehndi, K.S. Chithra · A.R. Rahman",
           "year": "2006",
           "durationSec": 363,
           "hookStartSec": 60,
@@ -64336,25 +64336,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-trip-101",
           "title": "Masti Ki Pathshala",
-          "artist": "Naresh Iyer, Mohammed Aslam \u00b7 A.R. Rahman",
+          "artist": "Naresh Iyer, Mohammed Aslam · A.R. Rahman",
           "year": "2006",
           "durationSec": 219,
           "hookStartSec": 35,
@@ -64914,25 +64914,25 @@ export const ARTISTS_DB = {
           "heat": [
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0,
+            1,
             0.9,
             0.95,
-            1.0
+            1
           ]
         },
         {
           "id": "hindi-motivating-31",
           "title": "Challa (Jab Tak Hai Jaan)",
-          "artist": "Rabbi Shergill \u00b7 A.R. Rahman",
+          "artist": "Rabbi Shergill · A.R. Rahman",
           "year": "2012",
           "durationSec": 323,
           "hookStartSec": 50,
@@ -65323,7 +65323,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-retro-121",
           "title": "Urvashi Urvashi (OG)",
-          "artist": "A.R. Rahman, Shankar Mahadevan & Noel James \u00b7 1994",
+          "artist": "A.R. Rahman, Shankar Mahadevan & Noel James · 1994",
           "year": "1994",
           "entrySec": 29,
           "exitSec": 69,
@@ -65371,7 +65371,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -65441,7 +65441,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-retro-223",
           "title": "Lukka Chuppi",
-          "artist": "Lata Mangeshkar, A.R. Rahman \u00b7 A.R. Rahman",
+          "artist": "Lata Mangeshkar, A.R. Rahman · A.R. Rahman",
           "year": "2006",
           "durationSec": 251,
           "hookStartSec": 60,
@@ -65560,7 +65560,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-11",
           "title": "Piya Haji Ali",
-          "artist": "A.R. Rahman, Srinivas, Murtaza Ghulam Qadir \u00b7 A.R. Rahman",
+          "artist": "A.R. Rahman, Srinivas, Murtaza Ghulam Qadir · A.R. Rahman",
           "year": "2000",
           "durationSec": 328,
           "hookStartSec": 60,
@@ -65679,7 +65679,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-69",
           "title": "Piya Milenge",
-          "artist": "Sukhwinder Singh, KMMC Sufi Ensemble \u00b7 A.R. Rahman",
+          "artist": "Sukhwinder Singh, KMMC Sufi Ensemble · A.R. Rahman",
           "year": "2013",
           "durationSec": 331,
           "hookStartSec": 65,
@@ -65798,7 +65798,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-70",
           "title": "Heer",
-          "artist": "Harshdeep Kaur \u00b7 A.R. Rahman",
+          "artist": "Harshdeep Kaur · A.R. Rahman",
           "year": "2012",
           "durationSec": 286,
           "hookStartSec": 45,
@@ -65917,7 +65917,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-72",
           "title": "Katiya Karun",
-          "artist": "Harshdeep Kaur \u00b7 A.R. Rahman",
+          "artist": "Harshdeep Kaur · A.R. Rahman",
           "year": "2011",
           "durationSec": 240,
           "hookStartSec": 45,
@@ -66036,7 +66036,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-74",
           "title": "Ik Onkar",
-          "artist": "Harshdeep Kaur \u00b7 A.R. Rahman",
+          "artist": "Harshdeep Kaur · A.R. Rahman",
           "year": "2006",
           "durationSec": 240,
           "hookStartSec": 30,
@@ -66155,7 +66155,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-75",
           "title": "Rubaroo",
-          "artist": "A.R. Rahman, Naresh Iyer \u00b7 A.R. Rahman",
+          "artist": "A.R. Rahman, Naresh Iyer · A.R. Rahman",
           "year": "2006",
           "durationSec": 150,
           "hookStartSec": 55,
@@ -66274,7 +66274,7 @@ export const ARTISTS_DB = {
         {
           "id": "hindi-sufi-96",
           "title": "Nadaan Parinde",
-          "artist": "A.R. Rahman & Mohit Chauhan \u00b7 2011",
+          "artist": "A.R. Rahman & Mohit Chauhan · 2011",
           "year": "2011",
           "entrySec": 55,
           "exitSec": 95,
@@ -66344,7 +66344,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -68056,6 +68056,562 @@ export const ARTISTS_DB = {
           ]
         }
       ]
+    },
+    "atif-aslam": {
+      "id": "atif-aslam",
+      "name": "Atif Aslam",
+      "altNames": [
+        "Atif",
+        "Atif Aslam Live"
+      ],
+      "lang": "hindi",
+      "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
+      "country": "India",
+      "verified": true,
+      "bio": "The iconic, soulful voice behind Bollywood's most unforgettable romantic, breakup, and sufi anthems.",
+      "subcategories": [
+        "romantic",
+        "breakup",
+        "sad",
+        "acoustic",
+        "sufi",
+        "pop",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "atif-1",
+          "title": "Tera Hone Laga Hoon",
+          "artist": "Atif Aslam, Alisha Chinai · Pritam",
+          "year": "2009",
+          "durationSec": 300,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "rTuxUAuJRyY",
+          "youtube_ids": [
+            "rTuxUAuJRyY"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "atif-2",
+          "title": "Tu Jaane Na",
+          "artist": "Atif Aslam · Pritam",
+          "year": "2009",
+          "durationSec": 337,
+          "hookStartSec": 50,
+          "hookEndSec": 90,
+          "entrySec": 50,
+          "exitSec": 90,
+          "videoId": "P8PWN1OmZOA",
+          "youtube_ids": [
+            "P8PWN1OmZOA"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "atif-3",
+          "title": "Jeena Jeena",
+          "artist": "Atif Aslam · Sachin-Jigar",
+          "year": "2015",
+          "durationSec": 229,
+          "hookStartSec": 36,
+          "hookEndSec": 76,
+          "entrySec": 36,
+          "exitSec": 76,
+          "videoId": "vK4Vq1d102M",
+          "youtube_ids": [
+            "vK4Vq1d102M"
+          ],
+          "playFull": false,
+          "energy": 8
+        },
+        {
+          "id": "atif-4",
+          "title": "Pehli Nazar Mein",
+          "artist": "Atif Aslam · Pritam",
+          "year": "2008",
+          "durationSec": 312,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "BadBAMnPX0I",
+          "youtube_ids": [
+            "BadBAMnPX0I"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "atif-5",
+          "title": "Dil Diyan Gallan",
+          "artist": "Atif Aslam · Vishal-Shekhar",
+          "year": "2017",
+          "durationSec": 260,
+          "hookStartSec": 48,
+          "hookEndSec": 88,
+          "entrySec": 48,
+          "exitSec": 88,
+          "videoId": "SAcpESN_Fk4",
+          "youtube_ids": [
+            "SAcpESN_Fk4"
+          ],
+          "playFull": false,
+          "energy": 8
+        },
+        {
+          "id": "atif-6",
+          "title": "Woh Lamhe Woh Baatein",
+          "artist": "Atif Aslam · Mithoon",
+          "year": "2005",
+          "durationSec": 318,
+          "hookStartSec": 50,
+          "hookEndSec": 90,
+          "entrySec": 50,
+          "exitSec": 90,
+          "videoId": "M1fT1l00Gz4",
+          "youtube_ids": [
+            "M1fT1l00Gz4"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "atif-7",
+          "title": "Aadat (Deep Cut)",
+          "artist": "Atif Aslam · Goher Mumtaz",
+          "year": "2005",
+          "durationSec": 268,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "j8i96w-XwL0",
+          "youtube_ids": [
+            "j8i96w-XwL0"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "atif-8",
+          "title": "Tere Sang Yaara",
+          "artist": "Atif Aslam · Arko",
+          "year": "2016",
+          "durationSec": 290,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "u_v_Lz9r2aY",
+          "youtube_ids": [
+            "u_v_Lz9r2aY"
+          ],
+          "playFull": false,
+          "energy": 8
+        }
+      ]
+    },
+    "diljit-dosanjh": {
+      "id": "diljit-dosanjh",
+      "name": "Diljit Dosanjh",
+      "altNames": [
+        "Diljit",
+        "Dosanjh"
+      ],
+      "lang": "hindi",
+      "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&auto=format&fit=crop&q=80",
+      "country": "India",
+      "verified": true,
+      "bio": "Global Punjabi icon, Coachella headliner, and chart-topping Bollywood hitmaker.",
+      "subcategories": [
+        "party",
+        "hiphop",
+        "pop",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "diljit-1",
+          "title": "Lover",
+          "artist": "Diljit Dosanjh · Intense",
+          "year": "2021",
+          "durationSec": 191,
+          "hookStartSec": 30,
+          "hookEndSec": 70,
+          "entrySec": 30,
+          "exitSec": 70,
+          "videoId": "mH_LHSS394k",
+          "youtube_ids": [
+            "mH_LHSS394k"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "diljit-2",
+          "title": "Naina",
+          "artist": "Diljit Dosanjh, Badshah",
+          "year": "2024",
+          "durationSec": 180,
+          "hookStartSec": 32,
+          "hookEndSec": 72,
+          "entrySec": 32,
+          "exitSec": 72,
+          "videoId": "k5i_fK_Uj_w",
+          "youtube_ids": [
+            "k5i_fK_Uj_w"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "diljit-3",
+          "title": "G.O.A.T.",
+          "artist": "Diljit Dosanjh · G-Funk",
+          "year": "2020",
+          "durationSec": 223,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "cl0a3i2wFcc",
+          "youtube_ids": [
+            "cl0a3i2wFcc"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "diljit-4",
+          "title": "Born to Shine",
+          "artist": "Diljit Dosanjh",
+          "year": "2020",
+          "durationSec": 213,
+          "hookStartSec": 32,
+          "hookEndSec": 72,
+          "entrySec": 32,
+          "exitSec": 72,
+          "videoId": "Z_q1bT0c1rU",
+          "youtube_ids": [
+            "Z_q1bT0c1rU"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "diljit-5",
+          "title": "Sauda Khara Khara",
+          "artist": "Diljit Dosanjh, Sukhbir, Dhvani Bhanushali",
+          "year": "2019",
+          "durationSec": 220,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "w_i_p7rE1b8",
+          "youtube_ids": [
+            "w_i_p7rE1b8"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "diljit-6",
+          "title": "Proper Patola",
+          "artist": "Diljit Dosanjh, Badshah, Aastha Gill",
+          "year": "2018",
+          "durationSec": 178,
+          "hookStartSec": 25,
+          "hookEndSec": 65,
+          "entrySec": 25,
+          "exitSec": 65,
+          "videoId": "r_1_Z8l0-14",
+          "youtube_ids": [
+            "r_1_Z8l0-14"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "karan-aujla": {
+      "id": "karan-aujla",
+      "name": "Karan Aujla",
+      "altNames": [
+        "Geetan Di Machine",
+        "Aujla"
+      ],
+      "lang": "hindi",
+      "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80",
+      "country": "India",
+      "verified": true,
+      "bio": "The lyrical powerhouse and Billboard-charting pioneer of modern Punjabi hip-hop.",
+      "subcategories": [
+        "hiphop",
+        "party",
+        "pop",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "aujla-1",
+          "title": "Tauba Tauba",
+          "artist": "Karan Aujla · Bad Newz",
+          "year": "2024",
+          "durationSec": 207,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "LK7-_dgAVQE",
+          "youtube_ids": [
+            "LK7-_dgAVQE"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "aujla-2",
+          "title": "Softly",
+          "artist": "Karan Aujla, Ikky",
+          "year": "2023",
+          "durationSec": 155,
+          "hookStartSec": 25,
+          "hookEndSec": 65,
+          "entrySec": 25,
+          "exitSec": 65,
+          "videoId": "cWMxCE2HTag",
+          "youtube_ids": [
+            "cWMxCE2HTag"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "aujla-3",
+          "title": "Winning Speech",
+          "artist": "Karan Aujla, Mxrci",
+          "year": "2024",
+          "durationSec": 202,
+          "hookStartSec": 30,
+          "hookEndSec": 70,
+          "entrySec": 30,
+          "exitSec": 70,
+          "videoId": "aM1-J3g_zLg",
+          "youtube_ids": [
+            "aM1-J3g_zLg"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "aujla-4",
+          "title": "White Brown Black",
+          "artist": "Karan Aujla, Avvy Sra",
+          "year": "2022",
+          "durationSec": 178,
+          "hookStartSec": 28,
+          "hookEndSec": 68,
+          "entrySec": 28,
+          "exitSec": 68,
+          "videoId": "k_uN1_09A-4",
+          "youtube_ids": [
+            "k_uN1_09A-4"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "aujla-5",
+          "title": "Admirin' You",
+          "artist": "Karan Aujla ft. Preston Pablo",
+          "year": "2023",
+          "durationSec": 214,
+          "hookStartSec": 32,
+          "hookEndSec": 72,
+          "entrySec": 32,
+          "exitSec": 72,
+          "videoId": "yW-X7s7zC0w",
+          "youtube_ids": [
+            "yW-X7s7zC0w"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "pritam": {
+      "id": "pritam",
+      "name": "Pritam",
+      "altNames": [
+        "Pritam Chakraborty",
+        "JAM8"
+      ],
+      "lang": "hindi",
+      "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&auto=format&fit=crop&q=80",
+      "country": "India",
+      "verified": true,
+      "bio": "The undisputed king of Bollywood melody, behind 2 decades of iconic party and love hits.",
+      "subcategories": [
+        "party",
+        "romantic",
+        "rock",
+        "pop",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "pritam-1",
+          "title": "Badtameez Dil",
+          "artist": "Benny Dayal, Shefali Alvares · Pritam",
+          "year": "2013",
+          "durationSec": 252,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "II2EO3NwUrQ",
+          "youtube_ids": [
+            "II2EO3NwUrQ"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "pritam-2",
+          "title": "Balam Pichkari",
+          "artist": "Vishal Dadlani, Shalmali Kholgade · Pritam",
+          "year": "2013",
+          "durationSec": 289,
+          "hookStartSec": 48,
+          "hookEndSec": 88,
+          "entrySec": 48,
+          "exitSec": 88,
+          "videoId": "0WtRNGubWGA",
+          "youtube_ids": [
+            "0WtRNGubWGA"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "pritam-3",
+          "title": "Subah Hone Na De",
+          "artist": "Mika Singh, Shefali Alvares · Pritam",
+          "year": "2011",
+          "durationSec": 288,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "d6P_Cj8lW44",
+          "youtube_ids": [
+            "d6P_Cj8lW44"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "pritam-4",
+          "title": "Kesariya",
+          "artist": "Arijit Singh · Pritam",
+          "year": "2022",
+          "durationSec": 268,
+          "hookStartSec": 46,
+          "hookEndSec": 86,
+          "entrySec": 46,
+          "exitSec": 86,
+          "videoId": "BddP6PYo2gs",
+          "youtube_ids": [
+            "BddP6PYo2gs"
+          ],
+          "playFull": false,
+          "energy": 8
+        }
+      ]
+    },
+    "mika-singh": {
+      "id": "mika-singh",
+      "name": "Mika Singh",
+      "altNames": [
+        "Mika",
+        "The King of Party"
+      ],
+      "lang": "hindi",
+      "image": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&auto=format&fit=crop&q=80",
+      "country": "India",
+      "verified": true,
+      "bio": "Bollywood's explosive powerhouse singer, delivering non-stop club bangers and dance hits.",
+      "subcategories": [
+        "party",
+        "pop",
+        "retro",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "mika-1",
+          "title": "Mauja Hi Mauja",
+          "artist": "Mika Singh · Pritam",
+          "year": "2007",
+          "durationSec": 245,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "ea9m4eE4-Z4",
+          "youtube_ids": [
+            "ea9m4eE4-Z4"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "mika-2",
+          "title": "Agal Bagal",
+          "artist": "Mika Singh · Pritam",
+          "year": "2013",
+          "durationSec": 260,
+          "hookStartSec": 38,
+          "hookEndSec": 78,
+          "entrySec": 38,
+          "exitSec": 78,
+          "videoId": "3e3P_5jD6b4",
+          "youtube_ids": [
+            "3e3P_5jD6b4"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "mika-3",
+          "title": "Jumme Ki Raat",
+          "artist": "Mika Singh, Palak Muchhal · Himesh Reshammiya",
+          "year": "2014",
+          "durationSec": 274,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "bYg2bLd-T08",
+          "youtube_ids": [
+            "bYg2bLd-T08"
+          ],
+          "playFull": false,
+          "energy": 10
+        }
+      ]
     }
   },
   "english": {
@@ -68210,7 +68766,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-54",
           "title": "Timeless",
-          "artist": "The Weeknd & Playboi Carti \u00b7 2024",
+          "artist": "The Weeknd & Playboi Carti · 2024",
           "year": "2024",
           "entrySec": 53,
           "exitSec": 93,
@@ -68306,7 +68862,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -68328,7 +68884,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-69",
           "title": "Starboy",
-          "artist": "The Weeknd \u00b7 2016",
+          "artist": "The Weeknd · 2016",
           "year": "2016",
           "entrySec": 65,
           "exitSec": 105,
@@ -68403,7 +68959,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -68446,7 +69002,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-73",
           "title": "The Hills",
-          "artist": "The Weeknd \u00b7 2015",
+          "artist": "The Weeknd · 2015",
           "year": "2015",
           "entrySec": 55,
           "exitSec": 95,
@@ -68516,7 +69072,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -68683,7 +69239,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-love-44",
           "title": "Save Your Tears",
-          "artist": "The Weeknd \u00b7 2020",
+          "artist": "The Weeknd · 2020",
           "year": "2020",
           "entrySec": 46,
           "exitSec": 86,
@@ -68780,7 +69336,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -68801,7 +69357,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-love-60",
           "title": "Wicked Games",
-          "artist": "The Weeknd \u00b7 2011",
+          "artist": "The Weeknd · 2011",
           "year": "2011",
           "entrySec": 68,
           "exitSec": 108,
@@ -68882,7 +69438,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -69429,7 +69985,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-96",
           "title": "Can't Feel My Face",
-          "artist": "The Weeknd \u00b7 2015",
+          "artist": "The Weeknd · 2015",
           "year": "2015",
           "entrySec": 43,
           "exitSec": 83,
@@ -69475,7 +70031,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -71009,7 +71565,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-love-45",
           "title": "Cruel Summer",
-          "artist": "Taylor Swift \u00b7 2019",
+          "artist": "Taylor Swift · 2019",
           "year": "2019",
           "entrySec": 53,
           "exitSec": 93,
@@ -71105,7 +71661,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -72946,7 +73502,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-indie-1",
           "title": "The Fate of Ophelia",
-          "artist": "Taylor Swift \u00b7 2025",
+          "artist": "Taylor Swift · 2025",
           "year": "2025",
           "entrySec": 32,
           "exitSec": 72,
@@ -73045,7 +73601,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -77192,7 +77748,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-112",
           "title": "Clarity",
-          "artist": "Zedd \u00b7 2012",
+          "artist": "Zedd · 2012",
           "year": "2012",
           "entrySec": 31,
           "exitSec": 71,
@@ -77214,7 +77770,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -81166,7 +81722,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-70",
           "title": "That's What I Like",
-          "artist": "Bruno Mars \u00b7 2016",
+          "artist": "Bruno Mars · 2016",
           "year": "2016",
           "entrySec": 27,
           "exitSec": 67,
@@ -81240,7 +81796,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -82950,7 +83506,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-63",
           "title": "APT.",
-          "artist": "ROS\u00c9 & Bruno Mars \u00b7 2024",
+          "artist": "ROSÉ & Bruno Mars · 2024",
           "year": "2024",
           "entrySec": 39,
           "exitSec": 79,
@@ -83048,7 +83604,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -83813,7 +84369,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-51",
           "title": "Shabang",
-          "artist": "Drake \u00b7 2026",
+          "artist": "Drake · 2026",
           "year": "2026",
           "entrySec": 25,
           "exitSec": 65,
@@ -83913,7 +84469,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -83931,7 +84487,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-60",
           "title": "WAIT FOR U",
-          "artist": "Future ft. Drake & Tems \u00b7 2022",
+          "artist": "Future ft. Drake & Tems · 2022",
           "year": "2022",
           "entrySec": 57,
           "exitSec": 97,
@@ -84020,7 +84576,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -84049,7 +84605,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-61",
           "title": "Knife Talk",
-          "artist": "Drake \u00b7 2021",
+          "artist": "Drake · 2021",
           "year": "2021",
           "entrySec": 64,
           "exitSec": 104,
@@ -84137,7 +84693,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -84167,7 +84723,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-62",
           "title": "Wants and Needs",
-          "artist": "Drake \u00b7 2021",
+          "artist": "Drake · 2021",
           "year": "2021",
           "entrySec": 26,
           "exitSec": 66,
@@ -84254,7 +84810,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -84285,7 +84841,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-79",
           "title": "Marvins Room",
-          "artist": "Drake \u00b7 2011",
+          "artist": "Drake · 2011",
           "year": "2011",
           "entrySec": 52,
           "exitSec": 92,
@@ -84349,7 +84905,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -84403,7 +84959,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-80",
           "title": "Best I Ever Had",
-          "artist": "Drake \u00b7 2009",
+          "artist": "Drake · 2009",
           "year": "2009",
           "entrySec": 59,
           "exitSec": 99,
@@ -84466,7 +85022,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -89002,7 +89558,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-love-55",
           "title": "A Sky Full of Stars",
-          "artist": "Coldplay \u00b7 2014",
+          "artist": "Coldplay · 2014",
           "year": "2014",
           "entrySec": 33,
           "exitSec": 73,
@@ -89088,7 +89644,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -90327,7 +90883,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-98",
           "title": "Hymn for the Weekend (Live In Buenos Aires)",
-          "artist": "Coldplay \u00b7 2015",
+          "artist": "Coldplay · 2015",
           "year": "2015",
           "entrySec": 57,
           "exitSec": 97,
@@ -90371,7 +90927,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -93675,7 +94231,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-81",
           "title": "One Kiss",
-          "artist": "Calvin Harris, Dua Lipa \u00b7 2018",
+          "artist": "Calvin Harris, Dua Lipa · 2018",
           "year": "2018",
           "entrySec": 38,
           "exitSec": 78,
@@ -93741,7 +94297,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -96606,7 +97162,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-70",
           "title": "I'm Good (Blue)",
-          "artist": "David Guetta & Bebe Rexha \u00b7 2022",
+          "artist": "David Guetta & Bebe Rexha · 2022",
           "year": "2022",
           "entrySec": 33,
           "exitSec": 73,
@@ -96692,7 +97248,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -98538,7 +99094,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-81",
           "title": "One Kiss",
-          "artist": "Calvin Harris, Dua Lipa \u00b7 2018",
+          "artist": "Calvin Harris, Dua Lipa · 2018",
           "year": "2018",
           "entrySec": 38,
           "exitSec": 78,
@@ -98604,7 +99160,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -98656,7 +99212,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-94",
           "title": "This Is What You Came For",
-          "artist": "Calvin Harris & Rihanna \u00b7 2016",
+          "artist": "Calvin Harris & Rihanna · 2016",
           "year": "2016",
           "entrySec": 29,
           "exitSec": 69,
@@ -98704,7 +99260,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -98774,7 +99330,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-108",
           "title": "Summer",
-          "artist": "Calvin Harris \u00b7 2014",
+          "artist": "Calvin Harris · 2014",
           "year": "2014",
           "entrySec": 65,
           "exitSec": 105,
@@ -98804,7 +99360,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -101897,7 +102453,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-66",
           "title": "Sunflower (Spider-Man: Into the Spider-Verse)",
-          "artist": "Post Malone & Swae Lee \u00b7 2018",
+          "artist": "Post Malone & Swae Lee · 2018",
           "year": "2018",
           "entrySec": 68,
           "exitSec": 108,
@@ -101978,7 +102534,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -103324,7 +103880,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-hiphop-205",
           "title": "Jackie Chan",
-          "artist": "Ti\u00ebsto & Dzeko ft. Preme, Post Malone",
+          "artist": "Tiësto & Dzeko ft. Preme, Post Malone",
           "year": "2018",
           "durationSec": 218,
           "hookStartSec": 30,
@@ -103443,7 +103999,7 @@ export const ARTISTS_DB = {
         {
           "id": "english-pop-87",
           "title": "rockstar",
-          "artist": "Post Malone \u00b7 2017",
+          "artist": "Post Malone · 2017",
           "year": "2017",
           "entrySec": 42,
           "exitSec": 82,
@@ -103502,7 +104058,7 @@ export const ARTISTS_DB = {
             0.02715219174873862,
             0.012000852831728581,
             0.002904110836605356,
-            3.917379718609837e-06,
+            0.000003917379718609837,
             0.0033455290099683177,
             0.01287680099549543,
             0.02844900102478215,
@@ -103559,17 +104115,705 @@ export const ARTISTS_DB = {
           "energy": 7
         }
       ]
+    },
+    "ariana-grande": {
+      "id": "ariana-grande",
+      "name": "Ariana Grande",
+      "altNames": [
+        "Ariana",
+        "Ari"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80",
+      "country": "United States",
+      "verified": true,
+      "bio": "Multi-platinum pop icon with four-octave vocal range and record-breaking Billboard #1 hits.",
+      "subcategories": [
+        "pop",
+        "rnb",
+        "romantic",
+        "party",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "ari-1",
+          "title": "7 rings",
+          "artist": "Ariana Grande",
+          "year": "2019",
+          "durationSec": 178,
+          "hookStartSec": 28,
+          "hookEndSec": 68,
+          "entrySec": 28,
+          "exitSec": 68,
+          "videoId": "QYh6mYIJG2Y",
+          "youtube_ids": [
+            "QYh6mYIJG2Y"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "ari-2",
+          "title": "thank u, next",
+          "artist": "Ariana Grande",
+          "year": "2018",
+          "durationSec": 207,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "gl1aHhXnN1k",
+          "youtube_ids": [
+            "gl1aHhXnN1k"
+          ],
+          "playFull": false,
+          "energy": 8
+        },
+        {
+          "id": "ari-3",
+          "title": "Side to Side",
+          "artist": "Ariana Grande ft. Nicki Minaj",
+          "year": "2016",
+          "durationSec": 237,
+          "hookStartSec": 36,
+          "hookEndSec": 76,
+          "entrySec": 36,
+          "exitSec": 76,
+          "videoId": "SXiSVQZLje8",
+          "youtube_ids": [
+            "SXiSVQZLje8"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "ari-4",
+          "title": "Into You",
+          "artist": "Ariana Grande",
+          "year": "2016",
+          "durationSec": 244,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "1ekZEVeXwek",
+          "youtube_ids": [
+            "1ekZEVeXwek"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "ari-5",
+          "title": "we can't be friends (wait for your love)",
+          "artist": "Ariana Grande",
+          "year": "2024",
+          "durationSec": 228,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "KNtJGQkC-WI",
+          "youtube_ids": [
+            "KNtJGQkC-WI"
+          ],
+          "playFull": false,
+          "energy": 8
+        }
+      ]
+    },
+    "justin-bieber": {
+      "id": "justin-bieber",
+      "name": "Justin Bieber",
+      "altNames": [
+        "Bieber",
+        "JB"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&auto=format&fit=crop&q=80",
+      "country": "Canada",
+      "verified": true,
+      "bio": "Global pop phenomenon, Grammy winner, and creator of generation-defining dance and love tracks.",
+      "subcategories": [
+        "pop",
+        "rnb",
+        "party",
+        "romantic",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "jb-1",
+          "title": "Sorry",
+          "artist": "Justin Bieber",
+          "year": "2015",
+          "durationSec": 200,
+          "hookStartSec": 34,
+          "hookEndSec": 74,
+          "entrySec": 34,
+          "exitSec": 74,
+          "videoId": "fRh_vgS2dFE",
+          "youtube_ids": [
+            "fRh_vgS2dFE"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "jb-2",
+          "title": "Peaches",
+          "artist": "Justin Bieber ft. Daniel Caesar, Giveon",
+          "year": "2021",
+          "durationSec": 198,
+          "hookStartSec": 32,
+          "hookEndSec": 72,
+          "entrySec": 32,
+          "exitSec": 72,
+          "videoId": "tQ0yjYUFKAE",
+          "youtube_ids": [
+            "tQ0yjYUFKAE"
+          ],
+          "playFull": false,
+          "energy": 8
+        },
+        {
+          "id": "jb-3",
+          "title": "Stay",
+          "artist": "The Kid LAROI, Justin Bieber",
+          "year": "2021",
+          "durationSec": 141,
+          "hookStartSec": 24,
+          "hookEndSec": 64,
+          "entrySec": 24,
+          "exitSec": 64,
+          "videoId": "kTJczUoc268",
+          "youtube_ids": [
+            "kTJczUoc268"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "jb-4",
+          "title": "Ghost",
+          "artist": "Justin Bieber",
+          "year": "2021",
+          "durationSec": 153,
+          "hookStartSec": 30,
+          "hookEndSec": 70,
+          "entrySec": 30,
+          "exitSec": 70,
+          "videoId": "Fp8msa5uYsc",
+          "youtube_ids": [
+            "Fp8msa5uYsc"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "jb-5",
+          "title": "What Do You Mean?",
+          "artist": "Justin Bieber",
+          "year": "2015",
+          "durationSec": 205,
+          "hookStartSec": 38,
+          "hookEndSec": 78,
+          "entrySec": 38,
+          "exitSec": 78,
+          "videoId": "DK_0jXPuIr0",
+          "youtube_ids": [
+            "DK_0jXPuIr0"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "rihanna": {
+      "id": "rihanna",
+      "name": "Rihanna",
+      "altNames": [
+        "Riri",
+        "Robyn Fenty"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&auto=format&fit=crop&q=80",
+      "country": "Barbados",
+      "verified": true,
+      "bio": "The best-selling female digital artist of all time, redefining pop, dance, and R&B.",
+      "subcategories": [
+        "pop",
+        "rnb",
+        "party",
+        "edm",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "riri-1",
+          "title": "Diamonds",
+          "artist": "Rihanna",
+          "year": "2012",
+          "durationSec": 225,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "lWA2pjMjpBs",
+          "youtube_ids": [
+            "lWA2pjMjpBs"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "riri-2",
+          "title": "We Found Love",
+          "artist": "Rihanna ft. Calvin Harris",
+          "year": "2011",
+          "durationSec": 215,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "tg00YEETFzg",
+          "youtube_ids": [
+            "tg00YEETFzg"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "riri-3",
+          "title": "This Is What You Came For",
+          "artist": "Calvin Harris ft. Rihanna",
+          "year": "2016",
+          "durationSec": 232,
+          "hookStartSec": 38,
+          "hookEndSec": 78,
+          "entrySec": 38,
+          "exitSec": 78,
+          "videoId": "kOkQ4T5WO9E",
+          "youtube_ids": [
+            "kOkQ4T5WO9E"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "riri-4",
+          "title": "Umbrella",
+          "artist": "Rihanna ft. JAY-Z",
+          "year": "2007",
+          "durationSec": 275,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "CvBfHwUxHIk",
+          "youtube_ids": [
+            "CvBfHwUxHIk"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "kendrick-lamar": {
+      "id": "kendrick-lamar",
+      "name": "Kendrick Lamar",
+      "altNames": [
+        "K-Dot",
+        "Kung Fu Kenny"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
+      "country": "United States",
+      "verified": true,
+      "bio": "Pulitzer Prize and multiple Grammy-winning hip-hop mastermind.",
+      "subcategories": [
+        "hiphop",
+        "trending",
+        "rock",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "kdot-1",
+          "title": "HUMBLE.",
+          "artist": "Kendrick Lamar",
+          "year": "2017",
+          "durationSec": 177,
+          "hookStartSec": 30,
+          "hookEndSec": 70,
+          "entrySec": 30,
+          "exitSec": 70,
+          "videoId": "tvTRZJ-4EyI",
+          "youtube_ids": [
+            "tvTRZJ-4EyI"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "kdot-2",
+          "title": "Not Like Us",
+          "artist": "Kendrick Lamar",
+          "year": "2024",
+          "durationSec": 274,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "H58vbez_m4E",
+          "youtube_ids": [
+            "H58vbez_m4E"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "kdot-3",
+          "title": "All the Stars",
+          "artist": "Kendrick Lamar, SZA",
+          "year": "2018",
+          "durationSec": 232,
+          "hookStartSec": 38,
+          "hookEndSec": 78,
+          "entrySec": 38,
+          "exitSec": 78,
+          "videoId": "GfCqMv--ncA",
+          "youtube_ids": [
+            "GfCqMv--ncA"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "kdot-4",
+          "title": "DNA.",
+          "artist": "Kendrick Lamar",
+          "year": "2017",
+          "durationSec": 185,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "NLZRYQMLDW4",
+          "youtube_ids": [
+            "NLZRYQMLDW4"
+          ],
+          "playFull": false,
+          "energy": 10
+        }
+      ]
+    },
+    "travis-scott": {
+      "id": "travis-scott",
+      "name": "Travis Scott",
+      "altNames": [
+        "La Flame",
+        "Cactus Jack"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1520523839898-50712743e9d7?w=600&auto=format&fit=crop&q=80",
+      "country": "United States",
+      "verified": true,
+      "bio": "The high-octane visionary of psychedelic trap and arena-shaking hip-hop.",
+      "subcategories": [
+        "hiphop",
+        "party",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "trav-1",
+          "title": "SICKO MODE",
+          "artist": "Travis Scott ft. Drake",
+          "year": "2018",
+          "durationSec": 312,
+          "hookStartSec": 60,
+          "hookEndSec": 100,
+          "entrySec": 60,
+          "exitSec": 100,
+          "videoId": "6ONRf7h3sdk",
+          "youtube_ids": [
+            "6ONRf7h3sdk"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "trav-2",
+          "title": "Goosebumps",
+          "artist": "Travis Scott ft. Kendrick Lamar",
+          "year": "2016",
+          "durationSec": 243,
+          "hookStartSec": 42,
+          "hookEndSec": 82,
+          "entrySec": 42,
+          "exitSec": 82,
+          "videoId": "Dst9gZkq1a8",
+          "youtube_ids": [
+            "Dst9gZkq1a8"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "trav-3",
+          "title": "FE!N",
+          "artist": "Travis Scott ft. Playboi Carti",
+          "year": "2023",
+          "durationSec": 191,
+          "hookStartSec": 32,
+          "hookEndSec": 72,
+          "entrySec": 32,
+          "exitSec": 72,
+          "videoId": "B9synWjqBn8",
+          "youtube_ids": [
+            "B9synWjqBn8"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "trav-4",
+          "title": "HIGHEST IN THE ROOM",
+          "artist": "Travis Scott",
+          "year": "2019",
+          "durationSec": 175,
+          "hookStartSec": 30,
+          "hookEndSec": 70,
+          "entrySec": 30,
+          "exitSec": 70,
+          "videoId": "tfSS1e3kYeo",
+          "youtube_ids": [
+            "tfSS1e3kYeo"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "queen": {
+      "id": "queen",
+      "name": "Queen",
+      "altNames": [
+        "Freddie Mercury",
+        "Brian May"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80",
+      "country": "United Kingdom",
+      "verified": true,
+      "bio": "Legendary British rock royalty with timeless anthems that define stadium rock.",
+      "subcategories": [
+        "rock",
+        "classic",
+        "party",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "queen-1",
+          "title": "Bohemian Rhapsody",
+          "artist": "Queen",
+          "year": "1975",
+          "durationSec": 354,
+          "hookStartSec": 55,
+          "hookEndSec": 95,
+          "entrySec": 55,
+          "exitSec": 95,
+          "videoId": "fJ9rUzIMcZQ",
+          "youtube_ids": [
+            "fJ9rUzIMcZQ"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "queen-2",
+          "title": "Don't Stop Me Now",
+          "artist": "Queen",
+          "year": "1978",
+          "durationSec": 210,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "HgzGwKwLmgM",
+          "youtube_ids": [
+            "HgzGwKwLmgM"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "queen-3",
+          "title": "We Will Rock You",
+          "artist": "Queen",
+          "year": "1977",
+          "durationSec": 122,
+          "hookStartSec": 15,
+          "hookEndSec": 55,
+          "entrySec": 15,
+          "exitSec": 55,
+          "videoId": "-tJYN-eG1zk",
+          "youtube_ids": [
+            "-tJYN-eG1zk"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "queen-4",
+          "title": "Another One Bites the Dust",
+          "artist": "Queen",
+          "year": "1980",
+          "durationSec": 215,
+          "hookStartSec": 35,
+          "hookEndSec": 75,
+          "entrySec": 35,
+          "exitSec": 75,
+          "videoId": "rY0WElgETLk",
+          "youtube_ids": [
+            "rY0WElgETLk"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
+    },
+    "avicii": {
+      "id": "avicii",
+      "name": "Avicii",
+      "altNames": [
+        "Tim Bergling"
+      ],
+      "lang": "english",
+      "image": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&auto=format&fit=crop&q=80",
+      "country": "Sweden",
+      "verified": true,
+      "bio": "Pioneering Swedish EDM titan whose melodic anthems revolutionized electronic dance music.",
+      "subcategories": [
+        "edm",
+        "party",
+        "pop",
+        "trending",
+        "all"
+      ],
+      "songs": [
+        {
+          "id": "avicii-1",
+          "title": "Levels",
+          "artist": "Avicii",
+          "year": "2011",
+          "durationSec": 198,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "_ovdm2yX4MA",
+          "youtube_ids": [
+            "_ovdm2yX4MA"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "avicii-2",
+          "title": "Wake Me Up",
+          "artist": "Avicii",
+          "year": "2013",
+          "durationSec": 247,
+          "hookStartSec": 45,
+          "hookEndSec": 85,
+          "entrySec": 45,
+          "exitSec": 85,
+          "videoId": "IcrbM1l_BoI",
+          "youtube_ids": [
+            "IcrbM1l_BoI"
+          ],
+          "playFull": false,
+          "energy": 9
+        },
+        {
+          "id": "avicii-3",
+          "title": "The Nights",
+          "artist": "Avicii",
+          "year": "2014",
+          "durationSec": 176,
+          "hookStartSec": 38,
+          "hookEndSec": 78,
+          "entrySec": 38,
+          "exitSec": 78,
+          "videoId": "UtF6Jej8yb4",
+          "youtube_ids": [
+            "UtF6Jej8yb4"
+          ],
+          "playFull": false,
+          "energy": 10
+        },
+        {
+          "id": "avicii-4",
+          "title": "Waiting For Love",
+          "artist": "Avicii",
+          "year": "2015",
+          "durationSec": 230,
+          "hookStartSec": 40,
+          "hookEndSec": 80,
+          "entrySec": 40,
+          "exitSec": 80,
+          "videoId": "cHHLHGNpCSA",
+          "youtube_ids": [
+            "cHHLHGNpCSA"
+          ],
+          "playFull": false,
+          "energy": 9
+        }
+      ]
     }
   }
 };
 
 export function getArtistsByLanguage(lang = 'hindi', subcategory = 'all') {
-  const list = Object.values(ARTISTS_DB[lang] || {});
-  if (!subcategory || subcategory === 'all') return list;
-  return list.filter(a => (a.subcategories || []).includes(subcategory));
+  const normLang = (lang || 'hindi').toLowerCase();
+  const pool = ARTISTS_DB[normLang] || (normLang === 'english' ? ARTISTS_DB.english : ARTISTS_DB.hindi) || {};
+  const list = Object.values(pool);
+
+  if (!subcategory || subcategory === 'all') {
+    return list;
+  }
+  const normSub = subcategory.toLowerCase();
+  return list.filter(a => Array.isArray(a.subcategories) && a.subcategories.includes(normSub));
 }
 
-export function getArtistProfile(artistId, lang = null) {
-  if (lang && ARTISTS_DB[lang]?.[artistId]) return ARTISTS_DB[lang][artistId];
-  return ARTISTS_DB.hindi?.[artistId] || ARTISTS_DB.english?.[artistId] || null;
+export function getArtistProfile(artistId, lang = 'hindi') {
+  if (!artistId) return null;
+  const normId = String(artistId).toLowerCase().trim();
+  const normLang = (lang || 'hindi').toLowerCase();
+
+  const primaryPool = ARTISTS_DB[normLang] || {};
+  if (primaryPool[normId]) return primaryPool[normId];
+
+  for (const a of Object.values(primaryPool)) {
+    if (a.id.toLowerCase() === normId || a.name.toLowerCase() === normId) return a;
+    if (Array.isArray(a.altNames) && a.altNames.some(alt => alt.toLowerCase() === normId)) return a;
+  }
+
+  for (const pool of Object.values(ARTISTS_DB)) {
+    if (pool[normId]) return pool[normId];
+    for (const a of Object.values(pool)) {
+      if (a.id.toLowerCase() === normId || a.name.toLowerCase() === normId) return a;
+      if (Array.isArray(a.altNames) && a.altNames.some(alt => alt.toLowerCase() === normId)) return a;
+    }
+  }
+
+  return null;
 }

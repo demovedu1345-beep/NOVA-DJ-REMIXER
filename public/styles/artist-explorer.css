@@ -1006,9 +1006,20 @@ body {
 
 
 /* =========================================================================
-   Player Layout & Positioning Protection (Desktop, Mobile & Short Viewports)
+   Player Stage & Deck Perfect Layout (Zero Collision Guarantee)
    Strictly prevents element collision, overlapping, and button occlusion
    ========================================================================= */
+
+/* Ensure main has proper flex layout and containment */
+main[data-paused],
+main:has(.deck) {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
 
 /* 1. Header Centered Category Button (Dead-Center Alignment on Desktop) */
 main button[class*="left-1/2"],
@@ -1019,74 +1030,173 @@ header button[class*="left-1/2"],
   left: 50% !important;
 }
 
-/* 2. Center Deck Area Height Protection */
+/* 2. Decks Stage Container: Flex Partitioning */
 main > div[class*="container-type"],
 main > div.relative.z-10.flex-1 {
-  min-height: clamp(160px, 28vh, 320px) !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  position: relative !important;
+  overflow: visible !important;
+  margin-top: clamp(8px, 1.8vh, 20px) !important;
+  margin-bottom: clamp(6px, 1.4vh, 16px) !important;
+}
+
+/* 3. Deck Sizing & Proportions */
+.deck {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: clamp(4px, 1.2vh, 16px) !important;
+}
+
+@media (min-width: 768px) {
+  .deck {
+    width: 58% !important;
+  }
+}
+
+/* Deck Header (DECK A LIVE) */
+.deck > header {
+  font-size: clamp(16px, 2.2vh, 28px) !important;
+  gap: 10px !important;
+  line-height: 1 !important;
+}
+
+/* Song Title in Deck: Bold, Heroic Anton font with strict 2-line clamp */
+.deck h2 {
+  font-size: clamp(32px, min(5.5vw, 6.5vh), 68px) !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.01em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Artist Name */
+.deck p {
+  font-size: clamp(14px, 2.2vh, 22px) !important;
+  margin-top: clamp(2px, 0.8vh, 8px) !important;
+  line-height: 1.2 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Waveform: Sleek, responsive audio bars */
+.deck div[class*="select-none"] {
+  padding-top: clamp(4px, 1vh, 12px) !important;
+}
+
+.deck div[class*="select-none"] > div[class*="cursor-grab"],
+.deck div[class*="select-none"] > div[class*="items-center"] {
+  height: clamp(34px, 6.5vh, 64px) !important;
+}
+
+/* AGENT Ticker: Sleek, thin marquee */
+main > div[class*="border-y-2"] {
+  flex-shrink: 0 !important;
+  margin-bottom: clamp(6px, 1.4vh, 16px) !important;
+  padding-top: clamp(4px, 0.8vh, 8px) !important;
+  padding-bottom: clamp(4px, 0.8vh, 8px) !important;
+  border-top-width: 1px !important;
+  border-bottom-width: 1px !important;
+}
+
+main > div[class*="border-y-2"] span.text-lime {
+  font-size: clamp(18px, 2.2vh, 26px) !important;
+}
+
+main > div[class*="border-y-2"] div.ticker-in {
+  font-size: clamp(14px, 1.8vh, 20px) !important;
+}
+
+/* Transport Action Buttons (SKIP & PLAY FULL): Perfectly Proportioned */
+main > div[class*="gap-[2vw]"] {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  gap: 12px !important;
+  z-index: 20 !important;
   position: relative !important;
 }
 
-/* 3. Responsive scaling for Short / Landscape Viewports (< 650px height) */
-@media (max-height: 650px) {
-  main {
-    padding-top: 1.5vh !important;
-    padding-bottom: 1.5vh !important;
-  }
+main > div[class*="gap-[2vw]"] button {
+  height: clamp(50px, 8vh, 72px) !important;
+  flex: 1 1 0% !important;
+  border-radius: clamp(18px, 2.5vh, 24px) !important;
+  font-size: clamp(24px, 3.6vh, 42px) !important;
+  font-family: var(--font-display, Anton, sans-serif) !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease !important;
+}
 
-  /* Compact deck typography */
+main > div[class*="gap-[2vw]"] button:active {
+  transform: scale(0.96) !important;
+}
+
+/* Responsive adjustment for Mobile Portrait (< 768px width) */
+@media (max-width: 767px) {
+  .deck {
+    width: 100% !important;
+  }
+  
   .deck h2 {
-    font-size: clamp(32px, 8.5vh, 60px) !important;
-    line-height: 0.9 !important;
+    font-size: clamp(28px, 7.5vw, 44px) !important;
   }
 
   .deck p {
-    font-size: clamp(14px, 3.2vh, 20px) !important;
-    margin-top: 4px !important;
-  }
-
-  /* Compact waveform */
-  .deck div[class*="select-none"] {
-    padding-top: 12px !important;
+    font-size: clamp(13px, 3.8vw, 17px) !important;
   }
 
   .deck div[class*="select-none"] > div[class*="cursor-grab"],
   .deck div[class*="select-none"] > div[class*="items-center"] {
-    height: clamp(38px, 8vh, 52px) !important;
+    height: clamp(34px, 5.5vh, 48px) !important;
   }
 
-  /* Compact AGENT bar */
-  main > div[class*="border-y-2"] {
-    margin-bottom: 1.5vh !important;
-    padding-top: 0.8vh !important;
-    padding-bottom: 0.8vh !important;
-  }
-
-  /* Compact transport buttons */
   main > div[class*="gap-[2vw]"] button {
-    height: clamp(48px, 9vh, 60px) !important;
-    font-size: clamp(20px, 4vh, 30px) !important;
+    height: clamp(48px, 6.8vh, 60px) !important;
+    font-size: clamp(22px, 3vh, 30px) !important;
     border-radius: 18px !important;
   }
 }
 
-/* 4. Ultra-Short Viewports (< 480px height, like mobile landscape) */
-@media (max-height: 480px) {
+/* Responsive adjustment for Short / Landscape screens (< 600px height) */
+@media (max-height: 600px) {
+  main {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
   main > div[class*="border-y-2"] {
     display: none !important;
   }
 
   .deck h2 {
-    font-size: clamp(26px, 8vh, 42px) !important;
+    font-size: clamp(24px, 8vh, 38px) !important;
+  }
+
+  .deck p {
+    font-size: 13px !important;
+    margin-top: 2px !important;
   }
 
   .deck div[class*="select-none"] > div[class*="cursor-grab"],
   .deck div[class*="select-none"] > div[class*="items-center"] {
-    height: 36px !important;
+    height: 32px !important;
   }
 
   main > div[class*="gap-[2vw]"] button {
-    height: 44px !important;
+    height: 40px !important;
     font-size: 18px !important;
+    border-radius: 12px !important;
   }
 }
 
