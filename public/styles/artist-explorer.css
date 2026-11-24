@@ -1021,6 +1021,10 @@ main {
   overflow: hidden !important;
   box-sizing: border-box !important;
   position: relative !important;
+  padding-left: clamp(20px, 3.6vw, 56px) !important;
+  padding-right: clamp(20px, 3.6vw, 56px) !important;
+  padding-top: clamp(14px, 2.2vh, 28px) !important;
+  padding-bottom: clamp(14px, 2.2vh, 28px) !important;
 }
 
 /* Header container: single row flex alignment */
@@ -1030,20 +1034,21 @@ main > div.relative.z-30.flex {
   align-items: center !important;
   width: 100% !important;
   flex-shrink: 0 !important;
-  min-height: 52px !important;
+  min-height: 56px !important;
+  height: 56px !important;
 }
 
 /* Audify Brand Logo - Bold, prominent, matching reference */
 main > div.relative.z-30.flex > span.text-lime,
 header span.text-lime {
   font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(34px, 3.8vw, 48px) !important;
+  font-size: clamp(38px, 4.4vw, 56px) !important;
   letter-spacing: 0.02em !important;
   line-height: 1 !important;
   color: #D4FF00 !important;
   font-weight: 900 !important;
   flex-shrink: 0 !important;
-  text-shadow: 0 0 16px rgba(212, 255, 0, 0.35) !important;
+  text-shadow: 0 0 24px rgba(212, 255, 0, 0.45) !important;
 }
 
 /* 1. Header Centered Category Button (Dead-Center Alignment on Tablet & Desktop with ZERO Truncation) */
@@ -1056,14 +1061,18 @@ header span.text-lime {
     left: 50% !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
-    max-width: min(60vw, 680px) !important;
+    max-width: min(65vw, 750px) !important;
     width: max-content !important;
-    padding: 5px 16px !important;
-    font-size: clamp(12px, 1.12vw, 16px) !important;
+    padding: 7px 22px !important;
+    font-size: clamp(13px, 1.25vw, 18px) !important;
     z-index: 25 !important;
     white-space: nowrap !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 10px !important;
+    border: 2px solid rgba(255, 255, 255, 0.28) !important;
+    border-radius: 9999px !important;
+    background: rgba(10, 10, 14, 0.4) !important;
+    backdrop-filter: blur(12px) !important;
   }
 
   main button[class*="left-1/2"] span,
@@ -1112,15 +1121,15 @@ header span.text-lime {
   }
 }
 
-/* 2. Decks Stage Container: Clean Responsive Sizing */
+/* 2. Decks Stage Container: Expansive, Beautiful Staging */
 main > div[class*="container-type"],
 main > div.relative.z-10.flex-1 {
   flex: 1 1 auto !important;
-  min-height: clamp(140px, 32vh, 340px) !important;
+  min-height: 0 !important;
   position: relative !important;
   overflow: visible !important;
-  margin-top: clamp(6px, 1.5vh, 18px) !important;
-  margin-bottom: clamp(4px, 1.2vh, 14px) !important;
+  margin-top: clamp(10px, 2.2vh, 24px) !important;
+  margin-bottom: clamp(10px, 2vh, 22px) !important;
 }
 
 /* 3. Deck Sizing & Proportions */
@@ -1132,21 +1141,21 @@ main > div.relative.z-10.flex-1 {
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
-  gap: clamp(4px, 1.2vh, 14px) !important;
+  gap: clamp(8px, 2vh, 22px) !important;
 }
 
 @media (min-width: 768px) {
   .deck {
-    width: 58% !important;
+    width: 62% !important;
   }
 }
 
 /* Deck Header (DECK A LIVE) */
 .deck > header {
   font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(20px, min(2.5vw, 3.8vh), 32px) !important;
+  font-size: clamp(24px, min(3vw, 4.4vh), 38px) !important;
   letter-spacing: 0.05em !important;
-  gap: 12px !important;
+  gap: 14px !important;
   line-height: 1 !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
@@ -1155,77 +1164,91 @@ main > div.relative.z-10.flex-1 {
 .deck > header span.text-lime {
   color: #D4FF00 !important;
   font-weight: 900 !important;
+  gap: 10px !important;
 }
 
-/* Song Title in Deck: Bold, Heroic Anton font - Large Commanding Scale */
+/* Song Title in Deck: Bold, Heroic Anton font - Grand Cinematic Scale */
 .deck h2 {
   font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(48px, min(8.8vw, 13vh), 125px) !important;
+  font-size: clamp(58px, min(10.5vw, 16vh), 155px) !important;
   line-height: 0.88 !important;
-  letter-spacing: -0.01em !important;
+  letter-spacing: -0.015em !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
   text-transform: uppercase !important;
   color: #FFFFFF !important;
-  margin-top: 2px !important;
-  margin-bottom: 2px !important;
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Artist Name: Prominent, clear, readable */
+/* Artist Name: Prominent, clear, beautiful typography */
 .deck p {
-  font-size: clamp(18px, min(2.4vw, 3.2vh), 30px) !important;
-  margin-top: clamp(3px, 0.8vh, 8px) !important;
+  font-size: clamp(20px, min(2.8vw, 3.8vh), 36px) !important;
+  margin-top: clamp(4px, 1vh, 12px) !important;
   line-height: 1.2 !important;
-  color: rgba(255, 255, 255, 0.82) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
 }
 
-/* Waveform: Sleek, tall, responsive audio bars */
+/* Waveform: Grand DJ visualizer with tall, chunky, reactive audio bars */
 .deck div[class*="select-none"] {
-  padding-top: clamp(6px, 1.2vh, 14px) !important;
+  padding-top: clamp(8px, 1.6vh, 20px) !important;
+  width: 100% !important;
 }
 
 .deck div[class*="select-none"] > div[class*="cursor-grab"],
 .deck div[class*="select-none"] > div[class*="items-center"] {
-  height: clamp(44px, 7.5vh, 76px) !important;
+  height: clamp(56px, 11vh, 105px) !important;
 }
 
 /* Waveform Time badges (IN 0:50 and OUT 1:35) */
 .deck div[class*="select-none"] span[class*="text-lime"],
 .deck div[class*="select-none"] span[class*="font-display"],
 .deck [class*="drag-hint-bubble"] {
-  font-size: clamp(14px, 1.8vh, 22px) !important;
-  letter-spacing: 0.04em !important;
-  font-weight: 700 !important;
+  font-size: clamp(16px, 2.2vh, 26px) !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 800 !important;
 }
 
 /* Cueing Deck proportional styling */
 .deck[data-slot="cue"] {
-  opacity: 0.5 !important;
-  transform: translate(116%, 0) scale(0.68) !important;
+  opacity: 0.55 !important;
+  transform: translate(114%, 0) scale(0.72) !important;
 }
 
-/* AGENT Ticker: Sleek, thin marquee positioned cleanly above bottom bar */
+/* AGENT Ticker: Sleek marquee positioned cleanly above bottom bar */
 main > div[class*="border-y-2"] {
   flex-shrink: 0 !important;
   position: relative !important;
   margin-top: auto !important;
-  margin-bottom: clamp(4px, 1.2vh, 12px) !important;
-  padding-top: clamp(3px, 0.6vh, 6px) !important;
-  padding-bottom: clamp(3px, 0.6vh, 6px) !important;
-  border-top-width: 1px !important;
-  border-bottom-width: 1px !important;
+  margin-bottom: clamp(8px, 1.8vh, 18px) !important;
+  padding-top: clamp(6px, 1vh, 10px) !important;
+  padding-bottom: clamp(6px, 1vh, 10px) !important;
+  border-top-width: 1.5px !important;
+  border-bottom-width: 1.5px !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
   z-index: 10 !important;
 }
 
 main > div[class*="border-y-2"] span.text-lime {
-  font-size: clamp(16px, 2vh, 24px) !important;
+  font-size: clamp(18px, 2.4vh, 28px) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.04em !important;
 }
 
 main > div[class*="border-y-2"] div.ticker-in {
+  font-size: clamp(15px, 1.9vh, 22px) !important;
+  font-weight: 600 !important;
+}
+
+main > div[class*="border-y-2"] button {
   font-size: clamp(13px, 1.6vh, 18px) !important;
+  padding: 6px 16px !important;
+  font-weight: 700 !important;
 }
 
 /* On very short screens (<= 500px height like landscape phones), hide the AGENT bar to prevent any overlap */
@@ -1235,27 +1258,29 @@ main > div[class*="border-y-2"] div.ticker-in {
   }
 }
 
-/* Transport Action Buttons (SKIP & PLAY FULL): Cleanly docked at the bottom */
+/* Transport Action Buttons (SKIP & PLAY FULL): Tall, bold, tactile */
 main > div[class*="gap-[2vw]"] {
   flex-shrink: 0 !important;
   display: flex !important;
-  gap: 12px !important;
+  gap: 16px !important;
   z-index: 40 !important;
   position: relative !important;
-  margin-top: auto !important;
+  margin-top: 0 !important;
 }
 
 main > div[class*="gap-[2vw]"] button {
-  height: clamp(44px, 7vh, 64px) !important;
+  height: clamp(56px, 9vh, 76px) !important;
   flex: 1 1 0% !important;
-  border-radius: clamp(14px, 2vh, 20px) !important;
-  font-size: clamp(22px, 3.2vh, 36px) !important;
+  border-radius: clamp(16px, 2.4vh, 24px) !important;
+  font-size: clamp(28px, 4.2vh, 46px) !important;
   font-family: var(--font-display, Anton, sans-serif) !important;
   letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  cursor: pointer !important;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease !important;
 }
 
@@ -1284,16 +1309,36 @@ div[class*="naux-players"] {
   display: inline-flex !important;
   align-items: center !important;
   flex-shrink: 0 !important;
-  margin-right: 8px !important;
+  margin-right: 10px !important;
   margin-left: 0 !important;
 }
 
 #audify-eq-btn {
-  height: 36px !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
+  height: 40px !important;
+  padding: 0 14px !important;
+  font-size: 14px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
+  gap: 8px !important;
+  border-radius: 9999px !important;
+}
+
+#audify-mini-spectrum-canvas {
+  width: 52px !important;
+  height: 22px !important;
+}
+
+main > div.relative.z-30.flex div.ml-auto button.tabular-nums {
+  font-size: clamp(14px, 1.2vw, 18px) !important;
+  padding: 6px 14px !important;
+  gap: 8px !important;
+  border-radius: 9999px !important;
+}
+
+main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-eq-btn) {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
 }
 
 @media (max-width: 600px) {
