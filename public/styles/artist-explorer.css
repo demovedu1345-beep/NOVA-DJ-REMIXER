@@ -1010,12 +1010,16 @@ body {
    Matches reference image media_1795517298699_8074d744.jpg bit-for-bit
    ========================================================================= */
 
-/* Hide any injected control pills that crowd the header */
+/* Hide any injected control pills that crowd the header & disable perimeter border glow */
 #audify-control-pills-container,
 #audify-rgb-border-canvas,
 #audify-rgb-border-container,
+#audify-rgb-aurora-border,
+.audify-border-ambient,
 .audify-laser-beam {
   display: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* Soft atmospheric ambient background */
