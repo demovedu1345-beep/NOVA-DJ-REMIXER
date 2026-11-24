@@ -1006,32 +1006,11 @@ body {
 
 
 /* =========================================================================
-   Player Stage & Deck Exact 1:1 Pixel-Perfect Layout
-   Matches reference image media_1795517298699_8074d744.jpg bit-for-bit
+   Player Stage & Deck Perfect Layout (Zero Collision Guarantee)
+   Strictly prevents element collision, overlapping, and button occlusion
    ========================================================================= */
 
-/* Hide any injected control pills that crowd the header & disable perimeter border glow */
-#audify-control-pills-container,
-#audify-rgb-border-canvas,
-#audify-rgb-border-container,
-#audify-rgb-aurora-border,
-.audify-border-ambient,
-.audify-laser-beam {
-  display: none !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-
-/* Soft atmospheric ambient background */
-#aurora-canvas,
-canvas#aurora-canvas {
-  opacity: 0.18 !important;
-  filter: blur(24px) !important;
-  pointer-events: none !important;
-  z-index: 0 !important;
-}
-
-/* Main Container: Full viewport height, deep obsidian, flex column */
+/* Ensure main has proper flex layout and containment */
 main[data-paused],
 main:has(.deck),
 main {
@@ -1041,201 +1020,126 @@ main {
   max-height: 100dvh !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
-  background: #050507 !important;
   position: relative !important;
-  padding-left: clamp(16px, 3.5vw, 48px) !important;
-  padding-right: clamp(16px, 3.5vw, 48px) !important;
-  padding-top: clamp(12px, 2.5vh, 28px) !important;
-  padding-bottom: clamp(12px, 2.5vh, 28px) !important;
 }
 
-/* 1. Header (Single Row, Dead-Centered Category Pill, Zero Clutter) */
+/* Header container: single row flex alignment */
 main > div.relative.z-30.flex {
   position: relative !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
   width: 100% !important;
-  height: 52px !important;
-  min-height: 52px !important;
   flex-shrink: 0 !important;
-  box-sizing: border-box !important;
+  min-height: 48px !important;
 }
 
-/* Logo on Left */
-main > div.relative.z-30.flex > span.text-lime {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(26px, 2.5vw, 36px) !important;
-  letter-spacing: 0.02em !important;
-  line-height: 1 !important;
-  color: #D4FF00 !important;
-  flex-shrink: 0 !important;
-}
-
-/* Category Pill Dead-Centered */
-main button[class*="left-1/2"],
-header button[class*="left-1/2"],
-main div.relative.z-30.flex > button[class*="left-1/2"] {
-  display: flex !important;
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 5px 18px !important;
-  border: 2px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: 9999px !important;
-  background: rgba(10, 10, 14, 0.35) !important;
-  backdrop-filter: blur(8px) !important;
-  max-width: min(65vw, 700px) !important;
-  width: max-content !important;
-  z-index: 25 !important;
-  white-space: nowrap !important;
-  box-sizing: border-box !important;
-}
-
-main button[class*="left-1/2"] span:first-child,
-header button[class*="left-1/2"] span:first-child {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(12px, 1.15vw, 16px) !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  color: rgba(255, 255, 255, 0.75) !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-}
-
-main button[class*="left-1/2"] span.text-lime,
-header button[class*="left-1/2"] span.text-lime {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(12px, 1.15vw, 16px) !important;
-  letter-spacing: 0.06em !important;
-  font-weight: 700 !important;
-  color: #D4FF00 !important;
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
-}
-
-/* Hide Row 2 category button on desktop & landscape */
+/* 1. Header Centered Category Button (Dead-Center Alignment on Tablet & Desktop with ZERO Truncation) */
 @media (min-width: 768px) {
+  main div.relative.z-30.flex > button[class*="left-1/2"],
+  main button[class*="left-1/2"],
+  header button[class*="left-1/2"] {
+    display: flex !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: min(60vw, 680px) !important;
+    width: max-content !important;
+    padding: 5px 16px !important;
+    font-size: clamp(12px, 1.12vw, 16px) !important;
+    z-index: 25 !important;
+    white-space: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  main button[class*="left-1/2"] span,
+  header button[class*="left-1/2"] span {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+  }
+
+  /* Hide row 2 mobile button on desktop/tablet */
   main > button[class*="md:hidden"],
   #btn-open-vibe-mobile {
     display: none !important;
   }
 }
 
-/* Right Side Controls Cluster */
-main > div.relative.z-30.flex div.ml-auto {
-  margin-left: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  flex-shrink: 0 !important;
-}
-
-/* Timer Button */
-main > div.relative.z-30.flex div.ml-auto button.tabular-nums {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 5px 16px !important;
-  border: 2px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: 9999px !important;
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(14px, 1.2vw, 18px) !important;
-  color: rgba(255, 255, 255, 0.7) !important;
-  letter-spacing: 0.04em !important;
-  background: transparent !important;
-}
-
-/* Exit Button */
-main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 40px !important;
-  height: 40px !important;
-  border: 2px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: 9999px !important;
-  color: rgba(255, 255, 255, 0.75) !important;
-  background: transparent !important;
-}
-
-/* 2. Decks Stage Container */
-main > div[class*="container-type"],
-main > div.relative.z-10.flex-1 {
-  position: relative !important;
-  flex: 1 1 auto !important;
-  min-height: clamp(160px, 35vh, 360px) !important;
-  width: 100% !important;
-  overflow: visible !important;
-  margin-top: clamp(8px, 1.8vh, 22px) !important;
-  margin-bottom: clamp(6px, 1.4vh, 18px) !important;
-}
-
-/* Deck A (Live): Left column taking 58% width */
-.deck[data-slot="live"] {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 58% !important;
-  opacity: 1 !important;
-  filter: none !important;
-  transform: translate(0) scale(1) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: clamp(4px, 1.2vh, 14px) !important;
-  z-index: 10 !important;
-}
-
-/* Deck B (Cueing): Top right quadrant scaled and translated right */
-.deck[data-slot="cue"] {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 58% !important;
-  opacity: 0.38 !important;
-  filter: grayscale(80%) !important;
-  transform: translate(114%) scale(0.56) !important;
-  transform-origin: 0 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: clamp(4px, 1.2vh, 14px) !important;
-  z-index: 5 !important;
-  pointer-events: none !important;
-}
-
+/* Mobile Portrait (< 768px width) */
 @media (max-width: 767px) {
-  .deck[data-slot="live"] {
-    width: 100% !important;
-  }
-  .deck[data-slot="cue"] {
+  main div.relative.z-30.flex > button[class*="left-1/2"],
+  main button[class*="left-1/2"],
+  header button[class*="left-1/2"] {
     display: none !important;
   }
+
+  main > button[class*="md:hidden"],
+  #btn-open-vibe-mobile {
+    display: flex !important;
+    width: max-content !important;
+    max-width: calc(100vw - 28px) !important;
+    margin-top: 6px !important;
+    margin-bottom: 2px !important;
+    padding: 4px 12px !important;
+    font-size: clamp(11px, 3.2vw, 13px) !important;
+    white-space: nowrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  main > button[class*="md:hidden"] span,
+  #btn-open-vibe-mobile span {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+  }
 }
 
-/* Deck Headers (DECK A ● LIVE) */
-.deck > header {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(16px, 2.2vh, 26px) !important;
-  letter-spacing: 0.05em !important;
-  line-height: 1 !important;
+/* 2. Decks Stage Container: Clean Responsive Sizing */
+main > div[class*="container-type"],
+main > div.relative.z-10.flex-1 {
+  flex: 1 1 auto !important;
+  min-height: clamp(140px, 32vh, 340px) !important;
+  position: relative !important;
+  overflow: visible !important;
+  margin-top: clamp(6px, 1.5vh, 18px) !important;
+  margin-bottom: clamp(4px, 1.2vh, 14px) !important;
+}
+
+/* 3. Deck Sizing & Proportions */
+.deck {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
   display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: clamp(4px, 1.2vh, 14px) !important;
 }
 
-/* Song Title in Deck */
+@media (min-width: 768px) {
+  .deck {
+    width: 58% !important;
+  }
+}
+
+/* Deck Header (DECK A LIVE) */
+.deck > header {
+  font-size: clamp(15px, 2vh, 26px) !important;
+  gap: 8px !important;
+  line-height: 1 !important;
+}
+
+/* Song Title in Deck: Bold, Heroic Anton font with strict 2-line clamp */
 .deck h2 {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(32px, min(6.5vw, 7.5vh), 72px) !important;
-  font-weight: 700 !important;
-  line-height: 0.86 !important;
+  font-size: clamp(26px, min(5.2vw, 6vh), 58px) !important;
+  line-height: 0.92 !important;
   letter-spacing: -0.01em !important;
-  color: #FFFFFF !important;
-  text-transform: uppercase !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
@@ -1244,119 +1148,79 @@ main > div.relative.z-10.flex-1 {
 
 /* Artist Name */
 .deck p {
-  font-size: clamp(14px, 2vh, 22px) !important;
-  color: rgba(255, 255, 255, 0.72) !important;
-  margin-top: clamp(2px, 0.8vh, 8px) !important;
+  font-size: clamp(13px, 1.9vh, 20px) !important;
+  margin-top: clamp(1px, 0.6vh, 6px) !important;
   line-height: 1.2 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
-/* Hint Badge Above Waveform */
-.deck div[class*="border-lime"] {
-  border: 1px solid #D4FF00 !important;
-  border-radius: 9999px !important;
-  padding: 3px 12px !important;
-  font-size: 12px !important;
-  color: #FFFFFF !important;
-  background: transparent !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  width: max-content !important;
+/* Waveform: Sleek, responsive audio bars */
+.deck div[class*="select-none"] {
+  padding-top: clamp(2px, 0.8vh, 10px) !important;
 }
 
-/* Waveform Bars */
 .deck div[class*="select-none"] > div[class*="cursor-grab"],
 .deck div[class*="select-none"] > div[class*="items-center"] {
-  height: clamp(30px, 5.2vh, 52px) !important;
+  height: clamp(28px, 5vh, 48px) !important;
 }
 
-/* 3. AGENT Status Bar (Ticker) */
+/* AGENT Ticker: Sleek, thin marquee positioned cleanly above bottom bar */
 main > div[class*="border-y-2"] {
-  position: relative !important;
   flex-shrink: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-  padding: 10px 0 !important;
+  position: relative !important;
   margin-top: auto !important;
-  margin-bottom: clamp(10px, 1.8vh, 18px) !important;
-  z-index: 20 !important;
+  margin-bottom: clamp(4px, 1.2vh, 12px) !important;
+  padding-top: clamp(3px, 0.6vh, 6px) !important;
+  padding-bottom: clamp(3px, 0.6vh, 6px) !important;
+  border-top-width: 1px !important;
+  border-bottom-width: 1px !important;
+  z-index: 10 !important;
 }
 
 main > div[class*="border-y-2"] span.text-lime {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(18px, 2.2vh, 28px) !important;
-  letter-spacing: 0.04em !important;
-  color: #D4FF00 !important;
-  line-height: 1 !important;
+  font-size: clamp(16px, 2vh, 24px) !important;
 }
 
-main > div[class*="border-y-2"] div.ticker-in,
-main > div[class*="border-y-2"] span:not(.text-lime) {
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(14px, 1.8vh, 22px) !important;
-  color: rgba(255, 255, 255, 0.88) !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
+main > div[class*="border-y-2"] div.ticker-in {
+  font-size: clamp(13px, 1.6vh, 18px) !important;
 }
 
-/* ✕ REMOVE NEXT & ＋ PLAY NEXT */
-main > div[class*="border-y-2"] button {
-  border-radius: 9999px !important;
-  font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(12px, 1.4vh, 16px) !important;
-  letter-spacing: 0.04em !important;
-  padding: 5px 14px !important;
-  line-height: 1 !important;
+/* On very short screens (<= 500px height like landscape phones), hide the AGENT bar to prevent any overlap */
+@media (max-height: 500px) {
+  main > div[class*="border-y-2"] {
+    display: none !important;
+  }
 }
 
-/* 4. Action Buttons (SKIP & PLAY FULL) */
+/* Transport Action Buttons (SKIP & PLAY FULL): Cleanly docked at the bottom */
 main > div[class*="gap-[2vw]"] {
   flex-shrink: 0 !important;
   display: flex !important;
-  gap: 16px !important;
-  width: 100% !important;
-  z-index: 30 !important;
+  gap: 12px !important;
+  z-index: 40 !important;
   position: relative !important;
+  margin-top: auto !important;
 }
 
 main > div[class*="gap-[2vw]"] button {
-  height: clamp(52px, 8.5vh, 68px) !important;
+  height: clamp(44px, 7vh, 64px) !important;
   flex: 1 1 0% !important;
-  border-radius: clamp(16px, 2.4vh, 22px) !important;
+  border-radius: clamp(14px, 2vh, 20px) !important;
+  font-size: clamp(22px, 3.2vh, 36px) !important;
   font-family: var(--font-display, Anton, sans-serif) !important;
-  font-size: clamp(26px, 3.8vh, 42px) !important;
   letter-spacing: 0.03em !important;
-  text-transform: uppercase !important;
   line-height: 1 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  cursor: pointer !important;
   transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease !important;
-}
-
-/* Solid Lime SKIP Button */
-main > div[class*="gap-[2vw]"] button:first-child {
-  background-color: #D4FF00 !important;
-  color: #000000 !important;
-  border: none !important;
-}
-
-/* Outline White PLAY FULL Button */
-main > div[class*="gap-[2vw]"] button:last-child {
-  background-color: transparent !important;
-  color: #FFFFFF !important;
-  border: 2px solid #FFFFFF !important;
 }
 
 main > div[class*="gap-[2vw]"] button:active {
   transform: scale(0.96) !important;
 }
 
-/* YouTube background players hidden offscreen */
+/* YouTube Background Players: Strictly off-screen & transparent to eliminate any UI occlusion / black boxes */
 .naux-players,
 .naux-players[data-visible="true"],
 #naux-players,
@@ -1370,4 +1234,76 @@ div[class*="naux-players"] {
   pointer-events: none !important;
   visibility: hidden !important;
   z-index: -9999 !important;
+}
+
+/* Control Pills & EQ button in top right */
+#audify-control-pills-container {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+  margin-left: 0 !important;
+}
+
+#audify-eq-btn {
+  height: 36px !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 600px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  main {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  main > div.relative.z-30.flex {
+    gap: 6px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+  }
+
+  main > div.relative.z-30.flex > span.text-lime {
+    font-size: 24px !important;
+  }
+
+  #audify-control-pills-container {
+    margin-right: 4px !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  #audify-eq-btn {
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+  }
+
+  main > div.relative.z-30.flex div.ml-auto button.tabular-nums {
+    font-size: 13px !important;
+    padding: 4px 10px !important;
+    gap: 5px !important;
+    border-width: 1.5px !important;
+  }
+
+  main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-eq-btn) {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+  }
+
+  main > div.relative.z-30.flex div.ml-auto {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
 }
