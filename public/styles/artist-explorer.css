@@ -1118,8 +1118,9 @@ main > div[class*="gap-[2vw]"] {
   flex-shrink: 0 !important;
   display: flex !important;
   gap: 12px !important;
-  z-index: 20 !important;
+  z-index: 40 !important;
   position: relative !important;
+  margin-top: auto !important;
 }
 
 main > div[class*="gap-[2vw]"] button {
@@ -1140,10 +1141,31 @@ main > div[class*="gap-[2vw]"] button:active {
   transform: scale(0.96) !important;
 }
 
+/* YouTube Background Players: Strictly off-screen & transparent to eliminate any UI occlusion / black boxes */
+.naux-players,
+.naux-players[data-visible="true"],
+#naux-players,
+div[class*="naux-players"] {
+  position: fixed !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0.001 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  z-index: -9999 !important;
+}
+
 /* Responsive adjustment for Mobile Portrait (< 768px width) */
 @media (max-width: 767px) {
   .deck {
     width: 100% !important;
+  }
+
+  .deck[data-slot="cue"],
+  .deck:not([data-slot="live"]):not([aria-hidden="false"]) {
+    display: none !important;
   }
   
   .deck h2 {
