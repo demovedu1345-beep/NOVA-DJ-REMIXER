@@ -1242,10 +1242,10 @@ div[class*="naux-players"] {
 
 
 /* =========================================================================
-   Responsive Header & Category Button Alignment (< 1024px vs >= 1024px)
+   Responsive Header & Category Button Alignment (< 1440px vs >= 1440px)
    Strictly guarantees zero overlap across mobile, tablet, and desktop
    ========================================================================= */
-@media (max-width: 1023px) {
+@media (max-width: 1439px) {
   main div.relative.z-30.flex > button[class*="left-1/2"],
   main button[class*="left-1/2"] {
     display: none !important;
@@ -1261,13 +1261,13 @@ div[class*="naux-players"] {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
   main div.relative.z-30.flex > button[class*="left-1/2"],
   main button[class*="left-1/2"] {
     display: flex !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    max-width: min(65vw, 680px) !important;
+    max-width: min(50vw, 680px) !important;
     width: auto !important;
     z-index: 25 !important;
     white-space: nowrap !important;
