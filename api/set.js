@@ -90,10 +90,10 @@ function slugMatchesSubtype(slug, subtype, requestedLangs = []) {
 
   // If requested languages filter is active, respect it
   if (requestedLangs && requestedLangs.length > 0) {
-    const onlyEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi');
-    const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english');
+    const onlyEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi') && !requestedLangs.includes('language');
+    const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi');
     if (onlyEnglish && !s.startsWith('english')) return false;
-    if (onlyHindi && s.startsWith('english')) return false;
+    if (onlyHindi && (s.startsWith('english') || s.startsWith('odia') || s.startsWith('punjabi') || s.startsWith('tamil-telugu') || s.startsWith('kannada') || s.startsWith('marathi') || s.startsWith('gujarati') || s.startsWith('marwadi') || s.startsWith('haryanvi-bhojpuri'))) return false;
   }
 
   // Bare subtype matches
@@ -113,6 +113,11 @@ function slugMatchesSubtype(slug, subtype, requestedLangs = []) {
 
 function catMatchesLang(catLang, requestedLangs) {
   const cl = (catLang || '').toLowerCase();
+  const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi');
+  const onlyEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi') && !requestedLangs.includes('language');
+  if (onlyHindi) return cl === 'hindi';
+  if (onlyEnglish) return cl === 'english';
+
   for (const rl of requestedLangs) {
     if (cl === rl) return true;
     if (rl === 'language' && cl !== 'hindi' && cl !== 'english') return true;
@@ -263,9 +268,11 @@ function buildSetFromCuratedDb(body) {
   const cues = [];
 
   const isStrictEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi');
+  const isStrictHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi');
 
   for (const { song: s, cat } of candidatePool) {
     if (isStrictEnglish && cat.lang !== 'english') continue;
+    if (isStrictHindi && cat.lang !== 'hindi') continue;
     const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
     if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
     const titleKey = (s.title || '').toLowerCase().trim();
@@ -311,6 +318,7 @@ function buildSetFromCuratedDb(body) {
   };
 }
 
+export { buildSetFromCuratedDb };
 export default async function handler(req, res) {
   if (handlePreflight(req, res)) return;
 
