@@ -1030,7 +1030,20 @@ main > div.relative.z-30.flex {
   align-items: center !important;
   width: 100% !important;
   flex-shrink: 0 !important;
-  min-height: 48px !important;
+  min-height: 52px !important;
+}
+
+/* Audify Brand Logo - Bold, prominent, matching reference */
+main > div.relative.z-30.flex > span.text-lime,
+header span.text-lime {
+  font-family: var(--font-display, Anton, sans-serif) !important;
+  font-size: clamp(34px, 3.8vw, 48px) !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  color: #D4FF00 !important;
+  font-weight: 900 !important;
+  flex-shrink: 0 !important;
+  text-shadow: 0 0 16px rgba(212, 255, 0, 0.35) !important;
 }
 
 /* 1. Header Centered Category Button (Dead-Center Alignment on Tablet & Desktop with ZERO Truncation) */
@@ -1130,38 +1143,68 @@ main > div.relative.z-10.flex-1 {
 
 /* Deck Header (DECK A LIVE) */
 .deck > header {
-  font-size: clamp(15px, 2vh, 26px) !important;
-  gap: 8px !important;
+  font-family: var(--font-display, Anton, sans-serif) !important;
+  font-size: clamp(20px, min(2.5vw, 3.8vh), 32px) !important;
+  letter-spacing: 0.05em !important;
+  gap: 12px !important;
   line-height: 1 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
 }
 
-/* Song Title in Deck: Bold, Heroic Anton font with strict 2-line clamp */
+.deck > header span.text-lime {
+  color: #D4FF00 !important;
+  font-weight: 900 !important;
+}
+
+/* Song Title in Deck: Bold, Heroic Anton font - Large Commanding Scale */
 .deck h2 {
-  font-size: clamp(26px, min(5.2vw, 6vh), 58px) !important;
-  line-height: 0.92 !important;
+  font-family: var(--font-display, Anton, sans-serif) !important;
+  font-size: clamp(48px, min(8.8vw, 13vh), 125px) !important;
+  line-height: 0.88 !important;
   letter-spacing: -0.01em !important;
   display: -webkit-box !important;
   -webkit-line-clamp: 2 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
+  text-transform: uppercase !important;
+  color: #FFFFFF !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
 }
 
-/* Artist Name */
+/* Artist Name: Prominent, clear, readable */
 .deck p {
-  font-size: clamp(13px, 1.9vh, 20px) !important;
-  margin-top: clamp(1px, 0.6vh, 6px) !important;
+  font-size: clamp(18px, min(2.4vw, 3.2vh), 30px) !important;
+  margin-top: clamp(3px, 0.8vh, 8px) !important;
   line-height: 1.2 !important;
-  color: rgba(255, 255, 255, 0.75) !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-weight: 600 !important;
 }
 
-/* Waveform: Sleek, responsive audio bars */
+/* Waveform: Sleek, tall, responsive audio bars */
 .deck div[class*="select-none"] {
-  padding-top: clamp(2px, 0.8vh, 10px) !important;
+  padding-top: clamp(6px, 1.2vh, 14px) !important;
 }
 
 .deck div[class*="select-none"] > div[class*="cursor-grab"],
 .deck div[class*="select-none"] > div[class*="items-center"] {
-  height: clamp(28px, 5vh, 48px) !important;
+  height: clamp(44px, 7.5vh, 76px) !important;
+}
+
+/* Waveform Time badges (IN 0:50 and OUT 1:35) */
+.deck div[class*="select-none"] span[class*="text-lime"],
+.deck div[class*="select-none"] span[class*="font-display"],
+.deck [class*="drag-hint-bubble"] {
+  font-size: clamp(14px, 1.8vh, 22px) !important;
+  letter-spacing: 0.04em !important;
+  font-weight: 700 !important;
+}
+
+/* Cueing Deck proportional styling */
+.deck[data-slot="cue"] {
+  opacity: 0.5 !important;
+  transform: translate(116%, 0) scale(0.68) !important;
 }
 
 /* AGENT Ticker: Sleek, thin marquee positioned cleanly above bottom bar */
