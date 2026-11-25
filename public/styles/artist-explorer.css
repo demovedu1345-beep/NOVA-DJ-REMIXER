@@ -1309,24 +1309,23 @@ main > div[class*="gap-[2vw]"] button:active {
   transform: scale(0.96) !important;
 }
 
-/* YouTube Background Players: Keep strictly IN-VIEWPORT & visibility:visible with 320x180 dimensions
-   so Mobile Chrome & iOS Safari never suspend/pause audio after 1-2 seconds, while 0.002 alpha keeps it invisible */
+/* YouTube Background Players: Strictly off-screen & transparent with full 320x180 dimensions
+   so browsers never pause playback while guaranteeing zero visual overlay on any screen */
 .naux-players,
 .naux-players[data-visible="true"],
 #naux-players,
 div[class*="naux-players"] {
   position: fixed !important;
-  left: 0 !important;
-  bottom: 0 !important;
-  top: auto !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  bottom: auto !important;
   width: 320px !important;
   height: 180px !important;
-  opacity: 0.002 !important;
+  opacity: 0 !important;
   pointer-events: none !important;
   visibility: visible !important;
-  z-index: 0 !important;
+  z-index: -9999 !important;
   overflow: hidden !important;
-  transform: translate3d(0, 0, 0) !important;
 }
 
 /* Control Pills & EQ button in top right */
@@ -1434,7 +1433,7 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
   /* Restore proper vertical mobile dual-deck stacking */
   .deck[data-slot="cue"] {
     opacity: 0.45 !important;
-    transform: translateY(calc(100cqh - 58%)) scale(0.68) !important;
+    transform: translateY(calc(100cqh - 62%)) scale(0.64) !important;
   }
 
   main > div[class*="border-y-2"] {
