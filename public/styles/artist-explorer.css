@@ -864,7 +864,8 @@ html {
   min-height: 100% !important;
   min-height: -webkit-fill-available !important;
   min-height: 100dvh !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
   -webkit-text-size-adjust: 100% !important;
   touch-action: pan-y pinch-zoom !important;
 }
@@ -875,20 +876,21 @@ body {
   min-height: 100% !important;
   min-height: -webkit-fill-available !important;
   min-height: 100dvh !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   position: relative !important;
   margin: 0 !important;
   padding: 0 !important;
   background-color: #050507 !important;
-  overscroll-behavior-y: contain !important;
+  overscroll-behavior-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
 }
 
-/* Ensure app wrapper fits true edge-to-edge full screen */
+/* Ensure app wrapper fits true edge-to-edge full screen without trapping scroll */
 #svelte, .min-h-dvh {
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   box-sizing: border-box !important;
 }
 
@@ -984,8 +986,8 @@ body {
     box-sizing: border-box !important;
   }
 
-  /* Full screen cover & safe-area paddings for fixed elements */
-  body, html {
+  /* Safe-area padding on body only */
+  body {
     padding-top: env(safe-area-inset-top, 0px) !important;
     padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   }
@@ -1010,10 +1012,21 @@ body {
    Strictly prevents element collision, overlapping, and button occlusion
    ========================================================================= */
 
-/* Ensure main has proper flex layout and containment */
+/* Non-player pages (Landing, Wizard 1-4, Set Review): Allow full native scrolling */
+main:not([data-paused]):not(:has(.deck)) {
+  height: auto !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: clip !important;
+  position: relative !important;
+  z-index: 2 !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Player Stage ONLY: Lock to viewport height so decks & transport stay cleanly docked */
 main[data-paused],
-main:has(.deck),
-main {
+main:has(.deck) {
   display: flex !important;
   flex-direction: column !important;
   height: 100dvh !important;
@@ -1021,6 +1034,7 @@ main {
   overflow: hidden !important;
   box-sizing: border-box !important;
   position: relative !important;
+  z-index: 2 !important;
   padding-left: clamp(20px, 3.6vw, 56px) !important;
   padding-right: clamp(20px, 3.6vw, 56px) !important;
   padding-top: clamp(14px, 2.2vh, 28px) !important;
@@ -1039,7 +1053,8 @@ main > div.relative.z-30.flex {
 }
 
 /* Audify Brand Logo - Bold, prominent, matching reference */
-main > div.relative.z-30.flex > span.text-lime,
+main:has(.deck) > div.relative.z-30.flex > span.text-lime,
+main[data-paused] > div.relative.z-30.flex > span.text-lime,
 header span.text-lime {
   font-family: var(--font-display, Anton, sans-serif) !important;
   font-size: clamp(38px, 4.4vw, 56px) !important;
@@ -1101,8 +1116,9 @@ header span.text-lime {
   main > button[class*="md:hidden"],
   #btn-open-vibe-mobile {
     display: flex !important;
-    width: max-content !important;
+    width: fit-content !important;
     max-width: calc(100vw - 28px) !important;
+    overflow: hidden !important;
     margin-top: 6px !important;
     margin-bottom: 2px !important;
     padding: 4px 12px !important;
@@ -1110,14 +1126,20 @@ header span.text-lime {
     white-space: nowrap !important;
     align-items: center !important;
     gap: 6px !important;
+    flex-shrink: 0 !important;
   }
 
-  main > button[class*="md:hidden"] span,
-  #btn-open-vibe-mobile span {
+  main > button[class*="md:hidden"] span:first-child,
+  #btn-open-vibe-mobile span:first-child {
     white-space: nowrap !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    max-width: none !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+
+  main > button[class*="md:hidden"] span.text-lime,
+  #btn-open-vibe-mobile span.text-lime {
+    flex-shrink: 0 !important;
   }
 }
 
@@ -1147,6 +1169,11 @@ main > div.relative.z-10.flex-1 {
 @media (min-width: 768px) {
   .deck {
     width: 62% !important;
+  }
+  /* Cueing Deck proportional styling (Desktop horizontal split) */
+  .deck[data-slot="cue"] {
+    opacity: 0.55 !important;
+    transform: translate(114%, 0) scale(0.72) !important;
   }
 }
 
@@ -1212,12 +1239,6 @@ main > div.relative.z-10.flex-1 {
   font-size: clamp(16px, 2.2vh, 26px) !important;
   letter-spacing: 0.05em !important;
   font-weight: 800 !important;
-}
-
-/* Cueing Deck proportional styling */
-.deck[data-slot="cue"] {
-  opacity: 0.55 !important;
-  transform: translate(114%, 0) scale(0.72) !important;
 }
 
 /* AGENT Ticker: Sleek marquee positioned cleanly above bottom bar */
@@ -1288,20 +1309,24 @@ main > div[class*="gap-[2vw]"] button:active {
   transform: scale(0.96) !important;
 }
 
-/* YouTube Background Players: Strictly off-screen & transparent to eliminate any UI occlusion / black boxes */
+/* YouTube Background Players: Keep strictly IN-VIEWPORT & visibility:visible with 320x180 dimensions
+   so Mobile Chrome & iOS Safari never suspend/pause audio after 1-2 seconds, while 0.002 alpha keeps it invisible */
 .naux-players,
 .naux-players[data-visible="true"],
 #naux-players,
 div[class*="naux-players"] {
   position: fixed !important;
-  left: -9999px !important;
-  top: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  opacity: 0.001 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  top: auto !important;
+  width: 320px !important;
+  height: 180px !important;
+  opacity: 0.002 !important;
   pointer-events: none !important;
-  visibility: hidden !important;
-  z-index: -9999 !important;
+  visibility: visible !important;
+  z-index: 0 !important;
+  overflow: hidden !important;
+  transform: translate3d(0, 0, 0) !important;
 }
 
 /* Control Pills & EQ button in top right */
@@ -1341,27 +1366,105 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
   min-width: 40px !important;
 }
 
-@media (max-width: 600px) {
-  html, body {
-    overflow-x: hidden !important;
+@media (max-width: 767px) {
+  main[data-paused],
+  main:has(.deck) {
     max-width: 100vw !important;
+    overflow: hidden !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-top: max(12px, env(safe-area-inset-top, 12px)) !important;
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
   }
 
-  main {
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+  main:not([data-paused]):not(:has(.deck)) {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-bottom: max(140px, calc(120px + env(safe-area-inset-bottom, 20px))) !important;
   }
 
   main > div.relative.z-30.flex {
     gap: 6px !important;
     font-size: 16px !important;
     width: 100% !important;
+    min-height: 44px !important;
+    height: auto !important;
   }
 
-  main > div.relative.z-30.flex > span.text-lime {
-    font-size: 24px !important;
+  main:has(.deck) > div.relative.z-30.flex > span.text-lime,
+  main[data-paused] > div.relative.z-30.flex > span.text-lime {
+    font-size: 26px !important;
+  }
+
+  .deck {
+    width: 100% !important;
+    gap: clamp(6px, 1.4vh, 14px) !important;
+  }
+
+  .deck > header {
+    font-size: clamp(16px, 4.4vw, 22px) !important;
+    gap: 8px !important;
+  }
+
+  .deck h2 {
+    font-size: clamp(36px, 10.5vw, 58px) !important;
+    line-height: 0.9 !important;
+  }
+
+  .deck p {
+    font-size: clamp(15px, 4vw, 20px) !important;
+    margin-top: 2px !important;
+  }
+
+  .deck div[class*="select-none"] {
+    padding-top: 6px !important;
+  }
+
+  .deck div[class*="select-none"] > div[class*="cursor-grab"],
+  .deck div[class*="select-none"] > div[class*="items-center"] {
+    height: clamp(44px, 7.5vh, 66px) !important;
+  }
+
+  .deck div[class*="select-none"] span[class*="text-lime"],
+  .deck div[class*="select-none"] span[class*="font-display"],
+  .deck [class*="drag-hint-bubble"] {
+    font-size: clamp(13px, 3.6vw, 18px) !important;
+  }
+
+  /* Restore proper vertical mobile dual-deck stacking */
+  .deck[data-slot="cue"] {
+    opacity: 0.45 !important;
+    transform: translateY(calc(100cqh - 58%)) scale(0.68) !important;
+  }
+
+  main > div[class*="border-y-2"] {
+    margin-bottom: 10px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    gap: 10px !important;
+  }
+
+  main > div[class*="border-y-2"] span.text-lime {
+    font-size: 16px !important;
+  }
+
+  main > div[class*="border-y-2"] div.ticker-in {
+    font-size: 13px !important;
+  }
+
+  main > div[class*="border-y-2"] button {
+    font-size: 13px !important;
+    padding: 4px 10px !important;
+  }
+
+  main > div[class*="gap-[2vw]"] {
+    gap: 10px !important;
+  }
+
+  main > div[class*="gap-[2vw]"] button {
+    height: clamp(50px, 7.8vh, 64px) !important;
+    font-size: clamp(22px, 6.2vw, 30px) !important;
+    border-radius: 16px !important;
   }
 
   #audify-control-pills-container {
@@ -1374,10 +1477,11 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
     height: 32px !important;
     padding: 0 8px !important;
     font-size: 11px !important;
+    gap: 4px !important;
   }
 
   main > div.relative.z-30.flex div.ml-auto button.tabular-nums {
-    font-size: 13px !important;
+    font-size: 12px !important;
     padding: 4px 10px !important;
     gap: 5px !important;
     border-width: 1.5px !important;

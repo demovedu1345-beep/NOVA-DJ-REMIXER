@@ -1,6 +1,6 @@
 // =========================================================================
-// Audify Mobile Background Audio, MediaSession & WakeLock Engine
-// Enables continuous background playback when phone screen is locked or tab minimized
+// Audify Mobile MediaSession, WakeLock & Visibility Playback Guardian
+// Avoids competing parent-document audio loops that steal YouTube audio focus
 // =========================================================================
 
 (function initBackgroundAudio() {
@@ -8,11 +8,6 @@
   if (window.__audify_bg_audio_initialized) return;
   window.__audify_bg_audio_initialized = true;
 
-  // 1. Silent 1-second 44.1kHz 16-bit PCM WAV Data URI
-  const SILENT_WAV_URI = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-
-  let anchorAudio = null;
-  let audioCtx = null;
   let isUnlocked = false;
   let wakeLock = null;
 
@@ -20,56 +15,11 @@
     return window.__nauxEngine || window.__novaOrchestrator || null;
   }
 
-  function createAnchorAudio() {
-    if (anchorAudio) return anchorAudio;
-    anchorAudio = document.createElement('audio');
-    anchorAudio.id = 'audify-bg-anchor';
-    anchorAudio.src = SILENT_WAV_URI;
-    anchorAudio.loop = true;
-    anchorAudio.autoplay = false;
-    anchorAudio.playsInline = true;
-    anchorAudio.setAttribute('playsinline', '');
-    anchorAudio.setAttribute('webkit-playsinline', '');
-    // Crucial: volume must be > 0 so iOS / Android doesn't suspend it as muted media
-    anchorAudio.volume = 0.001;
-    anchorAudio.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.001;pointer-events:none;bottom:-999px;';
-    const parent = document.body || document.documentElement;
-    if (parent) {
-      parent.appendChild(anchorAudio);
-    }
-    return anchorAudio;
-  }
-
-  // 2. Unlock Audio Session on First Touch/Click
+  // Unlock Audio Session Hook (no competing foreground <audio> element)
   async function unlockAudioSession() {
     if (isUnlocked) return;
-    try {
-      const a = createAnchorAudio();
-      await a.play();
-      isUnlocked = true;
-
-      // Also unlock Web Audio Context for iOS CoreAudio keepalive
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        audioCtx = new AudioContextClass();
-        if (audioCtx.state === 'suspended') {
-          await audioCtx.resume();
-        }
-        // Create an inaudible buffer source loop
-        const buffer = audioCtx.createBuffer(1, 22050, 22050);
-        const source = audioCtx.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
-        const gain = audioCtx.createGain();
-        gain.gain.value = 0.0001; // Inaudible
-        source.connect(gain);
-        gain.connect(audioCtx.destination);
-        source.start(0);
-      }
-      console.log('[Audify Mobile Audio] Background session successfully primed & unlocked');
-    } catch (e) {
-      // Will retry on next interaction
-    }
+    isUnlocked = true;
+    requestWakeLock();
   }
 
   window.__audifyUnlockAudio = unlockAudioSession;
@@ -111,9 +61,6 @@
             deck.player.playVideo();
           }
         }
-        if (anchorAudio && anchorAudio.paused) {
-          anchorAudio.play().catch(() => {});
-        }
         navigator.mediaSession.playbackState = 'playing';
       });
 
@@ -128,9 +75,6 @@
           if (deck?.player?.pauseVideo) {
             deck.player.pauseVideo();
           }
-        }
-        if (anchorAudio && !anchorAudio.paused) {
-          anchorAudio.pause();
         }
         navigator.mediaSession.playbackState = 'paused';
       });
@@ -218,37 +162,20 @@
   // 5. Visibility Change Guardian (Mobile Screen Off / App Switch)
   document.addEventListener('visibilitychange', () => {
     const engine = getEngine();
-    if (!engine) return;
-    if (engine.paused) {
-      if (anchorAudio && !anchorAudio.paused) anchorAudio.pause();
-      return;
-    }
+    if (!engine || engine.paused) return;
 
     const live = engine.liveDeck ? engine.liveDeck() : null;
     const player = live?.player;
 
-    if (document.hidden) {
-      // Screen locked or tab backgrounded: keep audio anchor pumping
-      if (anchorAudio && anchorAudio.paused && isUnlocked) {
-        anchorAudio.play().catch(() => {});
-      }
-      if (player && !engine.paused) {
-        try {
-          player.unMute?.();
-          player.setVolume?.(100);
-          player.playVideo?.();
-        } catch (_) {}
-      }
-    } else {
-      // Returning to foreground: re-affirm high volume and wake lock
+    if (!document.hidden) {
       requestWakeLock();
-      if (player && !engine.paused) {
-        try {
-          player.unMute?.();
-          player.setVolume?.(100);
-          player.playVideo?.();
-        } catch (_) {}
-      }
+    }
+    if (player && !engine.paused) {
+      try {
+        player.unMute?.();
+        player.setVolume?.(100);
+        player.playVideo?.();
+      } catch (_) {}
     }
   });
 
@@ -271,12 +198,8 @@
   }, 1000);
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      createAnchorAudio();
-      setupMediaSession();
-    });
+    document.addEventListener('DOMContentLoaded', setupMediaSession);
   } else {
-    createAnchorAudio();
     setupMediaSession();
   }
 })();
