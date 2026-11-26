@@ -8,7 +8,19 @@
     },
     {
       "source": "/api/logout",
-      "destination": "/api/me"
+      "destination": "/api/auth?action=logout"
+    },
+    {
+      "source": "/api/auth/google",
+      "destination": "/api/auth?action=google"
+    },
+    {
+      "source": "/api/auth/callback",
+      "destination": "/api/auth?action=callback"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/auth?action=logout"
     }
   ],
   "headers": [

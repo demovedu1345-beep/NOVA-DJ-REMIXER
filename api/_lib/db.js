@@ -194,6 +194,18 @@ async function ensurePgSchema(pool) {
           created_at TIMESTAMPTZ DEFAULT NOW()
         );
       `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS nova_likes (
+          owner_id TEXT NOT NULL,
+          song_id TEXT NOT NULL,
+          track_json JSONB NOT NULL,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          PRIMARY KEY (owner_id, song_id)
+        );
+      `);
+      await pool.query(`
+        CREATE INDEX IF NOT EXISTS idx_nova_likes_owner ON nova_likes(owner_id, created_at DESC);
+      `);
     })().catch((err) => {
       schemaReadyPromise = null;
       throw err;
@@ -286,6 +298,13 @@ async function ensureTursoSchema(cfg) {
           session_id TEXT NOT NULL, action TEXT NOT NULL,
           from_sec REAL, to_sec REAL, rating TEXT,
           created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )`,
+      },
+      {
+        sql: `CREATE TABLE IF NOT EXISTS nova_likes (
+          owner_id TEXT NOT NULL, song_id TEXT NOT NULL,
+          track_json TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (owner_id, song_id)
         )`,
       },
     ]).catch((err) => {
@@ -998,4 +1017,147 @@ export async function deleteSetRecord(id, sessionId) {
     console.warn('deleteSetRecord skipped:', err?.message);
   }
   return { deleted: false };
+}
+
+const memoryLikesStore = new Map();
+
+export async function listLikedSongs(ownerId) {
+  const keyOwner = String(ownerId || 'anon:default');
+  const cfg = detectConfig();
+  if (cfg.provider === 'none') {
+    return { persisted: false, likes: memoryLikesStore.get(keyOwner) || [] };
+  }
+  try {
+    if (cfg.provider === 'postgres') {
+      const pool = getPool(cfg.pgUrl);
+      await ensurePgSchema(pool);
+      const { rows } = await pool.query(
+        'SELECT track_json, created_at FROM nova_likes WHERE owner_id = $1 ORDER BY created_at DESC LIMIT 300',
+        [keyOwner]
+      );
+      return {
+        persisted: true,
+        likes: rows.map((r) => ({ ...(typeof r.track_json === 'string' ? JSON.parse(r.track_json) : r.track_json), likedAt: r.created_at })),
+      };
+    }
+    if (cfg.provider === 'turso') {
+      await ensureTursoSchema(cfg);
+      const [rows] = await tursoPipeline(cfg, [
+        { sql: 'SELECT track_json, created_at FROM nova_likes WHERE owner_id = ? ORDER BY created_at DESC LIMIT 300', args: [keyOwner] },
+      ]);
+      return {
+        persisted: true,
+        likes: (rows || []).map((r) => ({ ...(typeof r.track_json === 'string' ? JSON.parse(r.track_json) : r.track_json), likedAt: r.created_at })),
+      };
+    }
+    if (cfg.provider === 'kv') {
+      const raw = await kvCmd(cfg, ['GET', `nova:likes:${keyOwner}`]);
+      return { persisted: true, likes: raw ? JSON.parse(raw) : [] };
+    }
+  } catch (err) {
+    console.warn('listLikedSongs skipped:', err?.message);
+  }
+  return { persisted: false, likes: memoryLikesStore.get(keyOwner) || [] };
+}
+
+export async function toggleLikedSong(ownerId, track, forceLike = undefined) {
+  const keyOwner = String(ownerId || 'anon:default');
+  const songId = String(track.song_id);
+  const current = await listLikedSongs(keyOwner);
+  const exists = current.likes.some((t) => String(t.song_id) === songId);
+  const shouldLike = forceLike === true ? true : forceLike === false ? false : !exists;
+
+  if (!shouldLike) {
+    return await removeLikedSong(keyOwner, songId);
+  }
+
+  const item = { ...track, likedAt: new Date().toISOString() };
+  const cfg = detectConfig();
+  if (cfg.provider === 'none') {
+    const next = [item, ...(memoryLikesStore.get(keyOwner) || []).filter((t) => String(t.song_id) !== songId)].slice(0, 300);
+    memoryLikesStore.set(keyOwner, next);
+    return { persisted: false, liked: true, likes: next };
+  }
+  try {
+    if (cfg.provider === 'postgres') {
+      const pool = getPool(cfg.pgUrl);
+      await ensurePgSchema(pool);
+      await pool.query(
+        `INSERT INTO nova_likes (owner_id, song_id, track_json, created_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (owner_id, song_id) DO UPDATE SET track_json = EXCLUDED.track_json`,
+        [keyOwner, songId, JSON.stringify(item)]
+      );
+      const updated = await listLikedSongs(keyOwner);
+      return { persisted: true, liked: true, likes: updated.likes };
+    }
+    if (cfg.provider === 'turso') {
+      await ensureTursoSchema(cfg);
+      await tursoPipeline(cfg, [
+        {
+          sql: `INSERT INTO nova_likes (owner_id, song_id, track_json) VALUES (?, ?, ?)
+                ON CONFLICT(owner_id, song_id) DO UPDATE SET track_json = excluded.track_json`,
+          args: [keyOwner, songId, JSON.stringify(item)],
+        },
+      ]);
+      const updated = await listLikedSongs(keyOwner);
+      return { persisted: true, liked: true, likes: updated.likes };
+    }
+    if (cfg.provider === 'kv') {
+      const next = [item, ...current.likes.filter((t) => String(t.song_id) !== songId)].slice(0, 300);
+      await kvCmd(cfg, ['SET', `nova:likes:${keyOwner}`, JSON.stringify(next)]);
+      return { persisted: true, liked: true, likes: next };
+    }
+  } catch (err) {
+    console.warn('toggleLikedSong skipped:', err?.message);
+  }
+  const next = [item, ...(memoryLikesStore.get(keyOwner) || []).filter((t) => String(t.song_id) !== songId)].slice(0, 300);
+  memoryLikesStore.set(keyOwner, next);
+  return { persisted: false, liked: true, likes: next };
+}
+
+export async function removeLikedSong(ownerId, songId) {
+  const keyOwner = String(ownerId || 'anon:default');
+  const sId = String(songId);
+  const cfg = detectConfig();
+  if (cfg.provider === 'none') {
+    const next = (memoryLikesStore.get(keyOwner) || []).filter((t) => String(t.song_id) !== sId);
+    memoryLikesStore.set(keyOwner, next);
+    return { persisted: false, liked: false, likes: next };
+  }
+  try {
+    if (cfg.provider === 'postgres') {
+      const pool = getPool(cfg.pgUrl);
+      await ensurePgSchema(pool);
+      await pool.query('DELETE FROM nova_likes WHERE owner_id = $1 AND song_id = $2', [keyOwner, sId]);
+      const updated = await listLikedSongs(keyOwner);
+      return { persisted: true, liked: false, likes: updated.likes };
+    }
+    if (cfg.provider === 'turso') {
+      await ensureTursoSchema(cfg);
+      await tursoPipeline(cfg, [{ sql: 'DELETE FROM nova_likes WHERE owner_id = ? AND song_id = ?', args: [keyOwner, sId] }]);
+      const updated = await listLikedSongs(keyOwner);
+      return { persisted: true, liked: false, likes: updated.likes };
+    }
+    if (cfg.provider === 'kv') {
+      const current = await listLikedSongs(keyOwner);
+      const next = current.likes.filter((t) => String(t.song_id) !== sId);
+      await kvCmd(cfg, ['SET', `nova:likes:${keyOwner}`, JSON.stringify(next)]);
+      return { persisted: true, liked: false, likes: next };
+    }
+  } catch (err) {
+    console.warn('removeLikedSong skipped:', err?.message);
+  }
+  const next = (memoryLikesStore.get(keyOwner) || []).filter((t) => String(t.song_id) !== sId);
+  memoryLikesStore.set(keyOwner, next);
+  return { persisted: false, liked: false, likes: next };
+}
+
+export async function syncLikedSongs(ownerId, tracks) {
+  for (const t of tracks.slice(0, 100)) {
+    if (t?.song_id) {
+      await toggleLikedSong(ownerId, t, true);
+    }
+  }
+  return await listLikedSongs(ownerId);
 }
