@@ -172,8 +172,10 @@
     }
     if (player && !engine.paused) {
       try {
-        player.unMute?.();
-        player.setVolume?.(100);
+        if (!live?.awaitingUnmuteGesture) {
+          player.unMute?.();
+          player.setVolume?.(100);
+        }
         player.playVideo?.();
       } catch (_) {}
     }
@@ -188,8 +190,10 @@
       if (live?.player && live.status === 'live' && !engine.crossfading && !engine.awaitingStart) {
         if (typeof live.player.getPlayerState === 'function' && live.player.getPlayerState() === 2) {
           try {
-            live.player.unMute?.();
-            live.player.setVolume?.(100);
+            if (!live.awaitingUnmuteGesture) {
+              live.player.unMute?.();
+              live.player.setVolume?.(100);
+            }
             live.player.playVideo?.();
           } catch (_) {}
         }

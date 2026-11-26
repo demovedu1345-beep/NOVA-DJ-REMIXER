@@ -30,6 +30,10 @@ function computeMasterCounts() {
       counts.hindi += c;
       counts[`hindi:${sub}`] = c;
       counts[sub] = c;
+      if (k === 'diwali-party-songs') {
+        counts['hindi:diwali'] = c;
+        counts['diwali'] = c;
+      }
     } else if (lang === 'english') {
       counts.english += c;
       counts[`english:${sub}`] = c;
@@ -146,13 +150,139 @@ function shuffleArray(arr) {
   return a;
 }
 
+function decodeMoreToken(token) {
+  if (!token || typeof token !== 'string' || !token.startsWith('audify1:')) return null;
+  try {
+    return JSON.parse(Buffer.from(token.slice(8), 'base64url').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function encodeMoreToken(payload) {
+  return 'audify1:' + Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
+}
+
+function toCue(s, cat, idx = 0, energy = 'peak', langOverride = null, subtypeOverride = null) {
+  const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+  const dur = Number(s.durationSec) || 210;
+  const entry = Number.isFinite(s.entrySec) ? s.entrySec : (Number.isFinite(s.hookStartSec) ? s.hookStartSec : 35);
+  const exit = Number.isFinite(s.exitSec) ? s.exitSec : (Number.isFinite(s.hookEndSec) ? s.hookEndSec : Math.min(entry + 42, dur));
+  return {
+    song_id: s.id || `${cat?.slug || 'track'}-${idx + 1}`,
+    title: s.title,
+    artist: s.artist,
+    youtube_ids: [vId],
+    duration_sec: dur,
+    entry_sec: entry,
+    exit_sec: exit,
+    ...(s.bpm ? { bpm: s.bpm } : {}),
+    play_full: Boolean(s.playFull),
+    era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
+    language: langOverride || cat?.lang || 'hindi',
+    subtype: subtypeOverride || (cat?.slug ? slugToSubtype(cat.slug) : 'party'),
+    energy: s.energy || (energy === 'bangers' ? 9 : 8),
+    tags: [],
+    style: 'party',
+    unsure: false,
+    heat: s.heat || Array.from({ length: 100 }, (_, i) => +(0.5 + 0.4 * Math.sin(i / 10)).toFixed(3))
+  };
+}
+
+function getAllCatalogEntries() {
+  const entries = [];
+  for (const cat of Object.values(CURATED_CATEGORIES_DB)) {
+    for (const s of (cat.songs || [])) {
+      entries.push({ song: s, cat });
+    }
+  }
+  for (const [langKey, list] of Object.entries(ARTISTS_DB || {})) {
+    const items = Array.isArray(list) ? list : Object.values(list || {});
+    for (const art of items) {
+      const cat = { slug: `${langKey}-artists`, lang: art.lang || langKey };
+      for (const s of (art.songs || [])) {
+        entries.push({ song: s, cat });
+      }
+    }
+  }
+  return entries;
+}
+
 function buildSetFromCuratedDb(body) {
-  const answers = body?.answers || {};
-  const requestedArtist = body?.artist || answers.artist;
-  const rawLangs = answers.languages || answers.language || (body?.lang ? [body.lang] : []);
-  const requestedLangs = (Array.isArray(rawLangs) ? rawLangs : [rawLangs]).map(l => String(l).toLowerCase());
-  const requestedSubtypes = (answers.subtypes || (body?.kind ? [body.kind] : [])).map(s => String(s).toLowerCase());
+  const tokenData = decodeMoreToken(body?.more);
+  const answers = (body?.answers && Object.keys(body.answers).length > 0)
+    ? body.answers
+    : (tokenData?.answers || {});
+  const requestedArtist = body?.artist || answers.artist || tokenData?.artist;
+  const rawLangs = answers.languages || answers.language || (body?.lang ? [body.lang] : (tokenData?.lang ? [tokenData.lang] : []));
+  const requestedLangs = (Array.isArray(rawLangs) ? rawLangs : [rawLangs]).filter(Boolean).map(l => String(l).toLowerCase());
+  const rawSubs = answers.subtypes || (body?.kind ? [body.kind] : (tokenData?.kind ? [tokenData.kind] : []));
+  const requestedSubtypes = (Array.isArray(rawSubs) ? rawSubs : [rawSubs]).filter(Boolean).map(s => String(s).toLowerCase());
   const energy = answers.energy || 'peak';
+  const excludedIds = new Set([
+    ...(Array.isArray(body?.exclude) ? body.exclude : []),
+    ...(Array.isArray(body?.have) ? body.have : []),
+    ...(Array.isArray(body?.done) ? body.done : [])
+  ].map(x => String(x).toLowerCase()));
+
+  // 0a. Direct song IDs lookup (fetchSongs)
+  if (Array.isArray(body?.ids) && body.ids.length > 0) {
+    const want = new Set(body.ids.map(x => String(x)));
+    const cues = [];
+    const seen = new Set();
+    for (const { song: s, cat } of getAllCatalogEntries()) {
+      const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+      if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
+      if (!want.has(String(s.id)) && !want.has(String(vId))) continue;
+      if (seen.has(vId)) continue;
+      seen.add(vId);
+      cues.push(toCue(s, cat, cues.length, energy));
+    }
+    return { cues, fillers: [], note: 'Loaded requested tracks.', more: null };
+  }
+
+  // 0b. Direct song/artist search (searchSongs)
+  if (typeof body?.q === 'string' && body.q.trim().length > 0) {
+    const q = body.q.trim().toLowerCase();
+    const terms = q.split(/\s+/).filter(Boolean);
+    const scored = [];
+    const seenVideos = new Set();
+    const seenTitles = new Set();
+    for (const { song: s, cat } of getAllCatalogEntries()) {
+      if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) continue;
+      const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+      if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
+      if (excludedIds.has(String(s.id || '').toLowerCase()) || excludedIds.has(vId.toLowerCase())) continue;
+      const title = (s.title || '').toLowerCase();
+      const artist = (s.artist || '').toLowerCase();
+      const hay = `${title} ${artist} ${cat.slug || ''}`;
+      if (!terms.every(t => hay.includes(t))) continue;
+      const titleKey = `${title.trim()}|${artist.split(',')[0].trim()}`;
+      if (seenVideos.has(vId) || seenTitles.has(titleKey)) continue;
+      seenVideos.add(vId);
+      seenTitles.add(titleKey);
+      let score = 0;
+      if (title === q) score += 100;
+      else if (title.startsWith(q)) score += 60;
+      else if (title.includes(q)) score += 35;
+      if (artist.includes(q)) score += 25;
+      scored.push({ score, cue: toCue(s, cat, scored.length, energy) });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    return { cues: scored.slice(0, 40).map(x => x.cue), fillers: [], note: `Search results for "${body.q.trim()}".`, more: null };
+  }
+
+  const nextMoreToken = encodeMoreToken({
+    answers: {
+      languages: requestedLangs,
+      subtypes: requestedSubtypes,
+      ...(answers.time ? { time: answers.time } : {}),
+      ...(answers.crowd ? { crowd: answers.crowd } : {}),
+      ...(answers.energy ? { energy: answers.energy } : {})
+    },
+    ...(requestedArtist ? { artist: requestedArtist } : {}),
+    page: (tokenData?.page || 0) + 1
+  });
 
   // 1. DIRECT ARTIST SET SUPPORT: If an artist is requested, return their complete verified discography
   if (requestedArtist) {
@@ -167,35 +297,17 @@ function buildSetFromCuratedDb(body) {
       for (const s of artistSongs) {
         const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
         if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId) || seenVideos.has(vId)) continue;
+        if (excludedIds.has(String(s.id || '').toLowerCase()) || excludedIds.has(vId.toLowerCase())) continue;
         const titleKey = (s.title || '').toLowerCase().trim();
         if (seenTitles.has(titleKey)) continue;
 
         seenVideos.add(vId);
         seenTitles.add(titleKey);
 
-        const dur = Number(s.durationSec) || 210;
-        const entry = Number.isFinite(s.entrySec) ? s.entrySec : (Number.isFinite(s.hookStartSec) ? s.hookStartSec : 35);
-        const exit = Number.isFinite(s.exitSec) ? s.exitSec : (Number.isFinite(s.hookEndSec) ? s.hookEndSec : Math.min(entry + 42, dur));
-
-        cues.push({
-          song_id: s.id || `artist-${artProfile.id}-${cues.length + 1}`,
-          title: s.title,
-          artist: s.artist,
-          youtube_ids: [vId],
-          duration_sec: dur,
-          entry_sec: entry,
-          exit_sec: exit,
-          ...(s.bpm ? { bpm: s.bpm } : {}),
-          play_full: Boolean(s.playFull),
-          era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
-          language: artProfile.lang || 'hindi',
-          subtype: 'artist',
-          energy: s.energy || (energy === 'bangers' ? 9 : 8),
-          tags: artProfile.subcategories || [],
-          style: 'artist-discography',
-          unsure: false,
-          heat: s.heat || Array.from({ length: 100 }, (_, i) => +(0.5 + 0.4 * Math.sin(i / 10)).toFixed(3))
-        });
+        const cue = toCue(s, { slug: `artist-${artProfile.id}`, lang: artProfile.lang || 'hindi' }, cues.length, energy, artProfile.lang || 'hindi', 'artist');
+        cue.tags = artProfile.subcategories || [];
+        cue.style = 'artist-discography';
+        cues.push(cue);
       }
 
       if (cues.length > 0) {
@@ -203,7 +315,7 @@ function buildSetFromCuratedDb(body) {
           cues,
           fillers: [],
           note: `${artProfile.name} Complete Discography (${cues.length} tracks). Tap APPROVE & PLAY.`,
-          more: "more-token-audify",
+          more: nextMoreToken,
           artist: {
             id: artProfile.id,
             name: artProfile.name,
@@ -222,6 +334,18 @@ function buildSetFromCuratedDb(body) {
   // 2. If specific subtypes are requested, pull strictly from matching categories
   if (requestedSubtypes.length > 0) {
     for (const sub of requestedSubtypes) {
+      if (sub === 'hindi:artists' || sub === 'english:artists' || sub === 'artists') {
+        const artLang = sub.startsWith('english') ? 'english' : (sub.startsWith('hindi') ? 'hindi' : (requestedLangs[0] || 'hindi'));
+        const list = ARTISTS_DB?.[artLang];
+        const items = Array.isArray(list) ? list : Object.values(list || {});
+        for (const art of items) {
+          const cat = { slug: `${artLang}-artists`, lang: art.lang || artLang };
+          for (const s of (art.songs || [])) {
+            candidatePool.push({ song: s, cat });
+          }
+        }
+        continue;
+      }
       for (const cat of allCategories) {
         if (slugMatchesSubtype(cat.slug, sub, requestedLangs)) {
           if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) {
@@ -246,7 +370,7 @@ function buildSetFromCuratedDb(body) {
     }
   }
 
-  // 4. Fallback if candidate pool is empty
+  // 4. Fallback ONLY within requestedLangs (never cross-language when a language is selected)
   if (!candidatePool.length) {
     for (const cat of allCategories) {
       if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) {
@@ -262,59 +386,61 @@ function buildSetFromCuratedDb(body) {
   // 5. Shuffle candidate pool
   candidatePool = shuffleArray(candidatePool);
 
-  // 6. Convert to cue format & deduplicate by title AND videoId
+  // 6. Convert to cue format & deduplicate by title AND videoId AND exclude already-played tracks
   const seenTitles = new Set();
   const seenVideos = new Set();
   const cues = [];
 
-  const isStrictEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi');
+  const isStrictEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi') && !requestedLangs.includes('language');
   const isStrictHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi');
 
-  for (const { song: s, cat } of candidatePool) {
-    if (isStrictEnglish && cat.lang !== 'english') continue;
-    if (isStrictHindi && cat.lang !== 'hindi') continue;
-    const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
-    if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
-    const titleKey = (s.title || '').toLowerCase().trim();
+  const collectFromPool = (pool, ignoreExcluded = false) => {
+    for (const { song: s, cat } of pool) {
+      if (isStrictEnglish && cat.lang !== 'english') continue;
+      if (isStrictHindi && cat.lang !== 'hindi') continue;
+      if (requestedLangs.length > 0 && !catMatchesLang(cat.lang, requestedLangs)) continue;
+      const vId = s.videoId || (s.youtube_ids && s.youtube_ids[0]);
+      if (!vId || vId.length !== 11 || BLACKLIST_VIDS.has(vId)) continue;
+      const sIdLower = String(s.id || '').toLowerCase();
+      if (!ignoreExcluded && (excludedIds.has(sIdLower) || excludedIds.has(vId.toLowerCase()))) continue;
+      const titleKey = (s.title || '').toLowerCase().trim();
 
-    if (seenTitles.has(titleKey)) continue;
-    if (seenVideos.has(vId)) continue;
+      if (seenTitles.has(titleKey)) continue;
+      if (seenVideos.has(vId)) continue;
 
-    seenTitles.add(titleKey);
-    seenVideos.add(vId);
+      seenTitles.add(titleKey);
+      seenVideos.add(vId);
 
-    const dur = Number(s.durationSec) || 210;
-    const entry = Number.isFinite(s.entrySec) ? s.entrySec : (Number.isFinite(s.hookStartSec) ? s.hookStartSec : 35);
-    const exit = Number.isFinite(s.exitSec) ? s.exitSec : (Number.isFinite(s.hookEndSec) ? s.hookEndSec : Math.min(entry + 42, dur));
+      cues.push(toCue(s, cat, cues.length, energy, cat.lang || (isStrictEnglish ? 'english' : 'hindi')));
+      if (cues.length >= 100) break;
+    }
+  };
 
-    cues.push({
-      song_id: s.id || `${cat.slug}-${cues.length + 1}`,
-      title: s.title,
-      artist: s.artist,
-      youtube_ids: [vId],
-      duration_sec: dur,
-      entry_sec: entry,
-      exit_sec: exit,
-      ...(s.bpm ? { bpm: s.bpm } : {}),
-      play_full: Boolean(s.playFull),
-      era: s.year && Number(s.year) < 2010 ? 'pre2020' : 'post2020',
-      language: cat.lang || (isStrictEnglish ? 'english' : 'hindi'),
-      subtype: slugToSubtype(cat.slug),
-      energy: s.energy || (energy === 'bangers' ? 9 : 8),
-      tags: [],
-      style: 'party',
-      unsure: false,
-      heat: s.heat || Array.from({ length: 100 }, (_, i) => +(0.5 + 0.4 * Math.sin(i / 10)).toFixed(3))
-    });
+  collectFromPool(candidatePool, false);
 
-    if (cues.length >= 100) break;
+  // If all songs in the chosen subtype were already played (fetchMore), first try other categories of the SAME language
+  if (cues.length === 0 && requestedLangs.length > 0) {
+    const sameLangPool = [];
+    for (const cat of allCategories) {
+      if (catMatchesLang(cat.lang, requestedLangs)) {
+        for (const s of shuffleArray(cat.songs || []).slice(0, 30)) {
+          sameLangPool.push({ song: s, cat });
+        }
+      }
+    }
+    collectFromPool(shuffleArray(sameLangPool), false);
+  }
+
+  // If literally every song in the language was exhausted, reshuffle the requested pool cleanly
+  if (cues.length === 0) {
+    collectFromPool(candidatePool, true);
   }
 
   return {
     cues,
     fillers: [],
     note: "Tonight's set, curated from official YouTube party hits. Tap APPROVE & PLAY.",
-    more: "more-token-audify"
+    more: nextMoreToken
   };
 }
 
