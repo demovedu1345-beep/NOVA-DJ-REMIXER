@@ -17,6 +17,7 @@
     likes: [],
     currentSong: null,
     modalOpen: false,
+    showProfileForm: false,
     lastSig: '',
   };
 
@@ -77,6 +78,14 @@
     return state.currentSong;
   }
 
+  function isSplashScreen() {
+    try {
+      return Boolean(document.querySelector('.splash-line'));
+    } catch {
+      return false;
+    }
+  }
+
   function isPlayerActive() {
     try {
       return Boolean(window.__nauxEngine?.started && !window.__nauxEngine?.finished && document.querySelector('.deck[data-slot="live"]'));
@@ -98,7 +107,28 @@
     clearTimeout(el._t);
     el._t = setTimeout(() => {
       el.classList.remove('is-visible');
-    }, 3600);
+    }, 3200);
+  }
+
+  async function syncGuestLikesToAccount() {
+    const guestLikes = readLocalLikes(null);
+    if (!state.user || !guestLikes.length) return;
+    const sid = getGuestSessionId();
+    try {
+      const syncRes = await fetch(`/api/likes?sessionId=${encodeURIComponent(sid)}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'sync', tracks: guestLikes }),
+      });
+      if (syncRes.ok) {
+        const d = await syncRes.json();
+        if (Array.isArray(d.likes)) {
+          state.likes = d.likes;
+          writeLocalLikes(state.user, d.likes);
+          try { localStorage.removeItem(storageKey(null)); } catch {}
+        }
+      }
+    } catch {}
   }
 
   async function loadUserAndLikes() {
@@ -112,24 +142,7 @@
       }
     } catch {}
 
-    const guestLikes = readLocalLikes(null);
-    if (state.user && guestLikes.length > 0) {
-      try {
-        const syncRes = await fetch(`/api/likes?sessionId=${encodeURIComponent(sid)}`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ action: 'sync', tracks: guestLikes }),
-        });
-        if (syncRes.ok) {
-          const d = await syncRes.json();
-          if (Array.isArray(d.likes)) {
-            state.likes = d.likes;
-            writeLocalLikes(state.user, d.likes);
-            try { localStorage.removeItem(storageKey(null)); } catch {}
-          }
-        }
-      } catch {}
-    }
+    await syncGuestLikesToAccount();
 
     try {
       const likesRes = await fetch(`/api/likes?sessionId=${encodeURIComponent(sid)}`, { cache: 'no-store' });
@@ -157,9 +170,10 @@
         if (authStatus === 'ok' && state.user) {
           showToast(`Signed in as ${state.user.name || state.user.email}`);
         } else if (authStatus === 'unconfigured') {
-          showToast('Google Sign-In is optional · Add GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in Vercel to enable');
+          state.showProfileForm = true;
+          openModal();
         } else if (authStatus === 'error') {
-          showToast('Google Sign-In could not complete — you can still listen & like freely');
+          showToast('Sign-in was cancelled — you can still listen & like freely');
         }
       }
     } catch {}
@@ -285,8 +299,40 @@
     }
   }
 
-  function googleSignIn() {
-    window.location.href = '/api/auth/google';
+  function startSignIn() {
+    if (state.oauthConfigured) {
+      window.location.href = '/api/auth/google';
+      return;
+    }
+    state.showProfileForm = true;
+    openModal();
+  }
+
+  async function submitProfileSignIn(name, email) {
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      showToast('Please enter a valid email address');
+      return;
+    }
+    try {
+      const res = await fetch('/api/me', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'profile_signin', name: String(name || '').trim(), email: cleanEmail }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        if (d.user) {
+          state.user = d.user;
+          state.showProfileForm = false;
+          await syncGuestLikesToAccount();
+          await loadUserAndLikes();
+          showToast(`Signed in as ${state.user.name || state.user.email}`);
+        }
+      }
+    } catch {
+      showToast('Could not sign in right now — you can still use guest likes');
+    }
   }
 
   async function googleSignOut() {
@@ -304,6 +350,7 @@
 
   function closeModal() {
     state.modalOpen = false;
+    state.showProfileForm = false;
     const modal = document.getElementById('audify-liked-modal');
     if (modal) modal.remove();
   }
@@ -341,11 +388,19 @@
     modal.id = 'audify-liked-modal';
     modal.className = 'audify-liked-backdrop';
 
+    const profileFormHtml = (!state.user && state.showProfileForm)
+      ? `<form id="audify-profile-signin-form" class="audify-profile-form">
+           <input type="text" name="name" placeholder="Your name (optional)" class="audify-profile-input" />
+           <input type="email" name="email" placeholder="Your Gmail / email" required class="audify-profile-input" />
+           <button type="submit" class="audify-liked-btn-lime" style="padding:9px 16px;font-size:13px">SAVE & SIGN IN</button>
+         </form>`
+      : '';
+
     const userBar = state.user
       ? `<div class="audify-liked-user">
            ${state.user.picture ? `<img src="${esc(state.user.picture)}" alt="" class="audify-liked-avatar" />` : `<span class="audify-liked-initial">${esc((state.user.name || state.user.email || 'U').slice(0, 1).toUpperCase())}</span>`}
            <div class="audify-liked-user-meta">
-             <span class="audify-liked-user-name">${esc(state.user.name || 'Google User')}</span>
+             <span class="audify-liked-user-name">${esc(state.user.name || 'Audify User')}</span>
              <span class="audify-liked-user-email">${esc(state.user.email || '')}</span>
            </div>
            <button type="button" class="audify-liked-btn-ghost" data-action="signout">SIGN OUT</button>
@@ -353,12 +408,13 @@
       : `<div class="audify-liked-user">
            <div class="audify-liked-user-meta">
              <span class="audify-liked-user-name">GUEST LIKES (OPTIONAL LOGIN)</span>
-             <span class="audify-liked-user-email">Sign in with Google to save & sync across devices</span>
+             <span class="audify-liked-user-email">Sign in to keep your personal liked songs list</span>
            </div>
            <button type="button" class="audify-liked-btn-google" data-action="signin">
              <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-             <span>GOOGLE SIGN IN</span>
+             <span>${state.oauthConfigured ? 'GOOGLE SIGN IN' : 'SIGN IN'}</span>
            </button>
+           ${profileFormHtml}
          </div>`;
 
     const listHtml = state.likes.length === 0
@@ -406,11 +462,18 @@
         if (!btn) return;
         const action = btn.dataset.action;
         if (action === 'close') closeModal();
-        else if (action === 'signin') googleSignIn();
+        else if (action === 'signin') startSignIn();
         else if (action === 'signout') googleSignOut();
         else if (action === 'play-all') playLikedList();
         else if (btn.dataset.playId) playLikedList(btn.dataset.playId);
         else if (btn.dataset.removeId) removeLikedById(btn.dataset.removeId);
+      });
+      modal.addEventListener('submit', (e) => {
+        if (e.target && e.target.id === 'audify-profile-signin-form') {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          submitProfileSignIn(fd.get('name'), fd.get('email'));
+        }
       });
       document.body.appendChild(modal);
     }
@@ -420,14 +483,16 @@
     const portal = ensurePortal();
     if (!portal) return;
 
+    const splash = isSplashScreen();
     const playing = isPlayerActive();
     const live = getLiveCue();
     const liked = isTrackLiked(live);
     const countLabel = `♥ LIKED${state.likes.length ? ` (${state.likes.length})` : ''}`;
 
-    const sig = `${playing}|${liked}|${countLabel}|${songKeyOf(live)}`;
+    const sig = `${splash}|${playing}|${liked}|${countLabel}|${songKeyOf(live)}`;
     if (sig !== state.lastSig) {
       state.lastSig = sig;
+      portal.style.display = splash ? 'none' : 'flex';
       const likeBtn = portal.querySelector('#audify-like-track-btn');
       if (likeBtn) {
         likeBtn.style.display = playing ? 'inline-flex' : 'none';
@@ -454,6 +519,7 @@
 
   window.__audifyLikes = {
     open: openModal,
+    signIn: startSignIn,
     toggleLike: toggleLikeTrack,
     playLiked: playLikedList,
     getLikes: () => state.likes,
@@ -469,5 +535,5 @@
     loadUserAndLikes();
   }
 
-  setInterval(refreshUI, 800);
+  setInterval(refreshUI, 500);
 })();

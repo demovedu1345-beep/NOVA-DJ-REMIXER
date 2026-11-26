@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { handlePreflight, sendJson } from './_lib/http.js';
+import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import {
   clearSessionCookie,
   getOrigin,
@@ -105,6 +105,17 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    try {
+      const body = await readJsonBody(req);
+      if (body?.action === 'profile_signin' && body?.email) {
+        const email = String(body.email).trim().toLowerCase().slice(0, 120);
+        const name = String(body.name || email.split('@')[0] || 'Audify User').trim().slice(0, 80);
+        const id = 'email_' + crypto.createHash('sha256').update(email).digest('hex').slice(0, 24);
+        const user = { id, email, name, picture: null };
+        setSessionCookie(res, req, user);
+        return sendJson(res, 200, { ok: true, user });
+      }
+    } catch {}
     return sendJson(res, 200, { ok: true });
   }
 

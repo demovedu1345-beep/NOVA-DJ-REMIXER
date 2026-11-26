@@ -1851,3 +1851,24 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
   opacity: 1;
   transform: translate(-50%, 0);
 }
+
+.audify-profile-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.audify-profile-input {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+}
+.audify-profile-input:focus {
+  border-color: #c8ff00;
+}
