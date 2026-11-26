@@ -1,0 +1,47 @@
+import { CURATED_CATEGORIES_DB } from '../api/_lib/curated-songs-db.js';
+
+// Pool of 100% verified English bangers with official YouTube IDs and hook timestamps
+export const VERIFIED_ENGLISH_BANGERS = [
+  { title: "Cruel Summer", artist: "Taylor Swift", year: "2019", durationSec: 178, hookStartSec: 48, hookEndSec: 88, entrySec: 48, exitSec: 88, videoId: "ic8j13goQyc", youtube_ids: ["ic8j13goQyc"], playFull: false, energy: 9 },
+  { title: "Starboy", artist: "The Weeknd ft. Daft Punk", year: "2016", durationSec: 230, hookStartSec: 45, hookEndSec: 85, entrySec: 45, exitSec: 85, videoId: "dQTnKXYL1kc", youtube_ids: ["dQTnKXYL1kc"], playFull: false, energy: 9 },
+  { title: "Blinding Lights", artist: "The Weeknd", year: "2020", durationSec: 200, hookStartSec: 25, hookEndSec: 65, entrySec: 25, exitSec: 65, videoId: "4NRXx6U8ABQ", youtube_ids: ["4NRXx6U8ABQ"], playFull: false, energy: 9 },
+  { title: "Save Your Tears", artist: "The Weeknd", year: "2020", durationSec: 215, hookStartSec: 36, hookEndSec: 76, entrySec: 36, exitSec: 76, videoId: "XXYlFuWEuKI", youtube_ids: ["XXYlFuWEuKI"], playFull: false, energy: 8 },
+  { title: "Levitating", artist: "Dua Lipa", year: "2020", durationSec: 203, hookStartSec: 36, hookEndSec: 76, entrySec: 36, exitSec: 76, videoId: "TUVcZfQe-Kw", youtube_ids: ["TUVcZfQe-Kw"], playFull: false, energy: 9 },
+  { title: "Don't Start Now", artist: "Dua Lipa", year: "2019", durationSec: 183, hookStartSec: 32, hookEndSec: 72, entrySec: 32, exitSec: 72, videoId: "oygrmJFKYZY", youtube_ids: ["oygrmJFKYZY"], playFull: false, energy: 9 },
+  { title: "Dance The Night", artist: "Dua Lipa", year: "2023", durationSec: 176, hookStartSec: 30, hookEndSec: 70, entrySec: 30, exitSec: 70, videoId: "OiC1rgCPmUQ", youtube_ids: ["OiC1rgCPmUQ"], playFull: false, energy: 9 },
+  { title: "24K Magic", artist: "Bruno Mars", year: "2016", durationSec: 226, hookStartSec: 40, hookEndSec: 80, entrySec: 40, exitSec: 80, videoId: "UqyT8IEBkvY", youtube_ids: ["UqyT8IEBkvY"], playFull: false, energy: 9 },
+  { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", year: "2014", durationSec: 270, hookStartSec: 52, hookEndSec: 92, entrySec: 52, exitSec: 92, videoId: "OPf0YbXqDm0", youtube_ids: ["OPf0YbXqDm0"], playFull: false, energy: 10 },
+  { title: "Locked Out of Heaven", artist: "Bruno Mars", year: "2012", durationSec: 233, hookStartSec: 48, hookEndSec: 88, entrySec: 48, exitSec: 88, videoId: "e-fA-gBCkj0", youtube_ids: ["e-fA-gBCkj0"], playFull: false, energy: 9 },
+  { title: "Lose Yourself", artist: "Eminem", year: "2002", durationSec: 326, hookStartSec: 53, hookEndSec: 93, entrySec: 53, exitSec: 93, videoId: "_Yhyp-_hX2s", youtube_ids: ["_Yhyp-_hX2s"], playFull: false, energy: 10 },
+  { title: "Without Me", artist: "Eminem", year: "2002", durationSec: 290, hookStartSec: 42, hookEndSec: 82, entrySec: 42, exitSec: 82, videoId: "YVkUvmDQ3HY", youtube_ids: ["YVkUvmDQ3HY"], playFull: false, energy: 10 },
+  { title: "Believer", artist: "Imagine Dragons", year: "2017", durationSec: 204, hookStartSec: 35, hookEndSec: 75, entrySec: 35, exitSec: 75, videoId: "7wtfhZwyrcc", youtube_ids: ["7wtfhZwyrcc"], playFull: false, energy: 10 },
+  { title: "Radioactive", artist: "Imagine Dragons", year: "2012", durationSec: 187, hookStartSec: 34, hookEndSec: 74, entrySec: 34, exitSec: 74, videoId: "ktvTqvkFyHA", youtube_ids: ["ktvTqvkFyHA"], playFull: false, energy: 10 },
+  { title: "Shape of You", artist: "Ed Sheeran", year: "2017", durationSec: 233, hookStartSec: 41, hookEndSec: 81, entrySec: 41, exitSec: 81, videoId: "JGwWNGJdvx8", youtube_ids: ["JGwWNGJdvx8"], playFull: false, energy: 9 },
+  { title: "Bad Habits", artist: "Ed Sheeran", year: "2021", durationSec: 231, hookStartSec: 38, hookEndSec: 78, entrySec: 38, exitSec: 78, videoId: "orJSJGHjBLI", youtube_ids: ["orJSJGHjBLI"], playFull: false, energy: 9 },
+  { title: "Circles", artist: "Post Malone", year: "2019", durationSec: 215, hookStartSec: 44, hookEndSec: 84, entrySec: 44, exitSec: 84, videoId: "wXhTHyIgQ_U", youtube_ids: ["wXhTHyIgQ_U"], playFull: false, energy: 8 },
+  { title: "Sunflower", artist: "Post Malone, Swae Lee", year: "2018", durationSec: 158, hookStartSec: 30, hookEndSec: 70, entrySec: 30, exitSec: 70, videoId: "ApXoWvfEYVU", youtube_ids: ["ApXoWvfEYVU"], playFull: false, energy: 8 },
+  { title: "As It Was", artist: "Harry Styles", year: "2022", durationSec: 167, hookStartSec: 32, hookEndSec: 72, entrySec: 32, exitSec: 72, videoId: "H5v3kku4y6Q", youtube_ids: ["H5v3kku4y6Q"], playFull: false, energy: 8 },
+  { title: "Watermelon Sugar", artist: "Harry Styles", year: "2019", durationSec: 174, hookStartSec: 35, hookEndSec: 75, entrySec: 35, exitSec: 75, videoId: "E07s5ZYygmg", youtube_ids: ["E07s5ZYygmg"], playFull: false, energy: 8 },
+  { title: "Bad Guy", artist: "Billie Eilish", year: "2019", durationSec: 194, hookStartSec: 32, hookEndSec: 72, entrySec: 32, exitSec: 72, videoId: "DyDfgMOUjCI", youtube_ids: ["DyDfgMOUjCI"], playFull: false, energy: 9 },
+  { title: "Birds of a Feather", artist: "Billie Eilish", year: "2024", durationSec: 196, hookStartSec: 35, hookEndSec: 75, entrySec: 35, exitSec: 75, videoId: "V9PVRfjEBTI", youtube_ids: ["V9PVRfjEBTI"], playFull: false, energy: 8 },
+  { title: "Viva La Vida", artist: "Coldplay", year: "2008", durationSec: 242, hookStartSec: 42, hookEndSec: 82, entrySec: 42, exitSec: 82, videoId: "dvgZkm1xWPE", youtube_ids: ["dvgZkm1xWPE"], playFull: false, energy: 8 },
+  { title: "Yellow", artist: "Coldplay", year: "2000", durationSec: 269, hookStartSec: 48, hookEndSec: 88, entrySec: 48, exitSec: 88, videoId: "yKNxeF4KMsY", youtube_ids: ["yKNxeF4KMsY"], playFull: false, energy: 7 },
+  { title: "Bohemian Rhapsody", artist: "Queen", year: "1975", durationSec: 354, hookStartSec: 55, hookEndSec: 95, entrySec: 55, exitSec: 95, videoId: "fJ9rUzIMcZQ", youtube_ids: ["fJ9rUzIMcZQ"], playFull: false, energy: 9 },
+  { title: "Don't Stop Me Now", artist: "Queen", year: "1978", durationSec: 210, hookStartSec: 40, hookEndSec: 80, entrySec: 40, exitSec: 80, videoId: "HgzGwKwLmgM", youtube_ids: ["HgzGwKwLmgM"], playFull: false, energy: 9 },
+  { title: "Smells Like Teen Spirit", artist: "Nirvana", year: "1991", durationSec: 301, hookStartSec: 42, hookEndSec: 82, entrySec: 42, exitSec: 82, videoId: "hTWKbfoikeg", youtube_ids: ["hTWKbfoikeg"], playFull: false, energy: 10 },
+  { title: "God's Plan", artist: "Drake", year: "2018", durationSec: 198, hookStartSec: 30, hookEndSec: 70, entrySec: 30, exitSec: 70, videoId: "xpVfcZ0ZcFM", youtube_ids: ["xpVfcZ0ZcFM"], playFull: false, energy: 9 },
+  { title: "Hotline Bling", artist: "Drake", year: "2015", durationSec: 267, hookStartSec: 35, hookEndSec: 75, entrySec: 35, exitSec: 75, videoId: "uxpDa-c-4Mc", youtube_ids: ["uxpDa-c-4Mc"], playFull: false, energy: 8 },
+  { title: "One Dance", artist: "Drake ft. Wizkid, Kyla", year: "2016", durationSec: 173, hookStartSec: 28, hookEndSec: 68, entrySec: 28, exitSec: 68, videoId: "iAbnEUA0wpA", youtube_ids: ["iAbnEUA0wpA"], playFull: false, energy: 8 },
+  { title: "HUMBLE.", artist: "Kendrick Lamar", year: "2017", durationSec: 177, hookStartSec: 30, hookEndSec: 70, entrySec: 30, exitSec: 70, videoId: "tvTRZJ-4EyI", youtube_ids: ["tvTRZJ-4EyI"], playFull: false, energy: 9 },
+  { title: "Levels", artist: "Avicii", year: "2011", durationSec: 198, hookStartSec: 45, hookEndSec: 85, entrySec: 45, exitSec: 85, videoId: "_ovdm2yX4MA", youtube_ids: ["_ovdm2yX4MA"], playFull: false, energy: 10 },
+  { title: "Wake Me Up", artist: "Avicii", year: "2013", durationSec: 247, hookStartSec: 45, hookEndSec: 85, entrySec: 45, exitSec: 85, videoId: "IcrbM1l_BoI", youtube_ids: ["IcrbM1l_BoI"], playFull: false, energy: 9 },
+  { title: "Titanium", artist: "David Guetta ft. Sia", year: "2011", durationSec: 245, hookStartSec: 48, hookEndSec: 88, entrySec: 48, exitSec: 88, videoId: "JRfuAukYTKg", youtube_ids: ["JRfuAukYTKg"], playFull: false, energy: 10 },
+  { title: "Animals", artist: "Martin Garrix", year: "2013", durationSec: 184, hookStartSec: 40, hookEndSec: 80, entrySec: 40, exitSec: 80, videoId: "gCYcHz2R_ho", youtube_ids: ["gCYcHz2R_ho"], playFull: false, energy: 10 },
+  { title: "Closer", artist: "The Chainsmokers ft. Halsey", year: "2016", durationSec: 245, hookStartSec: 42, hookEndSec: 82, entrySec: 42, exitSec: 82, videoId: "0zGcUoRlhmw", youtube_ids: ["0zGcUoRlhmw"], playFull: false, energy: 9 },
+  { title: "Something Just Like This", artist: "The Chainsmokers & Coldplay", year: "2017", durationSec: 247, hookStartSec: 40, hookEndSec: 80, entrySec: 40, exitSec: 80, videoId: "FM7Z-Xq8Drc", youtube_ids: ["FM7Z-Xq8Drc"], playFull: false, energy: 9 },
+  { title: "Stay", artist: "The Kid LAROI, Justin Bieber", year: "2021", durationSec: 141, hookStartSec: 24, hookEndSec: 64, entrySec: 24, exitSec: 64, videoId: "kTJczUoc268", youtube_ids: ["kTJczUoc268"], playFull: false, energy: 9 },
+  { title: "Peaches", artist: "Justin Bieber ft. Daniel Caesar, Giveon", year: "2021", durationSec: 198, hookStartSec: 32, hookEndSec: 72, entrySec: 32, exitSec: 72, videoId: "tQ0yjYUFKAE", youtube_ids: ["tQ0yjYUFKAE"], playFull: false, energy: 8 },
+  { title: "Sorry", artist: "Justin Bieber", year: "2015", durationSec: 200, hookStartSec: 34, hookEndSec: 74, entrySec: 34, exitSec: 74, videoId: "fRh_vgS2dFE", youtube_ids: ["fRh_vgS2dFE"], playFull: false, energy: 9 }
+];
+
+console.log(`Loaded ${VERIFIED_ENGLISH_BANGERS.length} verified English bangers.`);

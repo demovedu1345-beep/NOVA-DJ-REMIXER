@@ -1,0 +1,9 @@
+with open(r"C:\Users\itzra\.gemini\antigravity\scratch\NOVA-DJ-REMIXER\public\naux\static\immutable\chunks\3cq6guoi7hqi2.js", "r", encoding="utf-8") as f:
+    text = f.read()
+
+idx = text.find('ENGLISH_KINDS')
+if idx == -1:
+    idx = text.find('Classic Rock')
+print("Classic Rock at:", idx)
+if idx != -1:
+    print(text[max(0, idx - 400):min(len(text), idx + 400)])

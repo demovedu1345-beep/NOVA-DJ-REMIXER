@@ -8,19 +8,23 @@
     },
     {
       "source": "/api/logout",
-      "destination": "/api/auth?action=logout"
+      "destination": "/api/me?action=logout"
     },
     {
       "source": "/api/auth/google",
-      "destination": "/api/auth?action=google"
+      "destination": "/api/me?action=google"
     },
     {
       "source": "/api/auth/callback",
-      "destination": "/api/auth?action=callback"
+      "destination": "/api/me?action=callback"
     },
     {
       "source": "/api/auth/logout",
-      "destination": "/api/auth?action=logout"
+      "destination": "/api/me?action=logout"
+    },
+    {
+      "source": "/api/likes",
+      "destination": "/api/sets?kind=likes"
     }
   ],
   "headers": [
