@@ -1,5 +1,5 @@
 // ============================================================================
-// Audify Optional Google Account + Per-User Liked Songs UI
+// Audify Optional Google Account Switcher + Per-User Liked Songs UI
 // React-Safe Portal Architecture (never mutates React-owned DOM nodes)
 // ============================================================================
 
@@ -13,6 +13,7 @@
 
   let state = {
     user: null,
+    accounts: [],
     oauthConfigured: false,
     likes: [],
     currentSong: null,
@@ -131,19 +132,8 @@
     } catch {}
   }
 
-  async function loadUserAndLikes() {
+  async function loadLikesForActiveUser() {
     const sid = getGuestSessionId();
-    try {
-      const meRes = await fetch('/api/me', { cache: 'no-store' });
-      if (meRes.ok) {
-        const me = await meRes.json();
-        state.user = me.user || null;
-        state.oauthConfigured = Boolean(me.oauthConfigured);
-      }
-    } catch {}
-
-    await syncGuestLikesToAccount();
-
     try {
       const likesRes = await fetch(`/api/likes?sessionId=${encodeURIComponent(sid)}`, { cache: 'no-store' });
       if (likesRes.ok) {
@@ -151,15 +141,26 @@
         if (Array.isArray(d.likes) && d.likes.length > 0) {
           state.likes = d.likes;
           writeLocalLikes(state.user, d.likes);
-        } else {
-          state.likes = readLocalLikes(state.user);
+          return;
         }
-      } else {
-        state.likes = readLocalLikes(state.user);
       }
-    } catch {
-      state.likes = readLocalLikes(state.user);
-    }
+    } catch {}
+    state.likes = readLocalLikes(state.user);
+  }
+
+  async function loadUserAndLikes() {
+    try {
+      const meRes = await fetch('/api/me', { cache: 'no-store' });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        state.user = me.user || null;
+        state.accounts = Array.isArray(me.accounts) ? me.accounts : [];
+        state.oauthConfigured = Boolean(me.oauthConfigured);
+      }
+    } catch {}
+
+    await syncGuestLikesToAccount();
+    await loadLikesForActiveUser();
 
     try {
       const u = new URL(window.location.href);
@@ -299,13 +300,55 @@
     }
   }
 
-  function startSignIn() {
+  function startSignIn(forceChooser = false) {
     if (state.oauthConfigured) {
       window.location.href = '/api/auth/google';
       return;
     }
-    state.showProfileForm = true;
+    if (state.accounts.length > 0 && !forceChooser) {
+      state.showProfileForm = false;
+    } else {
+      state.showProfileForm = true;
+    }
     openModal();
+  }
+
+  async function switchAccount(accountId) {
+    try {
+      const res = await fetch('/api/me', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'switch_account', id: accountId }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        if (d.user) {
+          state.user = d.user;
+          state.accounts = Array.isArray(d.accounts) ? d.accounts : state.accounts;
+          state.showProfileForm = false;
+          await loadLikesForActiveUser();
+          refreshUI();
+          showToast(`Switched to ${d.user.name || d.user.email}`);
+        }
+      }
+    } catch {}
+  }
+
+  async function removeAccount(accountId) {
+    try {
+      const res = await fetch('/api/me', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'remove_account', id: accountId }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        state.user = d.user || null;
+        state.accounts = Array.isArray(d.accounts) ? d.accounts : [];
+        await loadLikesForActiveUser();
+        refreshUI();
+      }
+    } catch {}
   }
 
   async function submitProfileSignIn(name, email) {
@@ -324,9 +367,11 @@
         const d = await res.json();
         if (d.user) {
           state.user = d.user;
+          state.accounts = Array.isArray(d.accounts) ? d.accounts : [d.user];
           state.showProfileForm = false;
           await syncGuestLikesToAccount();
-          await loadUserAndLikes();
+          await loadLikesForActiveUser();
+          refreshUI();
           showToast(`Signed in as ${state.user.name || state.user.email}`);
         }
       }
@@ -336,11 +381,17 @@
   }
 
   async function googleSignOut() {
-    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' });
+      if (res.ok) {
+        const d = await res.json().catch(() => ({}));
+        if (Array.isArray(d.accounts)) state.accounts = d.accounts;
+      }
+    } catch {}
     state.user = null;
-    state.likes = readLocalLikes(null);
+    await loadLikesForActiveUser();
     refreshUI();
-    showToast('Signed out');
+    showToast('Signed out (Guest mode active)');
   }
 
   function openModal() {
@@ -377,6 +428,70 @@
     return portal;
   }
 
+  const GOOGLE_SVG = `<svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+
+  function renderAccountSection() {
+    const otherAccounts = state.accounts.filter((a) => !state.user || a.id !== state.user.id);
+    const savedHtml = otherAccounts.length > 0
+      ? `<div class="audify-account-switcher">
+           <div class="audify-account-switcher-label">CHOOSE SAVED ACCOUNT</div>
+           ${otherAccounts.map((acc) => `
+             <div class="audify-account-row">
+               ${acc.picture ? `<img src="${esc(acc.picture)}" alt="" class="audify-liked-avatar-sm" />` : `<span class="audify-liked-initial-sm">${esc((acc.name || acc.email || 'U').slice(0, 1).toUpperCase())}</span>`}
+               <div class="audify-liked-user-meta">
+                 <span class="audify-liked-user-name">${esc(acc.name)}</span>
+                 <span class="audify-liked-user-email">${esc(acc.email)}</span>
+               </div>
+               <button type="button" class="audify-liked-btn-ghost" data-switch-id="${esc(acc.id)}">SWITCH</button>
+               <button type="button" class="audify-liked-btn-remove" data-remove-acc-id="${esc(acc.id)}" title="Forget account">✕</button>
+             </div>
+           `).join('')}
+         </div>`
+      : '';
+
+    const profileFormHtml = state.showProfileForm
+      ? `<form id="audify-profile-signin-form" class="audify-profile-form">
+           <input type="text" name="name" placeholder="Display name (e.g. Vedant)" class="audify-profile-input" />
+           <input type="email" name="email" placeholder="Gmail / Email address" required class="audify-profile-input" />
+           <div style="display:flex;gap:8px">
+             <button type="submit" class="audify-liked-btn-lime" style="padding:9px 16px;font-size:13px;flex:1">SIGN IN & SAVE</button>
+             <button type="button" class="audify-liked-btn-ghost" data-action="hide-form">CANCEL</button>
+           </div>
+         </form>`
+      : '';
+
+    if (state.user) {
+      return `
+        <div class="audify-liked-user">
+          ${state.user.picture ? `<img src="${esc(state.user.picture)}" alt="" class="audify-liked-avatar" />` : `<span class="audify-liked-initial">${esc((state.user.name || state.user.email || 'U').slice(0, 1).toUpperCase())}</span>`}
+          <div class="audify-liked-user-meta">
+            <span class="audify-liked-user-name">${esc(state.user.name || 'Audify User')} <span class="audify-active-badge">ACTIVE</span></span>
+            <span class="audify-liked-user-email">${esc(state.user.email || '')}</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button type="button" class="audify-liked-btn-google" data-action="add-account">${GOOGLE_SVG}<span>+ ACCOUNT</span></button>
+            <button type="button" class="audify-liked-btn-ghost" data-action="signout">SIGN OUT</button>
+          </div>
+          ${savedHtml}
+          ${profileFormHtml}
+        </div>`;
+    }
+
+    return `
+      <div class="audify-liked-user">
+        <div class="audify-liked-user-meta">
+          <span class="audify-liked-user-name">GUEST MODE (LOGIN OPTIONAL)</span>
+          <span class="audify-liked-user-email">Choose or sign in to an account to keep your own Liked Songs</span>
+        </div>
+        <button type="button" class="audify-liked-btn-google" data-action="add-account">
+          ${GOOGLE_SVG}
+          <span>${state.oauthConfigured ? 'CHOOSE GOOGLE ACCOUNT' : 'SIGN IN / ADD ACCOUNT'}</span>
+        </button>
+        ${savedHtml}
+        ${profileFormHtml}
+      </div>`;
+  }
+
   function renderModal() {
     const existing = document.getElementById('audify-liked-modal');
     if (!state.modalOpen) {
@@ -387,35 +502,6 @@
     const modal = existing || document.createElement('div');
     modal.id = 'audify-liked-modal';
     modal.className = 'audify-liked-backdrop';
-
-    const profileFormHtml = (!state.user && state.showProfileForm)
-      ? `<form id="audify-profile-signin-form" class="audify-profile-form">
-           <input type="text" name="name" placeholder="Your name (optional)" class="audify-profile-input" />
-           <input type="email" name="email" placeholder="Your Gmail / email" required class="audify-profile-input" />
-           <button type="submit" class="audify-liked-btn-lime" style="padding:9px 16px;font-size:13px">SAVE & SIGN IN</button>
-         </form>`
-      : '';
-
-    const userBar = state.user
-      ? `<div class="audify-liked-user">
-           ${state.user.picture ? `<img src="${esc(state.user.picture)}" alt="" class="audify-liked-avatar" />` : `<span class="audify-liked-initial">${esc((state.user.name || state.user.email || 'U').slice(0, 1).toUpperCase())}</span>`}
-           <div class="audify-liked-user-meta">
-             <span class="audify-liked-user-name">${esc(state.user.name || 'Audify User')}</span>
-             <span class="audify-liked-user-email">${esc(state.user.email || '')}</span>
-           </div>
-           <button type="button" class="audify-liked-btn-ghost" data-action="signout">SIGN OUT</button>
-         </div>`
-      : `<div class="audify-liked-user">
-           <div class="audify-liked-user-meta">
-             <span class="audify-liked-user-name">GUEST LIKES (OPTIONAL LOGIN)</span>
-             <span class="audify-liked-user-email">Sign in to keep your personal liked songs list</span>
-           </div>
-           <button type="button" class="audify-liked-btn-google" data-action="signin">
-             <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-             <span>${state.oauthConfigured ? 'GOOGLE SIGN IN' : 'SIGN IN'}</span>
-           </button>
-           ${profileFormHtml}
-         </div>`;
 
     const listHtml = state.likes.length === 0
       ? `<div class="audify-liked-empty">
@@ -446,7 +532,7 @@
           </div>
           <button type="button" class="audify-liked-close" data-action="close" aria-label="Close">✕</button>
         </div>
-        ${userBar}
+        ${renderAccountSection()}
         <div class="audify-liked-actions">
           <button type="button" class="audify-liked-btn-lime" data-action="play-all" ${state.likes.length === 0 ? 'disabled' : ''}>
             ▶ PLAY LIKED SET (${state.likes.length})
@@ -462,9 +548,15 @@
         if (!btn) return;
         const action = btn.dataset.action;
         if (action === 'close') closeModal();
-        else if (action === 'signin') startSignIn();
+        else if (action === 'add-account') {
+          if (state.oauthConfigured) window.location.href = '/api/auth/google';
+          else { state.showProfileForm = true; renderModal(); }
+        }
+        else if (action === 'hide-form') { state.showProfileForm = false; renderModal(); }
         else if (action === 'signout') googleSignOut();
         else if (action === 'play-all') playLikedList();
+        else if (btn.dataset.switchId) switchAccount(btn.dataset.switchId);
+        else if (btn.dataset.removeAccId) removeAccount(btn.dataset.removeAccId);
         else if (btn.dataset.playId) playLikedList(btn.dataset.playId);
         else if (btn.dataset.removeId) removeLikedById(btn.dataset.removeId);
       });
@@ -487,9 +579,11 @@
     const playing = isPlayerActive();
     const live = getLiveCue();
     const liked = isTrackLiked(live);
-    const countLabel = `♥ LIKED${state.likes.length ? ` (${state.likes.length})` : ''}`;
+    const countLabel = state.user
+      ? `♥ ${String(state.user.name || 'LIKED').split(' ')[0].toUpperCase()} (${state.likes.length})`
+      : `♥ LIKED${state.likes.length ? ` (${state.likes.length})` : ''}`;
 
-    const sig = `${splash}|${playing}|${liked}|${countLabel}|${songKeyOf(live)}`;
+    const sig = `${splash}|${playing}|${liked}|${countLabel}|${songKeyOf(live)}|${state.user?.id || ''}`;
     if (sig !== state.lastSig) {
       state.lastSig = sig;
       portal.style.display = splash ? 'none' : 'flex';
@@ -520,6 +614,7 @@
   window.__audifyLikes = {
     open: openModal,
     signIn: startSignIn,
+    switchAccount,
     toggleLike: toggleLikeTrack,
     playLiked: playLikedList,
     getLikes: () => state.likes,

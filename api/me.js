@@ -3,10 +3,12 @@ import { handlePreflight, readJsonBody, sendJson } from './_lib/http.js';
 import {
   clearSessionCookie,
   getOrigin,
+  getSavedAccounts,
   getSessionUser,
   isOAuthConfigured,
   readStateCookie,
-  setSessionCookie,
+  removeSavedAccount,
+  setSessionAndAccountCookies,
   setStateCookie,
 } from './_lib/auth.js';
 
@@ -28,7 +30,7 @@ export default async function handler(req, res) {
 
   if (action === 'logout') {
     clearSessionCookie(res, req);
-    if (req.method === 'POST') return sendJson(res, 200, { ok: true });
+    if (req.method === 'POST') return sendJson(res, 200, { ok: true, accounts: getSavedAccounts(req) });
     return redirect(res, '/');
   }
 
@@ -43,6 +45,7 @@ export default async function handler(req, res) {
     if (action === 'google') {
       const state = crypto.randomBytes(16).toString('hex');
       setStateCookie(res, req, state);
+      const loginHint = url.searchParams.get('login_hint');
       const params = new URLSearchParams({
         client_id: clientId,
         redirect_uri: redirectUri,
@@ -50,6 +53,7 @@ export default async function handler(req, res) {
         scope: 'openid email profile',
         state,
         prompt: 'select_account',
+        ...(loginHint ? { login_hint: loginHint } : {}),
       });
       return redirect(res, `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
     }
@@ -82,11 +86,12 @@ export default async function handler(req, res) {
       if (!userRes.ok) return redirect(res, '/?auth=error');
       const profile = await userRes.json();
 
-      setSessionCookie(res, req, {
+      setSessionAndAccountCookies(res, req, {
         id: profile.id || profile.sub,
         email: profile.email,
         name: profile.name || profile.given_name || profile.email,
         picture: profile.picture || null,
+        provider: 'google',
       });
       return redirect(res, '/?auth=ok');
     } catch {
@@ -96,11 +101,13 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     const user = getSessionUser(req);
+    const accounts = getSavedAccounts(req);
     return sendJson(res, 200, {
       loaded: true,
       enabled: true,
       oauthConfigured: isOAuthConfigured(),
       user: user || null,
+      accounts,
     }, 'no-store');
   }
 
@@ -111,9 +118,22 @@ export default async function handler(req, res) {
         const email = String(body.email).trim().toLowerCase().slice(0, 120);
         const name = String(body.name || email.split('@')[0] || 'Audify User').trim().slice(0, 80);
         const id = 'email_' + crypto.createHash('sha256').update(email).digest('hex').slice(0, 24);
-        const user = { id, email, name, picture: null };
-        setSessionCookie(res, req, user);
-        return sendJson(res, 200, { ok: true, user });
+        const user = { id, email, name, picture: null, provider: 'email' };
+        const accounts = setSessionAndAccountCookies(res, req, user);
+        return sendJson(res, 200, { ok: true, user, accounts });
+      }
+      if (body?.action === 'switch_account' && body?.id) {
+        const saved = getSavedAccounts(req);
+        const target = saved.find((a) => a.id === String(body.id));
+        if (!target) return sendJson(res, 404, { ok: false, error: 'Account not found in session' });
+        const accounts = setSessionAndAccountCookies(res, req, target);
+        return sendJson(res, 200, { ok: true, user: target, accounts });
+      }
+      if (body?.action === 'remove_account' && body?.id) {
+        const accounts = removeSavedAccount(res, req, body.id);
+        const active = getSessionUser(req);
+        const user = active && active.id === String(body.id) ? null : active;
+        return sendJson(res, 200, { ok: true, user, accounts });
       }
     } catch {}
     return sendJson(res, 200, { ok: true });
