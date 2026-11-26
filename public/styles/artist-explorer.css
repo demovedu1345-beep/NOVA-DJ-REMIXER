@@ -1503,24 +1503,46 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
 /* ============================================================================
    Audify Optional Google Login & Liked Songs UI (Strict Audify Design Match)
    ============================================================================ */
+.audify-likes-portal {
+  position: fixed;
+  right: 16px;
+  bottom: 84px;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.audify-likes-portal > button {
+  pointer-events: auto;
+}
+@media (max-width: 640px) {
+  .audify-likes-portal {
+    right: 12px;
+    bottom: 76px;
+    gap: 6px;
+  }
+}
 .audify-like-pill,
-.audify-liked-header-pill,
-.audify-liked-wizard-pill {
+.audify-liked-header-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   border-radius: 9999px;
   border: 2px solid rgba(255, 255, 255, 0.25);
-  background: rgba(5, 5, 7, 0.72);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(5, 5, 7, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.88);
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 6px 14px;
+  padding: 7px 14px;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, background-color 0.2s, color 0.2s;
 }
 .audify-like-pill:hover,

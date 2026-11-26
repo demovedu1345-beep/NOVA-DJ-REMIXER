@@ -1,6 +1,6 @@
 // ============================================================================
 // Audify Optional Google Account + Per-User Liked Songs UI
-// Strictly matches Audify's obsidian/lime/display-type design language
+// React-Safe Portal Architecture (never mutates React-owned DOM nodes)
 // ============================================================================
 
 (function initAudifyLikes() {
@@ -17,7 +17,7 @@
     likes: [],
     currentSong: null,
     modalOpen: false,
-    toast: null,
+    lastSig: '',
   };
 
   function getGuestSessionId() {
@@ -77,8 +77,15 @@
     return state.currentSong;
   }
 
+  function isPlayerActive() {
+    try {
+      return Boolean(window.__nauxEngine?.started && !window.__nauxEngine?.finished && document.querySelector('.deck[data-slot="live"]'));
+    } catch {
+      return false;
+    }
+  }
+
   function showToast(msg) {
-    state.toast = msg;
     let el = document.getElementById('audify-likes-toast');
     if (!el) {
       el = document.createElement('div');
@@ -105,7 +112,6 @@
       }
     } catch {}
 
-    // If user just signed in with Google, sync any guest likes into their account
     const guestLikes = readLocalLikes(null);
     if (state.user && guestLikes.length > 0) {
       try {
@@ -142,7 +148,6 @@
       state.likes = readLocalLikes(state.user);
     }
 
-    // Handle OAuth return params cleanly
     try {
       const u = new URL(window.location.href);
       const authStatus = u.searchParams.get('auth');
@@ -189,7 +194,6 @@
       likedAt: new Date().toISOString(),
     };
 
-    // Optimistic update
     if (already) {
       state.likes = state.likes.filter((t) => songKeyOf(t) !== key);
       showToast(`Removed "${normalized.title}" from Liked Songs`);
@@ -260,9 +264,7 @@
     let ordered = [...state.likes];
     if (startSongId) {
       const idx = ordered.findIndex((t) => songKeyOf(t) === String(startSongId));
-      if (idx > 0) {
-        ordered = [...ordered.slice(idx), ...ordered.slice(0, idx)];
-      }
+      if (idx > 0) ordered = [...ordered.slice(idx), ...ordered.slice(0, idx)];
     }
     const cues = ordered.map(toEngineCue).filter((c) => c.youtube_ids.length > 0);
     if (!cues.length) return;
@@ -279,7 +281,7 @@
       window.__startSetWithCues(cues);
       showToast(`Playing Liked Songs (${cues.length} tracks)`);
     } else {
-      showToast('Open or start a set first, then tap Play Liked');
+      showToast('Pick a quick set first, then tap Play Liked');
     }
   }
 
@@ -288,9 +290,7 @@
   }
 
   async function googleSignOut() {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch {}
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
     state.user = null;
     state.likes = readLocalLikes(null);
     refreshUI();
@@ -310,6 +310,24 @@
 
   function esc(str) {
     return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+
+  function ensurePortal() {
+    if (!document.body) return null;
+    let portal = document.getElementById('audify-likes-portal');
+    if (!portal) {
+      portal = document.createElement('div');
+      portal.id = 'audify-likes-portal';
+      portal.className = 'audify-likes-portal';
+      portal.innerHTML = `
+        <button id="audify-like-track-btn" type="button" class="audify-like-pill" style="display:none">♡ LIKE</button>
+        <button id="audify-liked-header-btn" type="button" class="audify-liked-header-pill">♥ LIKED</button>
+      `;
+      document.body.appendChild(portal);
+      portal.querySelector('#audify-like-track-btn').addEventListener('click', () => toggleLikeTrack());
+      portal.querySelector('#audify-liked-header-btn').addEventListener('click', openModal);
+    }
+    return portal;
   }
 
   function renderModal() {
@@ -398,66 +416,33 @@
     }
   }
 
-  function injectUI() {
-    // 1. Player footer: LIKE button beside + PLAY NEXT / REMOVE NEXT
-    const playNextBtn = Array.from(document.querySelectorAll('button')).find(
-      (b) => b.textContent && b.textContent.includes('PLAY NEXT') && !b.id.startsWith('audify-')
-    );
-    if (playNextBtn && playNextBtn.parentElement && !document.getElementById('audify-like-track-btn')) {
-      const likeBtn = document.createElement('button');
-      likeBtn.id = 'audify-like-track-btn';
-      likeBtn.type = 'button';
-      likeBtn.className = 'audify-like-pill';
-      likeBtn.addEventListener('click', () => toggleLikeTrack());
-      playNextBtn.parentElement.insertBefore(likeBtn, playNextBtn);
-    }
-
-    // 2. Player header: LIKED pill beside FX / EQ pill
-    const eqPill = document.getElementById('audify-eq-pill') || Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.includes('FX / EQ'));
-    if (eqPill && eqPill.parentElement && !document.getElementById('audify-liked-header-btn')) {
-      const hBtn = document.createElement('button');
-      hBtn.id = 'audify-liked-header-btn';
-      hBtn.type = 'button';
-      hBtn.className = 'audify-liked-header-pill';
-      hBtn.addEventListener('click', openModal);
-      eqPill.parentElement.insertBefore(hBtn, eqPill);
-    }
-
-    // 3. Wizard header: LIKED pill beside SIGN IN / 1 / 4
-    const stepIndicator = Array.from(document.querySelectorAll('span')).find((s) => /^\s*[1-4]\s*\/\s*4\s*$/.test(s.textContent || ''));
-    if (stepIndicator && stepIndicator.parentElement && !document.getElementById('audify-liked-wizard-btn')) {
-      const wBtn = document.createElement('button');
-      wBtn.id = 'audify-liked-wizard-btn';
-      wBtn.type = 'button';
-      wBtn.className = 'audify-liked-wizard-pill';
-      wBtn.addEventListener('click', openModal);
-      stepIndicator.parentElement.insertBefore(wBtn, stepIndicator);
-    }
-
-    refreshUI();
-  }
-
   function refreshUI() {
+    const portal = ensurePortal();
+    if (!portal) return;
+
+    const playing = isPlayerActive();
     const live = getLiveCue();
     const liked = isTrackLiked(live);
-
-    const likeBtn = document.getElementById('audify-like-track-btn');
-    if (likeBtn) {
-      likeBtn.classList.toggle('is-liked', liked);
-      likeBtn.innerHTML = liked ? '♥ LIKED' : '♡ LIKE';
-    }
-
     const countLabel = `♥ LIKED${state.likes.length ? ` (${state.likes.length})` : ''}`;
-    const hBtn = document.getElementById('audify-liked-header-btn');
-    if (hBtn) hBtn.textContent = countLabel;
 
-    const wBtn = document.getElementById('audify-liked-wizard-btn');
-    if (wBtn) wBtn.textContent = countLabel;
+    const sig = `${playing}|${liked}|${countLabel}|${songKeyOf(live)}`;
+    if (sig !== state.lastSig) {
+      state.lastSig = sig;
+      const likeBtn = portal.querySelector('#audify-like-track-btn');
+      if (likeBtn) {
+        likeBtn.style.display = playing ? 'inline-flex' : 'none';
+        likeBtn.classList.toggle('is-liked', liked);
+        likeBtn.textContent = liked ? '♥ LIKED' : '♡ LIKE';
+      }
+      const hBtn = portal.querySelector('#audify-liked-header-btn');
+      if (hBtn) {
+        hBtn.textContent = countLabel;
+      }
+    }
 
     if (state.modalOpen) renderModal();
   }
 
-  // Wrap onAudifySongChange cleanly
   const prevHook = window.onAudifySongChange;
   window.onAudifySongChange = function (songInfo = {}) {
     state.currentSong = songInfo;
@@ -474,13 +459,15 @@
     getLikes: () => state.likes,
   };
 
-  const observer = new MutationObserver(() => injectUI());
-  if (document.body) {
-    observer.observe(document.body, { childList: true, subtree: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      ensurePortal();
+      loadUserAndLikes();
+    });
   } else {
-    document.addEventListener('DOMContentLoaded', () => observer.observe(document.body, { childList: true, subtree: true }));
+    ensurePortal();
+    loadUserAndLikes();
   }
 
-  setInterval(refreshUI, 1200);
-  loadUserAndLikes();
+  setInterval(refreshUI, 800);
 })();
