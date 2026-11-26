@@ -106,6 +106,7 @@ export default async function handler(req, res) {
       loaded: true,
       enabled: true,
       oauthConfigured: isOAuthConfigured(),
+      googleClientId: process.env.GOOGLE_CLIENT_ID || null,
       user: user || null,
       accounts,
     }, 'no-store');
@@ -114,11 +115,20 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = await readJsonBody(req);
-      if (body?.action === 'profile_signin' && body?.email) {
-        const email = String(body.email).trim().toLowerCase().slice(0, 120);
-        const name = String(body.name || email.split('@')[0] || 'Audify User').trim().slice(0, 80);
-        const id = 'email_' + crypto.createHash('sha256').update(email).digest('hex').slice(0, 24);
-        const user = { id, email, name, picture: null, provider: 'email' };
+      if (body?.action === 'google_credential' && body?.credential) {
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        if (!clientId) return sendJson(res, 400, { ok: false, error: 'GOOGLE_CLIENT_ID not configured' });
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(String(body.credential))}`);
+        if (!verifyRes.ok) return sendJson(res, 401, { ok: false, error: 'Invalid Google credential' });
+        const profile = await verifyRes.json();
+        if (profile.aud !== clientId) return sendJson(res, 401, { ok: false, error: 'Token audience mismatch' });
+        const user = {
+          id: profile.sub,
+          email: profile.email,
+          name: profile.name || profile.given_name || profile.email,
+          picture: profile.picture || null,
+          provider: 'google',
+        };
         const accounts = setSessionAndAccountCookies(res, req, user);
         return sendJson(res, 200, { ok: true, user, accounts });
       }

@@ -1,5 +1,5 @@
 // ============================================================================
-// Audify Optional Google Account Switcher + Per-User Liked Songs UI
+// Audify Official Google Sign-In (GIS + OAuth 2.0) + Per-User Liked Songs UI
 // React-Safe Portal Architecture (never mutates React-owned DOM nodes)
 // ============================================================================
 
@@ -15,10 +15,11 @@
     user: null,
     accounts: [],
     oauthConfigured: false,
+    googleClientId: null,
+    gisInitialized: false,
     likes: [],
     currentSong: null,
     modalOpen: false,
-    showProfileForm: false,
     lastSig: '',
   };
 
@@ -108,7 +109,7 @@
     clearTimeout(el._t);
     el._t = setTimeout(() => {
       el.classList.remove('is-visible');
-    }, 3200);
+    }, 3400);
   }
 
   async function syncGuestLikesToAccount() {
@@ -148,6 +149,62 @@
     state.likes = readLocalLikes(state.user);
   }
 
+  async function handleGisCredential(response) {
+    if (!response?.credential) return;
+    try {
+      const res = await fetch('/api/me', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'google_credential', credential: response.credential }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        if (d.user) {
+          state.user = d.user;
+          state.accounts = Array.isArray(d.accounts) ? d.accounts : [d.user];
+          await syncGuestLikesToAccount();
+          await loadLikesForActiveUser();
+          refreshUI();
+          showToast(`Signed in with Google as ${d.user.name || d.user.email}`);
+        }
+      }
+    } catch {
+      showToast('Google Sign-In could not complete');
+    }
+  }
+
+  function initGoogleIdentityServices() {
+    if (!state.googleClientId || state.gisInitialized) return;
+    if (!window.google?.accounts?.id) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: state.googleClientId,
+        callback: handleGisCredential,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      state.gisInitialized = true;
+    } catch {}
+  }
+
+  function renderGisButton() {
+    const slot = document.getElementById('audify-gis-btn-slot');
+    if (!slot || !state.googleClientId || !window.google?.accounts?.id) return;
+    initGoogleIdentityServices();
+    if (slot.dataset.rendered === '1') return;
+    slot.innerHTML = '';
+    try {
+      window.google.accounts.id.renderButton(slot, {
+        theme: 'filled_black',
+        size: 'large',
+        shape: 'pill',
+        text: 'continue_with',
+        logo_alignment: 'left',
+      });
+      slot.dataset.rendered = '1';
+    } catch {}
+  }
+
   async function loadUserAndLikes() {
     try {
       const meRes = await fetch('/api/me', { cache: 'no-store' });
@@ -156,9 +213,11 @@
         state.user = me.user || null;
         state.accounts = Array.isArray(me.accounts) ? me.accounts : [];
         state.oauthConfigured = Boolean(me.oauthConfigured);
+        state.googleClientId = me.googleClientId || null;
       }
     } catch {}
 
+    initGoogleIdentityServices();
     await syncGuestLikesToAccount();
     await loadLikesForActiveUser();
 
@@ -171,10 +230,9 @@
         if (authStatus === 'ok' && state.user) {
           showToast(`Signed in as ${state.user.name || state.user.email}`);
         } else if (authStatus === 'unconfigured') {
-          state.showProfileForm = true;
           openModal();
         } else if (authStatus === 'error') {
-          showToast('Sign-in was cancelled — you can still listen & like freely');
+          showToast('Google Sign-In was cancelled — guest mode remains active');
         }
       }
     } catch {}
@@ -300,17 +358,18 @@
     }
   }
 
-  function startSignIn(forceChooser = false) {
+  function startGoogleSignIn() {
     if (state.oauthConfigured) {
       window.location.href = '/api/auth/google';
       return;
     }
-    if (state.accounts.length > 0 && !forceChooser) {
-      state.showProfileForm = false;
-    } else {
-      state.showProfileForm = true;
+    if (state.googleClientId && window.google?.accounts?.id) {
+      initGoogleIdentityServices();
+      window.google.accounts.id.prompt();
+      return;
     }
     openModal();
+    showToast('Google OAuth Client ID is required on the server to open Google Account Picker');
   }
 
   async function switchAccount(accountId) {
@@ -325,7 +384,6 @@
         if (d.user) {
           state.user = d.user;
           state.accounts = Array.isArray(d.accounts) ? d.accounts : state.accounts;
-          state.showProfileForm = false;
           await loadLikesForActiveUser();
           refreshUI();
           showToast(`Switched to ${d.user.name || d.user.email}`);
@@ -351,37 +409,11 @@
     } catch {}
   }
 
-  async function submitProfileSignIn(name, email) {
-    const cleanEmail = String(email || '').trim().toLowerCase();
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      showToast('Please enter a valid email address');
-      return;
-    }
-    try {
-      const res = await fetch('/api/me', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'profile_signin', name: String(name || '').trim(), email: cleanEmail }),
-      });
-      if (res.ok) {
-        const d = await res.json();
-        if (d.user) {
-          state.user = d.user;
-          state.accounts = Array.isArray(d.accounts) ? d.accounts : [d.user];
-          state.showProfileForm = false;
-          await syncGuestLikesToAccount();
-          await loadLikesForActiveUser();
-          refreshUI();
-          showToast(`Signed in as ${state.user.name || state.user.email}`);
-        }
-      }
-    } catch {
-      showToast('Could not sign in right now — you can still use guest likes');
-    }
-  }
-
   async function googleSignOut() {
     try {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.disableAutoSelect();
+      }
       const res = await fetch('/api/auth/logout', { method: 'POST' });
       if (res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -401,7 +433,6 @@
 
   function closeModal() {
     state.modalOpen = false;
-    state.showProfileForm = false;
     const modal = document.getElementById('audify-liked-modal');
     if (modal) modal.remove();
   }
@@ -434,7 +465,7 @@
     const otherAccounts = state.accounts.filter((a) => !state.user || a.id !== state.user.id);
     const savedHtml = otherAccounts.length > 0
       ? `<div class="audify-account-switcher">
-           <div class="audify-account-switcher-label">CHOOSE SAVED ACCOUNT</div>
+           <div class="audify-account-switcher-label">SWITCH GOOGLE ACCOUNT</div>
            ${otherAccounts.map((acc) => `
              <div class="audify-account-row">
                ${acc.picture ? `<img src="${esc(acc.picture)}" alt="" class="audify-liked-avatar-sm" />` : `<span class="audify-liked-initial-sm">${esc((acc.name || acc.email || 'U').slice(0, 1).toUpperCase())}</span>`}
@@ -442,53 +473,44 @@
                  <span class="audify-liked-user-name">${esc(acc.name)}</span>
                  <span class="audify-liked-user-email">${esc(acc.email)}</span>
                </div>
-               <button type="button" class="audify-liked-btn-ghost" data-switch-id="${esc(acc.id)}">SWITCH</button>
-               <button type="button" class="audify-liked-btn-remove" data-remove-acc-id="${esc(acc.id)}" title="Forget account">✕</button>
+               <button type="button" class="audify-liked-btn-ghost" data-switch-id="${esc(acc.id)}">CONTINUE</button>
+               <button type="button" class="audify-liked-btn-remove" data-remove-acc-id="${esc(acc.id)}" title="Remove account">✕</button>
              </div>
            `).join('')}
          </div>`
       : '';
 
-    const profileFormHtml = state.showProfileForm
-      ? `<form id="audify-profile-signin-form" class="audify-profile-form">
-           <input type="text" name="name" placeholder="Display name (e.g. Vedant)" class="audify-profile-input" />
-           <input type="email" name="email" placeholder="Gmail / Email address" required class="audify-profile-input" />
-           <div style="display:flex;gap:8px">
-             <button type="submit" class="audify-liked-btn-lime" style="padding:9px 16px;font-size:13px;flex:1">SIGN IN & SAVE</button>
-             <button type="button" class="audify-liked-btn-ghost" data-action="hide-form">CANCEL</button>
-           </div>
-         </form>`
-      : '';
+    const googleButtonHtml = state.googleClientId
+      ? `<div id="audify-gis-btn-slot"></div>`
+      : `<button type="button" class="audify-liked-btn-google" data-action="google-oauth">
+           ${GOOGLE_SVG}
+           <span>CONTINUE WITH GOOGLE</span>
+         </button>`;
 
     if (state.user) {
       return `
         <div class="audify-liked-user">
           ${state.user.picture ? `<img src="${esc(state.user.picture)}" alt="" class="audify-liked-avatar" />` : `<span class="audify-liked-initial">${esc((state.user.name || state.user.email || 'U').slice(0, 1).toUpperCase())}</span>`}
           <div class="audify-liked-user-meta">
-            <span class="audify-liked-user-name">${esc(state.user.name || 'Audify User')} <span class="audify-active-badge">ACTIVE</span></span>
+            <span class="audify-liked-user-name">${esc(state.user.name || 'Google User')} <span class="audify-active-badge">ACTIVE</span></span>
             <span class="audify-liked-user-email">${esc(state.user.email || '')}</span>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button type="button" class="audify-liked-btn-google" data-action="add-account">${GOOGLE_SVG}<span>+ ACCOUNT</span></button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <button type="button" class="audify-liked-btn-google" data-action="google-oauth">${GOOGLE_SVG}<span>+ USE ANOTHER ACCOUNT</span></button>
             <button type="button" class="audify-liked-btn-ghost" data-action="signout">SIGN OUT</button>
           </div>
           ${savedHtml}
-          ${profileFormHtml}
         </div>`;
     }
 
     return `
       <div class="audify-liked-user">
         <div class="audify-liked-user-meta">
-          <span class="audify-liked-user-name">GUEST MODE (LOGIN OPTIONAL)</span>
-          <span class="audify-liked-user-email">Choose or sign in to an account to keep your own Liked Songs</span>
+          <span class="audify-liked-user-name">GUEST MODE (GOOGLE SIGN-IN OPTIONAL)</span>
+          <span class="audify-liked-user-email">${state.oauthConfigured || state.googleClientId ? 'Choose your Google account to sync your Liked Songs' : 'Add GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in Vercel to enable Google Account Chooser'}</span>
         </div>
-        <button type="button" class="audify-liked-btn-google" data-action="add-account">
-          ${GOOGLE_SVG}
-          <span>${state.oauthConfigured ? 'CHOOSE GOOGLE ACCOUNT' : 'SIGN IN / ADD ACCOUNT'}</span>
-        </button>
+        ${googleButtonHtml}
         ${savedHtml}
-        ${profileFormHtml}
       </div>`;
   }
 
@@ -548,11 +570,7 @@
         if (!btn) return;
         const action = btn.dataset.action;
         if (action === 'close') closeModal();
-        else if (action === 'add-account') {
-          if (state.oauthConfigured) window.location.href = '/api/auth/google';
-          else { state.showProfileForm = true; renderModal(); }
-        }
-        else if (action === 'hide-form') { state.showProfileForm = false; renderModal(); }
+        else if (action === 'google-oauth') startGoogleSignIn();
         else if (action === 'signout') googleSignOut();
         else if (action === 'play-all') playLikedList();
         else if (btn.dataset.switchId) switchAccount(btn.dataset.switchId);
@@ -560,15 +578,10 @@
         else if (btn.dataset.playId) playLikedList(btn.dataset.playId);
         else if (btn.dataset.removeId) removeLikedById(btn.dataset.removeId);
       });
-      modal.addEventListener('submit', (e) => {
-        if (e.target && e.target.id === 'audify-profile-signin-form') {
-          e.preventDefault();
-          const fd = new FormData(e.target);
-          submitProfileSignIn(fd.get('name'), fd.get('email'));
-        }
-      });
       document.body.appendChild(modal);
     }
+
+    renderGisButton();
   }
 
   function refreshUI() {
@@ -613,7 +626,7 @@
 
   window.__audifyLikes = {
     open: openModal,
-    signIn: startSignIn,
+    signIn: startGoogleSignIn,
     switchAccount,
     toggleLike: toggleLikeTrack,
     playLiked: playLikedList,
