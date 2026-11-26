@@ -216,7 +216,8 @@
         gap: 8px;
         margin-bottom: 22px;
       }
-      .audify-eq-preset-btn {
+      .audify-eq-preset-btn,
+      .audify-eq-cal-btn {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -231,12 +232,14 @@
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
       }
-      .audify-eq-preset-btn:hover {
+      .audify-eq-preset-btn:hover,
+      .audify-eq-cal-btn:hover {
         background: rgba(255, 255, 255, 0.12);
         color: #ffffff;
         border-color: rgba(255, 255, 255, 0.22);
       }
-      .audify-eq-preset-btn.active {
+      .audify-eq-preset-btn.active,
+      .audify-eq-cal-btn.active {
         background: rgba(212, 255, 0, 0.16);
         border-color: #D4FF00;
         color: #D4FF00;
@@ -358,9 +361,9 @@
         <!-- Beat Sync Calibration & Precision Nudge -->
         <div class="audify-eq-section-title">BEAT SYNC & LATENCY CALIBRATION:</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-          <button id="audify-sync-tap-btn" class="audify-eq-preset-btn squeeze" style="flex:1;min-width:140px;background:rgba(212,255,0,0.14);border-color:#D4FF00;color:#D4FF00;font-weight:700;">🎯 SYNC DOWNBEAT NOW</button>
-          <button id="audify-nudge-back-btn" class="audify-eq-preset-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms earlier">⏪ -50ms</button>
-          <button id="audify-nudge-fwd-btn" class="audify-eq-preset-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms later">⏩ +50ms</button>
+          <button id="audify-sync-tap-btn" class="audify-eq-cal-btn squeeze" style="flex:1;min-width:140px;background:rgba(212,255,0,0.14);border-color:#D4FF00;color:#D4FF00;font-weight:700;">🎯 SYNC DOWNBEAT NOW</button>
+          <button id="audify-nudge-back-btn" class="audify-eq-cal-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms earlier">⏪ -50ms</button>
+          <button id="audify-nudge-fwd-btn" class="audify-eq-cal-btn squeeze" style="flex:0 0 74px;" title="Nudge visual pulse 50ms later">⏩ +50ms</button>
         </div>
 
         <!-- Quick Presets -->
@@ -524,7 +527,7 @@
     };
 
     // Preset buttons
-    modalEl.querySelectorAll('.audify-eq-preset-btn').forEach(btn => {
+    modalEl.querySelectorAll('.audify-eq-preset-btn[data-preset]').forEach(btn => {
       btn.onclick = () => {
         const pKey = btn.dataset.preset;
         window.__audify_beat_analyzer?.applyPreset(pKey);
@@ -600,7 +603,7 @@
 
   function highlightPreset(key) {
     if (!modalEl) return;
-    modalEl.querySelectorAll('.audify-eq-preset-btn').forEach(btn => {
+    modalEl.querySelectorAll('.audify-eq-preset-btn[data-preset]').forEach(btn => {
       if (key && btn.dataset.preset === key) btn.classList.add('active');
       else btn.classList.remove('active');
     });

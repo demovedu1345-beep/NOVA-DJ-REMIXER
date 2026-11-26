@@ -183,22 +183,26 @@
 
   // Periodic metadata, lockscreen & playback watchdog
   setInterval(() => {
-    syncMediaSessionMetadata();
-    const engine = getEngine();
-    if (engine && !engine.paused && engine.started && !engine.finished) {
-      const live = engine.liveDeck ? engine.liveDeck() : null;
-      if (live?.player && live.status === 'live' && !engine.crossfading && !engine.awaitingStart) {
-        if (typeof live.player.getPlayerState === 'function' && live.player.getPlayerState() === 2) {
-          try {
-            if (!live.awaitingUnmuteGesture) {
-              live.player.unMute?.();
-              live.player.setVolume?.(100);
-            }
-            live.player.playVideo?.();
-          } catch (_) {}
+    try {
+      syncMediaSessionMetadata();
+      const engine = getEngine();
+      if (engine && !engine.paused && engine.started && !engine.finished) {
+        const live = engine.liveDeck ? engine.liveDeck() : null;
+        if (live?.player && live.status === 'live' && !engine.crossfading && !engine.awaitingStart) {
+          if (typeof live.player.getPlayerState === 'function') {
+            try {
+              if (live.player.getPlayerState() === 2) {
+                if (!live.awaitingUnmuteGesture) {
+                  live.player.unMute?.();
+                  live.player.setVolume?.(100);
+                }
+                live.player.playVideo?.();
+              }
+            } catch (_) {}
+          }
         }
       }
-    }
+    } catch (_) {}
   }, 1000);
 
   if (document.readyState === 'loading') {

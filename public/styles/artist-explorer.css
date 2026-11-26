@@ -1512,6 +1512,12 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
   align-items: center;
   gap: 8px;
   pointer-events: none;
+  transition: top 0.2s ease, bottom 0.2s ease, right 0.2s ease;
+}
+.audify-likes-portal.is-wizard {
+  top: 18px;
+  right: 18px;
+  bottom: auto;
 }
 .audify-likes-portal > button {
   pointer-events: auto;
@@ -1521,6 +1527,11 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
     right: 12px;
     bottom: 76px;
     gap: 6px;
+  }
+  .audify-likes-portal.is-wizard {
+    top: 14px;
+    right: 14px;
+    bottom: auto;
   }
 }
 .audify-like-pill,
@@ -1577,7 +1588,7 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
 .audify-liked-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 99998;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -1830,9 +1841,9 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
 .audify-likes-toast {
   position: fixed;
   left: 50%;
-  bottom: 24px;
-  transform: translate(-50%, 16px);
-  z-index: 80;
+  top: 24px;
+  transform: translate(-50%, -16px);
+  z-index: 999999;
   padding: 10px 18px;
   border-radius: 9999px;
   border: 2px solid #c8ff00;
@@ -1846,6 +1857,7 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
   transition: opacity 0.2s ease, transform 0.2s ease;
   max-width: 90vw;
   text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
 }
 .audify-likes-toast.is-visible {
   opacity: 1;
@@ -1937,7 +1949,7 @@ main > div.relative.z-30.flex div.ml-auto button:not(.tabular-nums):not(#audify-
 .audify-google-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -52,7 +52,10 @@
       const raw = localStorage.getItem(ACCOUNTS_CACHE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
+        if (Array.isArray(parsed) && parsed.length) {
+          const valid = parsed.filter((a) => a && typeof a === 'object' && a.id && a.email);
+          if (valid.length) return valid;
+        }
       }
     } catch {}
     return [
@@ -76,7 +79,8 @@
   function saveCachedAccounts(accounts) {
     try {
       if (Array.isArray(accounts) && accounts.length) {
-        localStorage.setItem(ACCOUNTS_CACHE_KEY, JSON.stringify(accounts.slice(0, 8)));
+        const valid = accounts.filter((a) => a && typeof a === 'object' && a.id);
+        localStorage.setItem(ACCOUNTS_CACHE_KEY, JSON.stringify(valid.slice(0, 8)));
       }
     } catch {}
   }
@@ -89,7 +93,7 @@
     try {
       const raw = localStorage.getItem(storageKey(user));
       const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      return (Array.isArray(parsed) ? parsed : []).filter((t) => t && typeof t === 'object' && songKeyOf(t));
     } catch {
       return [];
     }
@@ -97,12 +101,13 @@
 
   function writeLocalLikes(user, likes) {
     try {
-      localStorage.setItem(storageKey(user), JSON.stringify((likes || []).slice(0, 300)));
+      const valid = (likes || []).filter((t) => t && typeof t === 'object' && songKeyOf(t));
+      localStorage.setItem(storageKey(user), JSON.stringify(valid.slice(0, 300)));
     } catch {}
   }
 
   function songKeyOf(track) {
-    if (!track) return '';
+    if (!track || typeof track !== 'object') return '';
     return String(track.song_id || track.id || (Array.isArray(track.youtube_ids) && track.youtube_ids[0]) || track.videoId || '').trim();
   }
 
@@ -111,6 +116,7 @@
     if (!key) return false;
     const yt = Array.isArray(track.youtube_ids) && track.youtube_ids[0] ? String(track.youtube_ids[0]) : String(track.videoId || '');
     return state.likes.some((t) => {
+      if (!t || typeof t !== 'object') return false;
       const tk = songKeyOf(t);
       const tyt = Array.isArray(t.youtube_ids) && t.youtube_ids[0] ? String(t.youtube_ids[0]) : '';
       return tk === key || (yt && tyt && yt === tyt);
@@ -709,16 +715,18 @@
 
     const splash = isSplashScreen();
     const playing = isPlayerActive();
+    const wizard = !splash && !playing;
     const live = getLiveCue();
     const liked = isTrackLiked(live);
     const countLabel = state.user
       ? `♥ ${String(state.user.name || 'LIKED').split(' ')[0].toUpperCase()} (${state.likes.length})`
       : `♥ LIKED${state.likes.length ? ` (${state.likes.length})` : ''}`;
 
-    const sig = `${splash}|${playing}|${liked}|${countLabel}|${songKeyOf(live)}|${state.user?.id || ''}`;
+    const sig = `${splash}|${playing}|${wizard}|${liked}|${countLabel}|${songKeyOf(live)}|${state.user?.id || ''}`;
     if (sig !== state.lastSig) {
       state.lastSig = sig;
       portal.style.display = splash ? 'none' : 'flex';
+      portal.classList.toggle('is-wizard', wizard);
       const likeBtn = portal.querySelector('#audify-like-track-btn');
       if (likeBtn) {
         likeBtn.style.display = playing ? 'inline-flex' : 'none';
@@ -730,10 +738,23 @@
         hBtn.textContent = countLabel;
       }
     }
-
-    if (state.modalOpen) renderModal();
-    if (state.chooserOpen) renderGoogleChooser();
   }
+
+  // Intercept top header SIGN IN button & disclaimer links
+  document.addEventListener('click', (e) => {
+    const signinBtn = e.target.closest('a[href*="/api/auth/google"], button[data-action="signin"], .nav-signin, [data-auth="signin"]');
+    if (signinBtn) {
+      e.preventDefault();
+      openGoogleChooser();
+      return;
+    }
+    const termLink = e.target.closest('.audify-google-disclaimer a');
+    if (termLink) {
+      e.preventDefault();
+      showToast('Audify uses standard Google OAuth 2.0. Optional login for sync only.');
+      return;
+    }
+  }, true);
 
   const prevHook = window.onAudifySongChange;
   window.onAudifySongChange = function (songInfo = {}) {
@@ -746,6 +767,7 @@
 
   window.__audifyLikes = {
     open: openModal,
+    signIn: openGoogleChooser,
     openChooser: openGoogleChooser,
     closeChooser: closeGoogleChooser,
     signOut: googleSignOut,

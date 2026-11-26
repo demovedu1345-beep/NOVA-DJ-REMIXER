@@ -2112,13 +2112,18 @@
     }
   };
 
-  let activeMixStyle = localStorage.getItem('audify_mix_style') || 'drum_roll';
+  let activeMixStyle = 'drum_roll';
+  try {
+    activeMixStyle = localStorage.getItem('audify_mix_style') || 'drum_roll';
+  } catch (_) {}
 
   window.setAudifyMixStyle = function (style) {
     if (SOUND_FX[style]) {
       activeMixStyle = style;
-      localStorage.setItem('audify_mix_style', style);
-      localStorage.setItem('audify_mix_action', style);
+      try {
+        localStorage.setItem('audify_mix_style', style);
+        localStorage.setItem('audify_mix_action', style);
+      } catch (_) {}
       const label = document.getElementById('audify-mix-label');
       if (label) label.textContent = getMixStyleLabel(style);
     }
@@ -2128,7 +2133,9 @@
     const validModes = ['auto', 'soft', 'curtain', 'fusion', 'vortex', 'chromatic-wave'];
     if (validModes.includes(mode)) {
       auroraMode = mode;
-      localStorage.setItem('audify_aurora_mode', mode);
+      try {
+        localStorage.setItem('audify_aurora_mode', mode);
+      } catch (_) {}
       const label = document.getElementById('audify-aurora-label');
       if (label) label.textContent = getAuroraModeLabel(mode);
     }

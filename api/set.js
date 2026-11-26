@@ -117,7 +117,7 @@ function slugMatchesSubtype(slug, subtype, requestedLangs = []) {
 
 function catMatchesLang(catLang, requestedLangs) {
   const cl = (catLang || '').toLowerCase();
-  const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi');
+  const onlyHindi = requestedLangs.includes('hindi') && !requestedLangs.includes('english') && !requestedLangs.includes('language') && !requestedLangs.includes('odia') && !requestedLangs.includes('south') && !requestedLangs.includes('punjabi') && !requestedLangs.includes('marathi') && !requestedLangs.includes('gujarati') && !requestedLangs.includes('kannada') && !requestedLangs.includes('marwadi') && !requestedLangs.includes('bhojpuri') && !requestedLangs.includes('haryanvi');
   const onlyEnglish = requestedLangs.includes('english') && !requestedLangs.includes('hindi') && !requestedLangs.includes('language');
   if (onlyHindi) return cl === 'hindi';
   if (onlyEnglish) return cl === 'english';
@@ -125,8 +125,9 @@ function catMatchesLang(catLang, requestedLangs) {
   for (const rl of requestedLangs) {
     if (cl === rl) return true;
     if (rl === 'language' && cl !== 'hindi' && cl !== 'english') return true;
-    if ((rl === 'tamil-telugu' || rl === 'south') && (cl === 'south' || cl === 'tamil-telugu' || cl === 'tamil' || cl === 'telugu')) return true;
-    if ((rl === 'haryanvi-bhojpuri' || rl === 'regional') && (cl === 'haryanvi-bhojpuri' || cl === 'regional' || cl === 'haryanvi' || cl === 'bhojpuri')) return true;
+    if (rl === 'punjabi' && cl === 'punjabi') return true;
+    if ((rl === 'tamil-telugu' || rl === 'south' || rl === 'tamil' || rl === 'telugu') && (cl === 'south' || cl === 'tamil-telugu' || cl === 'tamil' || cl === 'telugu')) return true;
+    if ((rl === 'haryanvi-bhojpuri' || rl === 'regional' || rl === 'haryanvi' || rl === 'bhojpuri') && (cl === 'haryanvi-bhojpuri' || cl === 'regional' || cl === 'haryanvi' || cl === 'bhojpuri')) return true;
     if (rl === 'gujarati' && (cl === 'gujarati' || cl === 'garba')) return true;
     if (rl === 'marathi' && cl === 'marathi') return true;
     if (rl === 'marwadi' && (cl === 'marwadi' || cl === 'rajasthani')) return true;
@@ -214,10 +215,37 @@ function buildSetFromCuratedDb(body) {
     ? body.answers
     : (tokenData?.answers || {});
   const requestedArtist = body?.artist || answers.artist || tokenData?.artist;
+
   const rawLangs = answers.languages || answers.language || (body?.lang ? [body.lang] : (tokenData?.lang ? [tokenData.lang] : []));
   const requestedLangs = (Array.isArray(rawLangs) ? rawLangs : [rawLangs]).filter(Boolean).map(l => String(l).toLowerCase());
   const rawSubs = answers.subtypes || (body?.kind ? [body.kind] : (tokenData?.kind ? [tokenData.kind] : []));
   const requestedSubtypes = (Array.isArray(rawSubs) ? rawSubs : [rawSubs]).filter(Boolean).map(s => String(s).toLowerCase());
+
+  // Deep extraction for category, genre, prompt, preset, mood, vibe, style, subtype
+  const inputGenre = String(body?.genre || body?.category || body?.subtype || body?.style || body?.preset || body?.mood || body?.vibe || '').trim().toLowerCase();
+  if (inputGenre) {
+    if (inputGenre.includes(':')) {
+      const [gLang, gSub] = inputGenre.split(':');
+      if (gLang && !requestedLangs.includes(gLang)) requestedLangs.push(gLang);
+      if (gSub && !requestedSubtypes.includes(inputGenre)) requestedSubtypes.push(inputGenre, gSub);
+    } else if (inputGenre.startsWith('hindi-') || inputGenre.startsWith('english-') || inputGenre.startsWith('punjabi-') || inputGenre.startsWith('gujarati-') || inputGenre.startsWith('marathi-') || inputGenre.startsWith('kannada-') || inputGenre.startsWith('odia-') || inputGenre.startsWith('marwadi-') || inputGenre.startsWith('tamil-telugu-') || inputGenre.startsWith('haryanvi-bhojpuri-')) {
+      const gLang = inputGenre.split('-')[0];
+      const gSub = inputGenre.slice(gLang.length + 1);
+      const mappedLang = gLang === 'tamil' ? 'tamil-telugu' : gLang;
+      if (!requestedLangs.includes(mappedLang)) requestedLangs.push(mappedLang);
+      if (!requestedSubtypes.includes(inputGenre)) requestedSubtypes.push(inputGenre, `${mappedLang}:${gSub}`, gSub);
+    } else if (['hindi', 'english', 'punjabi', 'marathi', 'gujarati', 'kannada', 'odia', 'marwadi', 'bhojpuri', 'haryanvi', 'tamil', 'telugu', 'south', 'regional', 'language'].includes(inputGenre)) {
+      const mapped = inputGenre === 'tamil' || inputGenre === 'telugu' ? 'tamil-telugu' : (inputGenre === 'bhojpuri' || inputGenre === 'haryanvi' ? 'haryanvi-bhojpuri' : inputGenre);
+      if (!requestedLangs.includes(mapped)) requestedLangs.push(mapped);
+      if (inputGenre !== 'hindi' && inputGenre !== 'english') {
+        const subTag = `language:${inputGenre}`;
+        if (!requestedSubtypes.includes(subTag)) requestedSubtypes.push(subTag, inputGenre);
+      }
+    } else {
+      if (!requestedSubtypes.includes(inputGenre)) requestedSubtypes.push(inputGenre);
+    }
+  }
+
   const energy = answers.energy || 'peak';
   const excludedIds = new Set([
     ...(Array.isArray(body?.exclude) ? body.exclude : []),
@@ -418,22 +446,28 @@ function buildSetFromCuratedDb(body) {
 
   collectFromPool(candidatePool, false);
 
-  // If all songs in the chosen subtype were already played (fetchMore), first try other categories of the SAME language
-  if (cues.length === 0 && requestedLangs.length > 0) {
-    const sameLangPool = [];
-    for (const cat of allCategories) {
-      if (catMatchesLang(cat.lang, requestedLangs)) {
-        for (const s of shuffleArray(cat.songs || []).slice(0, 30)) {
-          sameLangPool.push({ song: s, cat });
+  // If candidate pool tracks were already played (fetchMore / pagination)
+  if (cues.length === 0) {
+    if (requestedSubtypes.length > 0) {
+      // Strictly reshuffle the requested subtype pool without leaking cross-genre tracks
+      collectFromPool(candidatePool, true);
+    } else if (requestedLangs.length > 0) {
+      // If only language was requested (no specific subtype), try other categories of the same language
+      const sameLangPool = [];
+      for (const cat of allCategories) {
+        if (catMatchesLang(cat.lang, requestedLangs)) {
+          for (const s of shuffleArray(cat.songs || []).slice(0, 30)) {
+            sameLangPool.push({ song: s, cat });
+          }
         }
       }
+      collectFromPool(shuffleArray(sameLangPool), false);
+      if (cues.length === 0) {
+        collectFromPool(candidatePool, true);
+      }
+    } else {
+      collectFromPool(candidatePool, true);
     }
-    collectFromPool(shuffleArray(sameLangPool), false);
-  }
-
-  // If literally every song in the language was exhausted, reshuffle the requested pool cleanly
-  if (cues.length === 0) {
-    collectFromPool(candidatePool, true);
   }
 
   return {
