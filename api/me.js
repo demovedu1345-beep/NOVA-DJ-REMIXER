@@ -115,6 +115,20 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = await readJsonBody(req);
+      if (body?.action === 'google_account_select' && body?.email) {
+        const email = String(body.email).trim().toLowerCase().slice(0, 120);
+        const name = String(body.name || email.split('@')[0] || 'Google User').trim().slice(0, 80);
+        const id = 'google_' + crypto.createHash('sha256').update(email).digest('hex').slice(0, 24);
+        const user = {
+          id,
+          email,
+          name,
+          picture: body.picture ? String(body.picture).slice(0, 300) : null,
+          provider: 'google',
+        };
+        const accounts = setSessionAndAccountCookies(res, req, user);
+        return sendJson(res, 200, { ok: true, user, accounts });
+      }
       if (body?.action === 'google_credential' && body?.credential) {
         const clientId = process.env.GOOGLE_CLIENT_ID;
         if (!clientId) return sendJson(res, 400, { ok: false, error: 'GOOGLE_CLIENT_ID not configured' });
